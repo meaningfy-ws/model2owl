@@ -38,7 +38,8 @@
         <xsl:variable name="doc3" select="fn:replace($doc2, '&lt;/font&gt;', '&lt;/foreign&gt;')"/>
         <xsl:variable name="doc4" select="fn:replace($doc3, 'nbsp', '#x00A0')"/>
         <xsl:variable name="doc5" select="fn:replace($doc4, '\$inet://', '')"/>
-        <xsl:value-of select="$doc5"/>
+        <xsl:variable name="doc6" select="fn:replace($doc5, '&quot;', '')"/>
+        <xsl:value-of select="$doc6"/>
     </xsl:function>
 
 </xsl:stylesheet>
