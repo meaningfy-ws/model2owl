@@ -178,8 +178,8 @@ generate-html-docs-from-rdf: get-widoco
 	@java -jar widoco/widoco.jar -ontFile ${WIDOCO_RDF_INPUT_FILE_PATH} -outFolder ${WIDOCO_OUTPUT_FOLDER_PATH}  -getOntologyMetadata -uniteSections -webVowl
 
 generate-respec:
-	@source model2owl-venv/bin/activate
-	@jinja -d ${RESPEC_INPUT_JSON_PATH} respec-resources/respec-template.j2 -o ${RESPEC_OUTPUT_FILE_PATH}
+	@source model2owl-venv/bin/activate; \
+	jinja -d ${RESPEC_INPUT_JSON_PATH} respec-resources/respec-template.j2 -o ${RESPEC_OUTPUT_FILE_PATH}
 
 SHELL=/bin/bash -o pipefail
 BUILD_PRINT = \e[1;34mSTEP:
