@@ -45,6 +45,10 @@ get-rdflib:
 	@echo Installing rdflib
 	@source model2owl-venv/bin/activate && pip install rdflib
 
+get-jinja:
+	@echo Installing jinja
+	@source model2owl-venv/bin/activate && pip install jinja-cli
+
 get-widoco:
 	@echo Installing widoco
 	@mkdir -p ${MODEL2OWL_FOLDER}/widoco
@@ -168,6 +172,9 @@ convert-rdf-to-rdf:
 generate-html-docs-from-rdf: get-widoco
 	@echo ${WIDOCO_RDF_INPUT_FILE_PATH}
 	@java -jar widoco/widoco.jar -ontFile ${WIDOCO_RDF_INPUT_FILE_PATH} -outFolder ${WIDOCO_OUTPUT_FOLDER_PATH}  -getOntologyMetadata -uniteSections -webVowl
+
+generate-respec:
+	@jinja -d ${RESPEC_INPUT_JSON_PATH} respec_resources/respec-template.j2 -o ${RESPEC_OUTPUT_FILE_PATH}
 
 SHELL=/bin/bash -o pipefail
 BUILD_PRINT = \e[1;34mSTEP:
