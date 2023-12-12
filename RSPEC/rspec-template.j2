@@ -2,6 +2,7 @@
 {% set language = "en" %} {% set sortattr = "sort" %}
 
 <head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     {% set name = metadata.title|lower|replace(' ', '-') %}
 	
     <meta charset="utf-8" />
@@ -10,85 +11,106 @@
     <script class="remove">
     // All config options at https://respec.org/docs/
 
-	var myeditors = [
-	{% for role, contributors in contributors | groupby("role") %}
-	{% if role == "E" %}
-	    {% set editors = contributors|sort(attribute='last_name') %}
-	    {% if editors %}
-		{% for editor in editors %}
-		   {
-		    name: "{{ editor.first_name }} {{ editor.last_name}}",
-		      {% if editor.affiliation.website %}
-		    companyURL: "{{ editor.affiliation.website }}",
-		      {% endif %}
-		      {% if editor.affiliation.name %}
-		    company: "{{ editor.affiliation.name }}",
-		      {% endif %}
-		      {% if editor.email %}
-		    mailto: "{{ editor.email }}"
-		      {% endif %}
-		    }
-		{% if not loop.last %}, {% endif %}
-		{% endfor %}
-             {% endif %}
-        {% endif %}
-	{% endfor %}
-		]
 
-	var myauthors = [
-	{% for role, contributors in contributors | groupby("role") %}
-	{% if role == "A" %}
-	    {% set editors = contributors|sort(attribute='last_name') %}
-	    {% if editors %}
-		{% for editor in editors %}
-		   {
-		    name: "{{ editor.first_name }} {{ editor.last_name}}",
-		      {% if editor.affiliation.website %}
-		    companyURL: "{{ editor.affiliation.website }}",
-		      {% endif %}
-		      {% if editor.affiliation.name %}
-		    company: "{{ editor.affiliation.name }}",
-		      {% endif %}
-		      {% if editor.email %}
-		    mailto: "{{ editor.email }}"
-		      {% endif %}
-		    }
-		{% if not loop.last %}, {% endif %}
-		{% endfor %}
-             {% endif %}
-        {% endif %}
-	{% endfor %}
-		]
 		
 	function quickreference() {
 		$('#table-quickoverview').DataTable();
 	};
 
+    	var editors = [
+	    {% if metadata.editors %}
+		{% for editor in metadata.editors %}
+		   {
+		    name: "{{ editor }}",
+		    companyURL: "",
+		    company: "",
+		    mailto: ""
+
+		    }
+		{% if not loop.last %}, {% endif %}
+		{% endfor %}
+             {% endif %}
+		]
+
+        	var authors = [
+	    {% if metadata.authors %}
+		{% for author in metadata.authors %}
+		   {
+		    name: "{{ author }}",
+		    companyURL: "",
+		    company: "",
+		    mailto: ""
+
+		    }
+		{% if not loop.last %}, {% endif %}
+		{% endfor %}
+             {% endif %}
+		]
+
    {% block respecconfig %}
     var respecConfig = {
       postProcess: [quickreference],
-      edDraftURI: "{{metadata.navigation.self}}",
-      latestVersion: "{{metadata.navigation.prev}}",
-      specStatus: "LS",
       publishDate: "{{ metadata.issued }}",
-      editors: myeditors,
-      authors: myauthors,
-      github: "SEMICeu/DCAT-AP",
       shortName: "{{metadata.title}}",
+        editors: editors,
+      authors: authors,
+        github: "{{ metadata.github }}",
       xref: "web-platform",
-      logos: [{
-        src: "https://github.com/SEMICeu/Core-Person-Vocabulary/blob/v2.0.0/releases/2.00/html/semic-icon.png",
-        url: "https://semic.eu",
-        alt: "SEMIC",
-        width: 154,
-        height: 140,
-        id: "semic-logo",
-      },],
       generatedSubtitle: "",
       additionalCopyrightHolders: ""
     };
 
     {% endblock %}
+{##}
+{#       {% block respecconfig %}#}
+{#    var respecConfig = {#}
+{#      postProcess: [quickreference],#}
+      {#edDraftURI: "{{metadata.navigation.self}}",#}
+      {#latestVersion: "{{metadata.navigation.self}}",#}
+{#      specStatus: "LS",#}
+{#      publishDate: "{{ metadata.issued }}",#}
+{#      editors: [],#}
+{#      authors: [],#}
+{#      github: "OP-TED/ePO",#}
+{#      shortName: "{{metadata.title}}",#}
+{#      xref: "web-platform",#}
+{#      doJsonLd: true,#}
+{#      logos: [{#}
+{#        src: "https://github.com/SEMICeu/Core-Person-Vocabulary/blob/v2.0.0/releases/2.00/html/semic-icon.png",#}
+{#        url: "https://semic.eu",#}
+{#        alt: "SEMIC",#}
+{#        width: 154,#}
+{#        height: 140,#}
+{#        id: "semic-logo",#}
+{#      },],#}
+{#      generatedSubtitle: "",#}
+{#      additionalCopyrightHolders: "",#}
+{#      localBiblio: {#}
+{#        "ISA":{#}
+{#           "href":"https://ec.europa.eu/isa/",#}
+{#           "title":"Interoperability Solutions for European Public Administrations (ISA)",#}
+{#           "publisher":"European Commission"#}
+{#          },#}
+{#        "ISA2":{#}
+{#          "href":"https://ec.europa.eu/isa2/",#}
+{#          "title":"Interoperability solutions for public administrations, businesses and citizens (ISA²)",#}
+{#          "publisher":"European Commission"#}
+{#        },#}
+{#        "SEMIC":{#}
+{#          "href":"https://ec.europa.eu/isa2/actions/improving-semantic-interoperability-european-egovernment-systems_en",#}
+{#          "title":"Interoperability solutions for public administrations, businesses and citizens (ISA²). Improving semantic interoperability in European eGovernment systems",#}
+{#          "publisher":"European Commission"#}
+{#         },#}
+{#        "IdentifierGuidelines":{#}
+{#          "href":"https://github.com/SEMICeu/DCAT-AP/blob/2.x.y-draft/releases/2.x.y/usageguide-identifiers.md",#}
+{#          "title":"Guidelines on the management of identifiers",#}
+{#          "publisher":"European Commission"#}
+{#         }#}
+{##}
+{#      }#}
+{#    };#}
+{##}
+{#    {% endblock %}#}
 
     </script>
     <style>
@@ -100,9 +122,9 @@
     </style>
     {# -- documentation indication by nunjuncs template language
        Copyright must be specified otherwise Respec generates a value
-     #} 
+     #}
     <p class="copyright">
-        Copyright © 2022
+        Copyright © 2023
     </p>
     {# <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">SEMIC Editor's Draft</a><time class="dt-published" datetime="2022-11-07">07 November 2022</time></p> #}
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -117,7 +139,7 @@
 {% block summary %}
 <section id="abstract">
     <h2>Summary</h2>
-        {% if metadata.description %}{{ metadata.description[language] }}{% endif %}
+        {% if metadata.description %}{{ metadata.description }}{% endif %}
 </section>
 {% endblock %}
 
@@ -157,12 +179,6 @@ A <strong>Data Portal</strong> is a Web-based system that contains a data catalo
                    data-placement="right">{{ entity.label[language] }}</a>
 
             </h3>
-	        <!-- XXX an image in the h3 will break the rendering of the Table Of Contents of Respec -->
-		<!-- outcomment github feedback possibility
-                <a href="{{ metadata.feedbackurl }}/new?title=Issue%20for%20{{ entity.name }}&body=Explain%20your%20issue"}}>
-                   <img src="html/callout.png" loading="lazy" alt="(create issue)" width="20" height="20"/>
-		</a>
-		-->
             <dl>
                 <dt>
                     Definition
@@ -223,9 +239,9 @@ A <strong>Data Portal</strong> is a Web-based system that contains a data catalo
                             <th class="data-table__header-title--sortable" style="width:30%">
                                 Definition
                             </th>
-                            <th class="data-table__header-title--sortable" style="width:30%">
-                                Usage
-                            </th>
+{#                            <th class="data-table__header-title--sortable" style="width:30%">#}
+{#                                Usage#}
+{#                            </th>#}
                         </tr>
                     </thead>
                     <tbody class="supertype">
@@ -235,10 +251,13 @@ A <strong>Data Portal</strong> is a Web-based system that contains a data catalo
                                 resource="{{ prop.uri }}"
                                 class="class mandatory">
                                 <td>
-				    <a href="{{ metadata.feedbackurl }}/new?title=Issue%20for%20{{ prop.label[language] }}%20in%20{{ entity.label[language]}}&body=Explain%20your%20issue%20for%20{{ metadata.navigation.self }}%23{{ (entity.label[language] ~ '.' ~ prop.label[language]) | replace(" ","") | urlencode }}" target="_blank" rel="noopener noreferrer" >
+
+                                    <a href="{{ metadata.feedbackurl }}/new?title=Issue%20for%20{{ prop.label[language] }}%20in%20{{ entity.label[language]}}" target="_blank" rel="noopener noreferrer" >
 					    <!--                                        <i class="icon">[o]</i> -->
-                                        <img src="data:image/jpeg;base64,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" loading="lazy" alt="[o]" width="100" height="100"/>
+{#                                        <img src="https://icon2.cleanpng.com/20180426/plq/kisspng-line-angle-font-5ae26353b5d786.0490384515247860037448.jpg" loading="lazy" alt="[o]" width="100" height="100"/>#}
+                                    <i class="fa-regular fa-message"></i>
                                     </a>
+
                                 </td>
                                 <td>
                                         <a href="{{ prop.uri }}"
@@ -248,15 +267,10 @@ A <strong>Data Portal</strong> is a Web-based system that contains a data catalo
                                         {{ prop.label[language] }}</a>
                                 </td>
                                 <td>
-                                    {% for range in prop.scopedrange %}
-                                        {% if range['range_uri'] == range['range_puri'] %}
-                                            <a href="#{{ range['range_label'][language] | replace(" ","") | urlencode }}"
-                                               data-toggle="tooltip"
-                                               data-content="{{ range['range_puri'] }}"
-                                               data-placement="right">{{ range['range_label'][language] }}</a>
-                                        {% else %}
-                                            <a href="#{{ range['range_label'][language] | replace(" ","") | urlencode }}" data-placement="right">{{ range['range_label'][language] }}</a>
-                                        {% endif %}
+                                    {% for range in prop.range %}
+
+                                            <a href="{{ range['uri'] }}" data-placement="right">{{ range['name'] }}</a>
+
                                     {% endfor %}
                                 </td>
                                 <td>
@@ -265,16 +279,8 @@ A <strong>Data Portal</strong> is a Web-based system that contains a data catalo
                                 <td property="rdfs:comment">
                                     {{ prop.description[language] }}
                                 </td>
-                                <td property="skos:scopeNote">
-                                    {{ prop.usage[language] | safe }}
-                                </td>
-				<!--
-                                <td>
-                                    {% if prop['codelist_uri'] %}<a href="{{ prop['codelist_uri'] }}">Link</a>{% endif %}
-                                </td>
-				-->
-{#                                <td>#}
-{#                                    {% if prop.rawTags['DCAT'] %}<a href="{{ prop.rawTags['DCAT'] }}">Link</a>{% endif %}#}
+{#                                <td property="skos:scopeNote">#}
+{#                                    {{ prop.usage[language] | safe }}#}
 {#                                </td>#}
                             </tr>
                         {% endfor %}
@@ -297,59 +303,6 @@ The main entities are those that form the core of the Application Profile.
    {{ renderentity(entity) }}
 {#{% endif %}#}
 {% endfor %}
-</section>
-
-
-    <section>
-        <h2>
-            Datatypes
-        </h2>
-
-	The following datatypes are used within this specification.
-
-	<table class="data-table simple" id="table-mandatory-classes">
-	    <thead>
-		<tr class="data-table__header">
-		    <th class="data-table__header-title--sortable">
-		    </th>
-		    <th class="data-table__header-title--sortable data-table__header-title--sortable-active">
-			Class
-		    </th>
-		    <th class="data-table__header-title--sortable">
-			Definition
-		    </th>
-		</tr>
-	    </thead>
-	    <tbody class="supertype">
-            {% for entity in datatypes | sort(attribute=sortattr)%}
-		<tr><td>
-                   <a href="{{ metadata.feedbackurl }}/new?title=Issue%20for%20{{ entity.name }}&body=Explain%20your%20issue"}}>
-                     <img src="html/callout.png" loading="lazy" alt="(create issue)" width="50" height="50"/>
-		   </a>
-		</td><td>
-                {% if entity.scopeduri %}
-                    <div id="{{ entity.label[language] | replace(" ","") | urlencode }}">
-                        <a href="{{ entity.scopeduri }}"
-                           data-toggle="tooltip"
-                           data-content="{{ entity.uri }}"
-                           data-placement="right">{{ entity.label[language] }}</a>
-                    </div>
-                {% else %}
-                    <div id="{{ entity.label[language] | replace(" ","") | urlencode }}">
-                        <a href="{{ entity.uri }}"
-                           data-toggle="tooltip"
-                           data-content="{{ entity.uri }}"
-                           data-placement="right">{{ entity.label[language] }}</a>
-                    </div>
-                {% endif %}
-		</td><td>
-                    {{ entity.description[language] }}
-		</td></tr>
-            {%- endfor %}
-            </tbody>
-	</table>
-
-
 </section>
 
 </body>
