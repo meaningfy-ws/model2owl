@@ -25,15 +25,15 @@
     
     <xd:doc scope="stylesheet">
         <xd:desc>
-            <xd:p><xd:b>Created on:</xd:b> Mar 21, 2020</xd:p>
-            <xd:p><xd:b>Author:</xd:b> lps</xd:p>
-            <xd:p>This module constructs the core OWL ontology</xd:p>
+            <xd:p><xd:b>Created on:</xd:b> July 12, 2024</xd:p>
+            <xd:p><xd:b>Author:</xd:b> Dragos</xd:p>
+            <xd:p>This module transforms OWL ontology to linkML</xd:p>
         </xd:desc>
     </xd:doc>
     
     
-    <xsl:import href="common/selectors.xsl"/>
     <xsl:import href="linkml/elements-linkml.xsl"/>
+    <xsl:import href="../config-proxy.xsl"/>
 
     <xsl:output method="text" encoding="UTF-8" byte-order-mark="no" indent="yes"
         cdata-section-elements="lines"/>
@@ -41,10 +41,40 @@
     
     
     <xd:doc>
-        <xd:desc>The main template for OWL core file</xd:desc>
+        <xd:desc>The main template for linkML file</xd:desc>
     </xd:doc>
     <xsl:template match="/">
-            <xsl:apply-templates/>
+        <!--        -\-\-\-\-\-\-\- metadata section -\-\-\-\-\-\-\-\-\-\-->
+        <xsl:text>id: </xsl:text><xsl:value-of select="$base-ontology-uri"/>
+        <xsl:text>&#10;</xsl:text>
+        <xsl:text>name: </xsl:text><xsl:value-of select="$ontologyTitleCore"/>
+        <xsl:text>&#10;</xsl:text>
+        <xsl:text>description: </xsl:text><xsl:value-of select="fn:normalize-space(f:formatDocString($ontologyDescriptionCore))"/>
+        <xsl:text>&#10;</xsl:text>
+        <!--        -\-\-\-\-\-\-\- prefixes section -\-\-\-\-\-\-\-\-\-\-->
+        <xsl:variable name="listOfUsedPrefixes" select="f:getAllNamespacesUsed(root())"/>
+        <xsl:text>prefixes: </xsl:text>
+        <xsl:text>&#10;</xsl:text>
+        <xsl:for-each select="$listOfUsedPrefixes">
+            <xsl:variable name="namespace" select="."/>
+            <xsl:text>  </xsl:text>
+            <xsl:value-of select="fn:concat($namespace,': ')"/>
+            <xsl:value-of select="f:getNamespaceValues($namespace, $namespacePrefixes)"/>
+            <xsl:text>&#10;</xsl:text>
+        </xsl:for-each>
+        
+        <!--        -\-\-\-\-\-\-\- types section -\-\-\-\-\-\-\-\-\-\-->
+        <xsl:text>&#10;types:&#10;  string:&#10;    base: xsd:string&#10;  boolean:&#10;    base: xsd:boolean&#10;  integer:&#10;    base: xsd:integer&#10;</xsl:text>
+        <!--        -\-\-\-\-\-\-\- classes section -\-\-\-\-\-\-\-\-\-\-->
+        <xsl:text>&#10;classes:&#10;</xsl:text>
+        
+        <!-- Process all Class elements -->
+        <xsl:apply-templates select="//element[@xmi:type='uml:Class']"/>
+        <!--        -\-\-\-\-\-\-\- enums section -\-\-\-\-\-\-\-\-\-\-->
+        <xsl:text>&#10;enums:&#10;</xsl:text>
+        
+        <!-- Process all Enumeration elements -->
+        <xsl:apply-templates select="//element[@xmi:type='uml:Enumeration']"/>
     </xsl:template>
     
 
