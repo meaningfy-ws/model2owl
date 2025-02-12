@@ -54,17 +54,21 @@
         <!--        -\-\-\-\-\-\-\- prefixes section -\-\-\-\-\-\-\-\-\-\-->
         <xsl:variable name="listOfUsedPrefixes" select="f:getAllNamespacesUsed(root())"/>
         <xsl:text>prefixes: </xsl:text>
+        
         <xsl:text>&#10;</xsl:text>
-        <xsl:for-each select="$listOfUsedPrefixes">
-            <xsl:variable name="namespace" select="."/>
+        <xsl:for-each select="$namespacePrefixes//*:prefixes/*:prefix[@importURI]">
+            <xsl:variable name="namespace" select="@name"/>
             <xsl:text>  </xsl:text>
-            <xsl:value-of select="fn:concat($namespace,': ')"/>
-            <xsl:value-of select="f:getNamespaceValues($namespace, $namespacePrefixes)"/>
+            <xsl:value-of select="fn:concat($namespace, ': ')"/>
+            <xsl:value-of select="@importURI"/>
             <xsl:text>&#10;</xsl:text>
         </xsl:for-each>
+        <xsl:text>&#10;</xsl:text>
+        <xsl:text>imports:&#xA;  - linkml:types&#xA;</xsl:text>
+        <xsl:text>default_range: string&#xA;</xsl:text>
         
-        <!--        -\-\-\-\-\-\-\- types section -\-\-\-\-\-\-\-\-\-\-->
-        <xsl:text>&#10;types:&#10;  string:&#10;    base: xsd:string&#10;  boolean:&#10;    base: xsd:boolean&#10;  integer:&#10;    base: xsd:integer&#10;</xsl:text>
+<!--        <!-\-        -\\-\\-\\-\\-\\-\\-\\- types section -\\-\\-\\-\\-\\-\\-\\-\\-\\-\\-\->
+        <xsl:text>&#10;types:&#10;  string:&#10;    base: xsd:string&#10;  boolean:&#10;    base: xsd:boolean&#10;  integer:&#10;    base: xsd:integer&#10;</xsl:text>-->
         <!--        -\-\-\-\-\-\-\- classes section -\-\-\-\-\-\-\-\-\-\-->
         <xsl:text>&#10;classes:&#10;</xsl:text>
         

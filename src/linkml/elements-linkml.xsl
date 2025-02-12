@@ -237,9 +237,9 @@
             <xsl:value-of
                 select="
                     if (fn:contains($targetRoleName, ':')) then
-                        fn:concat(fn:substring-after($targetRoleName, ':'),$range)
+                        fn:substring-after($targetRoleName, ':')
                     else
-                        fn:concat($targetRoleName,$range)"/>
+                        $targetRoleName"/>
             <xsl:text>:&#10;</xsl:text>
             <xsl:text>        slot_uri: </xsl:text>
             <xsl:value-of select="$targetRoleName"/>
@@ -288,9 +288,9 @@
             <xsl:value-of
                 select="
                     if (fn:contains($sourceRoleName, ':')) then
-                        fn:concat(fn:substring-after($sourceRoleName, ':'), $range)
+                        fn:substring-after($sourceRoleName, ':')
                     else
-                        fn:concat($sourceRoleName, $range)"/>
+                        $sourceRoleName"/>
             <xsl:text>:&#10;</xsl:text>
             <xsl:text>        slot_uri: </xsl:text>
             <xsl:value-of select="$sourceRoleName"/>
@@ -362,7 +362,7 @@
             <xsl:when test="count($enumerationAttributes) > 0">
                 <xsl:for-each select="$enumerationAttributes">
                     <xsl:text>      </xsl:text>
-                    <xsl:value-of select="replace(@name, '.', '_')"/>
+                    <xsl:value-of select="if (contains(./@name, '.')) then replace(./@name, '\.', '_') else ./@name"/>
                     <xsl:text>:&#10;        description: </xsl:text>
                     <xsl:value-of select="replace(fn:normalize-space(f:formatDocString(./documentation/@value)),':\s+',':')"/>
                     <xsl:text>&#10;</xsl:text>

@@ -38,5 +38,5 @@
     <prefix name="at-voc-new" value="http://publications.europa.eu/resource/authority/new/"/>
     <prefix name="legal" value="http://www.w3.org/ns/legal-entity#"/>
     <prefix name="adms" value="http://www.w3.org/ns/adms#" importURI="http://www.w3.org/ns/adms"/>
-    
+    <prefix name="linkml" value="https://w3id.org/linkml/" importURI="https://w3id.org/linkml/"/>
 </prefixes>

@@ -20,44 +20,44 @@
     
     <xsl:choose>
         <!-- XSD Data Types -->
-        <xsl:when test="$type = 'xsd:anyURI'">Uri</xsl:when>
-        <xsl:when test="$type = 'xsd:boolean'">Boolean</xsl:when>
-        <xsl:when test="$type = 'xsd:byte'">Integer</xsl:when>
-        <xsl:when test="$type = 'xsd:date'">Date</xsl:when>
-        <xsl:when test="$type = 'xsd:dateTime'">Datetime</xsl:when>
-        <xsl:when test="$type = 'xsd:dateTimeStamp'">Datetime</xsl:when>
-        <xsl:when test="$type = 'xsd:time'">Time</xsl:when>
-        <xsl:when test="$type = 'xsd:decimal'">Decimal</xsl:when>
-        <xsl:when test="$type = 'xsd:double'">Double</xsl:when>
-        <xsl:when test="$type = 'xsd:float'">Float</xsl:when>
-        <xsl:when test="$type = 'xsd:int'">Integer</xsl:when>
-        <xsl:when test="$type = 'xsd:integer'">Integer</xsl:when>
-        <xsl:when test="$type = 'xsd:language'">String</xsl:when>
-        <xsl:when test="$type = 'xsd:long'">Integer</xsl:when>
-        <xsl:when test="$type = 'xsd:Name'">String</xsl:when>
-        <xsl:when test="$type = 'xsd:NCName'">String</xsl:when>
-        <xsl:when test="$type = 'xsd:NMTOKEN'">String</xsl:when>
-        <xsl:when test="$type = 'xsd:negativeInteger'">Integer</xsl:when>
-        <xsl:when test="$type = 'xsd:nonNegativeInteger'">Integer</xsl:when>
-        <xsl:when test="$type = 'xsd:nonPositiveInteger'">Integer</xsl:when>
-        <xsl:when test="$type = 'xsd:normalizedString'">String</xsl:when>
-        <xsl:when test="$type = 'xsd:positiveInteger'">Integer</xsl:when>
-        <xsl:when test="$type = 'xsd:short'">Integer</xsl:when>
-        <xsl:when test="$type = 'xsd:string'">String</xsl:when>
-        <xsl:when test="$type = 'xsd:token'">String</xsl:when>
-        <xsl:when test="$type = 'xsd:unsignedByte'">Integer</xsl:when>
-        <xsl:when test="$type = 'xsd:unsignedInt'">Integer</xsl:when>
-        <xsl:when test="$type = 'xsd:unsignedLong'">Integer</xsl:when>
-        <xsl:when test="$type = 'xsd:unsignedShort'">Integer</xsl:when>
+        <xsl:when test="$type = 'xsd:anyURI'">uri</xsl:when>
+        <xsl:when test="$type = 'xsd:boolean'">boolean</xsl:when>
+        <xsl:when test="$type = 'xsd:byte'">integer</xsl:when>
+        <xsl:when test="$type = 'xsd:date'">date</xsl:when>
+        <xsl:when test="$type = 'xsd:dateTime'">datetime</xsl:when>
+        <xsl:when test="$type = 'xsd:dateTimeStamp'">datetime</xsl:when>
+        <xsl:when test="$type = 'xsd:time'">time</xsl:when>
+        <xsl:when test="$type = 'xsd:decimal'">decimal</xsl:when>
+        <xsl:when test="$type = 'xsd:double'">double</xsl:when>
+        <xsl:when test="$type = 'xsd:float'">float</xsl:when>
+        <xsl:when test="$type = 'xsd:int'">integer</xsl:when>
+        <xsl:when test="$type = 'xsd:integer'">integer</xsl:when>
+        <xsl:when test="$type = 'xsd:language'">string</xsl:when>
+        <xsl:when test="$type = 'xsd:long'">integer</xsl:when>
+        <xsl:when test="$type = 'xsd:Name'">string</xsl:when>
+        <xsl:when test="$type = 'xsd:NCName'">string</xsl:when>
+        <xsl:when test="$type = 'xsd:NMTOKEN'">string</xsl:when>
+        <xsl:when test="$type = 'xsd:negativeinteger'">integer</xsl:when>
+        <xsl:when test="$type = 'xsd:nonNegativeinteger'">integer</xsl:when>
+        <xsl:when test="$type = 'xsd:nonPositiveinteger'">integer</xsl:when>
+        <xsl:when test="$type = 'xsd:normalizedstring'">string</xsl:when>
+        <xsl:when test="$type = 'xsd:positiveinteger'">integer</xsl:when>
+        <xsl:when test="$type = 'xsd:short'">integer</xsl:when>
+        <xsl:when test="$type = 'xsd:string'">string</xsl:when>
+        <xsl:when test="$type = 'xsd:token'">string</xsl:when>
+        <xsl:when test="$type = 'xsd:unsignedByte'">integer</xsl:when>
+        <xsl:when test="$type = 'xsd:unsignedInt'">integer</xsl:when>
+        <xsl:when test="$type = 'xsd:unsignedLong'">integer</xsl:when>
+        <xsl:when test="$type = 'xsd:unsignedShort'">integer</xsl:when>
         
         <!-- RDF Data Types -->
-        <xsl:when test="$type = 'rdf:HTML'">String</xsl:when>
-        <xsl:when test="$type = 'rdf:XMLLiteral'">String</xsl:when>
-        <xsl:when test="$type = 'rdf:langString'">String</xsl:when>
-        <xsl:when test="$type = 'rdf:PlainLiteral'">String</xsl:when>
+        <xsl:when test="$type = 'rdf:HTML'">string</xsl:when>
+        <xsl:when test="$type = 'rdf:XMLLiteral'">string</xsl:when>
+        <xsl:when test="$type = 'rdf:langstring'">string</xsl:when>
+        <xsl:when test="$type = 'rdf:PlainLiteral'">string</xsl:when>
         
         <!-- Default fallback -->
-        <xsl:otherwise>String</xsl:otherwise>
+        <xsl:otherwise>string</xsl:otherwise>
     </xsl:choose>
 </xsl:function>
     
