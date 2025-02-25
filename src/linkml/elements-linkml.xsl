@@ -353,8 +353,8 @@
             ./@name"/>
         <xsl:text>:&#10;    description: </xsl:text>
         <xsl:value-of select="replace(fn:normalize-space(f:formatDocString(./properties/@documentation)),':\s+',':')"/>
-        <xsl:text>&#10;    uri: </xsl:text>
-        <xsl:value-of select="./@name"/>
+<!--        <xsl:text>&#10;    uri: </xsl:text>
+        <xsl:value-of select="./@name"/>-->
         <xsl:text>&#10;    permissible_values:&#10;</xsl:text>
         <xsl:variable name="enumerationAttributes" select="./attributes/attribute"/>
         <xsl:choose>
