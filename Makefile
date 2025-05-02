@@ -39,6 +39,10 @@ WIDOCO_OUTPUT_FOLDER_PATH?=output/widoco
 NAMESPACES_USER_XML_FILE_PATH?=${MODEL2OWL_FOLDER}/test/ePO-default-config/namespaces.xml
 IMPORTS_XML_FILE_PATH?=${ABSOLUTE_MODEL2OWL_FOLDER}/test/ePO-default-config/imports.xml
 INTERM_FOLDER_PATH?=${ABSOLUTE_MODEL2OWL_FOLDER}/.temp
+CATALOG_DIR?=${INTERM_FOLDER_PATH}
+CORE_CATALOG_PATH?=${CATALOG_DIR}/catalog-core.xml
+RESTR_CATALOG_PATH?=${CATALOG_DIR}/catalog-restrictions.xml
+SHAPES_CATALOG_PATH?=${CATALOG_DIR}/catalog-shapes.xml
 ENRICHED_NAMESPACES_XML_PATH:=${INTERM_FOLDER_PATH}/enriched-namespaces.xml
 NAMESPACES_AS_RDFPIPE_ARGS=$(shell ${MODEL2OWL_FOLDER}/scripts/get_namespaces.sh ${ENRICHED_NAMESPACES_XML_PATH})
 RDF_XML_MIME_TYPE:='application/rdf+xml'
@@ -115,10 +119,20 @@ get-python-test-deps:
 	@echo Installing test dependencies
 	source model2owl-venv/bin/activate && pip install -r requirements-test.txt
 
+get-robot: robot/robot.jar
+
+robot/robot.jar:
+	@echo Installing robot
+	mkdir -p robot
+	cd robot \
+		&& curl -L -o robot.jar "https://github.com/ontodev/robot/releases/download/v1.9.7/robot.jar" \
+		&& chmod +x robot.jar
+	@echo 'robot path is robot/robot.jar'
+
 ######################################################################################
 # Download, install saxon, xspec, rdflib and other dependencies
 ######################################################################################
-install:  get-saxon get-rdflib get-widoco get-jena-cli-tools get-jinja get-jq
+install:  get-saxon get-rdflib get-robot get-widoco get-jena-cli-tools get-jinja get-jq
 
 ############################ Main tasks ##############################################
 # Run all tests
@@ -239,9 +253,14 @@ owl-core:
 	@make convert-between-serialization-formats INPUT_FORMAT=${RDF_XML_MIME_TYPE} \
 		OUTPUT_FORMAT=${RDF_XML_MIME_TYPE} \
 		FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.tmp.rdf \
-		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.rdf
+  		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.rdf
+	@make convert-single-rdf-to-owl \
+		FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.tmp.rdf \
+  		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl \
+		CATALOG_PATH=${CORE_CATALOG_PATH}
 	@echo Output owl core file:
 	@ls -lh ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.rdf
+	@ls -lh ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl
 	@rm -f ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.tmp.rdf
 
 owl-restrictions:
@@ -254,8 +273,13 @@ owl-restrictions:
 		OUTPUT_FORMAT=${RDF_XML_MIME_TYPE} \
 		FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.tmp.rdf \
 		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.rdf
+	@make convert-single-rdf-to-owl \
+		FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.tmp.rdf \
+		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.owl \
+		CATALOG_PATH=${RESTR_CATALOG_PATH}
 	@echo Output owl restrictions file:
 	@ls -lh ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.rdf
+	@ls -lh ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.owl
 	@rm -f ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.tmp.rdf
 
 shacl:
@@ -268,8 +292,13 @@ shacl:
 		OUTPUT_FORMAT=${RDF_XML_MIME_TYPE} \
 		FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_shapes.tmp.rdf \
 		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_shapes.rdf
+	@make convert-single-rdf-to-owl \
+		FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_shapes.tmp.rdf \
+		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_shapes.owl \
+		CATALOG_PATH=${SHAPES_CATALOG_PATH}
 	@echo Output shacl file location:
 	@ls -lh ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_shapes.rdf
+	@ls -lh ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_shapes.owl
 	@rm -f ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_shapes.tmp.rdf
 
 respec-json:
@@ -394,6 +423,16 @@ convert-rdf-to-jsonld:
 		echo " ==> Output in JSON-LD format";  \
 		ls -lh $${FILE_PATH%.*}.json;  \
 	done
+# A recipe for converting a single RDF/XML file to RDF/XML (OWL API flavor) format.	
+convert-single-rdf-to-owl:
+	@echo "Converting ${FILE_PATH} ontology into RDF/XML (OWL API flavor)"
+	@make _generate-catalog
+	@java -jar robot/robot.jar convert \
+		-i ${FILE_PATH} \
+		--format owl \
+		-o ${OUTPUT_FILE_PATH} \
+		--catalog ${CATALOG_PATH}
+
 convert-rdf-to-rdf:
 	@for FILE_PATH in ${RDF_FILELIST}; do \
 		echo Converting $${FILE_PATH} into RDF/XML; \
@@ -581,6 +620,27 @@ generate-asciidoc-glossary:
 		echo "Generated model data JSON: $$MODEL_DATA_JSON_PATH"; \
 	fi; \
  	command -v tree > /dev/null 2>&1 && tree "${OUTPUT_GLOSSARY_PATH}"
+# The recipe generates catalog XML files that are needed for Robot to correctly
+# resolve internal and external imports. This is a temporary workaround and it's
+# needed because both ePO and ADMS published versions are faulty/invalid.
+_generate-catalog:
+	@# the command uses dummy input
+	@mkdir -p ${CATALOG_DIR}
+	@java -jar ${SAXON} \
+		-s:<(echo "<s/>") \
+		-xsl:${MODEL2OWL_FOLDER}/src/xml/robot-catalog.xsl \
+		-o:${CORE_CATALOG_PATH}
+	@java -jar ${SAXON} \
+		-s:<(echo "<s/>") \
+		-xsl:${MODEL2OWL_FOLDER}/src/xml/robot-catalog.xsl \
+		-o:${RESTR_CATALOG_PATH} \
+	corePath=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl
+	@java -jar ${SAXON} \
+		-s:<(echo "<s/>") \
+		-xsl:${MODEL2OWL_FOLDER}/src/xml/robot-catalog.xsl \
+		-o:${SHAPES_CATALOG_PATH} \
+	corePath=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl \
+	restrictionsPath=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.owl
 
 # A generic recipe for converting RDF data from one serialization format to 
 # another. It can also be used to regenerate a file using the same format.
