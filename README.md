@@ -76,6 +76,7 @@ make owl-core XMI_INPUT_FILE_PATH=/home/mypc/work/model2owl/file1.xml OUTPUT_FOL
 
 #### Setting up commands
 * **get-saxon** - this will install saxon in a folder inside the project
+* **get-robot** - this will install [robot](https://robot.obolibrary.org/) application
 * **get-rdflib** - this will install rdflib library
 * **get-widoco** - this will install saxon in a folder inside the project
 * **install** - this will automatically execute all the commands above
@@ -117,9 +118,13 @@ make owl-core XMI_INPUT_FILE_PATH=/home/mypc/work/model2owl/file1.xml OUTPUT_FOL
 * **convert-to-turtle** - converts rdf file/files to turtle
   * parameters:
     * ONTOLOGY_FOLDER_PATH - path to the folder containing rdf file/files
-* **convert-to-rdf** - converts turtle file/files to rdf
+* **convert-rdf-to-rdf** - reformats one or many RDF/XML file(s) in the given directory
   * parameters:
-    * ONTOLOGY_FOLDER_PATH - path to the folder containing turtle file/files
+    * ONTOLOGY_FOLDER_PATH - path to the folder containing RDF file/files
+* **convert-single-rdf-to-owl** - converts an RDF file from RDF/XML format to [OWL API](https://github.com/owlcs/owlapi/wiki) flavor of RDF/XML
+  * parameters:
+    * FILE_PATH - path to the input RDF/XML file
+    * OUTPUT_FILE_PATH - output file path
 
 ### Installation
 Prerequisites:
