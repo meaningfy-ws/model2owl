@@ -351,7 +351,7 @@ _generate-catalog:
 		-s:<(echo "<s/>") \
 		-xsl:${MODEL2OWL_FOLDER}/src/xml/robot-catalog.xsl \
 		-o:${SHAPES_CATALOG_PATH} \
-		restrictionsPath=$(realpath ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.owl) \
+		restrictionsPath=$(realpath ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl) \
 		corePath=$(realpath ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl)
 
 
