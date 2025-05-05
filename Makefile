@@ -341,18 +341,18 @@ _generate-catalog:
 	@java -jar ${SAXON} \
 		-s:<(echo "<s/>") \
 		-xsl:${MODEL2OWL_FOLDER}/src/xml/robot-catalog.xsl \
-		-o:${CORE_CATALOG_PATH}
+		-o:${CORE_CATALOG_PATH}	
 	@java -jar ${SAXON} \
 		-s:<(echo "<s/>") \
 		-xsl:${MODEL2OWL_FOLDER}/src/xml/robot-catalog.xsl \
 		-o:${RESTR_CATALOG_PATH} \
-	corePath=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl
+	corePath=$(realpath ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl)
 	@java -jar ${SAXON} \
 		-s:<(echo "<s/>") \
 		-xsl:${MODEL2OWL_FOLDER}/src/xml/robot-catalog.xsl \
 		-o:${SHAPES_CATALOG_PATH} \
-	corePath=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl \
-	restrictionsPath=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.owl
+	corePath=$(realpath ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl) \
+	restrictionsPath=$(realpath ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.owl)
 
 
 # A generic recipe for converting RDF data from one serialization format to 
