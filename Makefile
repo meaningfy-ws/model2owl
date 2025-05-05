@@ -14,6 +14,8 @@ OUTPUT_GLOSSARY_PATH?=output
 OUTPUT_CONVENTION_REPORT_PATH?=output
 # Output folder path
 OUTPUT_FOLDER_PATH?=output
+CORE_OWL_FOLDER_PATH?=${OUTPUT_FOLDER_PATH}
+RESTR_OWL_FOLDER_PATH?=${OUTPUT_FOLDER_PATH}
 # Input XMI/XML UML file path
 XMI_INPUT_FILE_PATH?=test/test-multi-xmi/ePO_CM.xml
 #Input filename without extension
@@ -181,6 +183,8 @@ generate-convention-SVRL-report:
 # make (owl-core | owl-restrictions | shacl) [XMI_INPUT_FILE_PATH=/path/to/cm.xmi] 
 #	[OUTPUT_FOLDER_PATH=/output/directory]
 #	[NAMESPACES_USER_XML_FILE_PATH=/path/to/namespaces.xml]
+#	[CORE_OWL_FOLDER_PATH=/path/to/core.owl]
+#	[RESTR_OWL_FOLDER_PATH=/path/to/restrictions.owl]
 # where:
 #   NAMESPACES_USER_XML_FILE_PATH: path to the *.xml file provided by a user
 #
@@ -335,6 +339,9 @@ convert-rdf-to-rdf:
 # The recipe generates catalog XML files that are needed for Robot to correctly
 # resolve internal and external imports. This is a temporary workaround and it's
 # needed because both ePO and ADMS published versions are faulty/invalid.
+# Usage: make _generate-catalog
+#	CORE_OWL_FOLDER_PATH=/path/to/core.owl-dir/
+#	RESTR_OWL_FOLDER_PATH=/path/to/restrictions.owl-dir/
 _generate-catalog:
 	@# the command uses dummy input
 	@mkdir -p ${CATALOG_DIR}
@@ -346,13 +353,13 @@ _generate-catalog:
 		-s:<(echo "<s/>") \
 		-xsl:${MODEL2OWL_FOLDER}/src/xml/robot-catalog.xsl \
 		-o:${RESTR_CATALOG_PATH} \
-		corePath=$(realpath ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl)
+		corePath=$(shell realpath ${CORE_OWL_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl)
 	@java -jar ${SAXON} \
 		-s:<(echo "<s/>") \
 		-xsl:${MODEL2OWL_FOLDER}/src/xml/robot-catalog.xsl \
 		-o:${SHAPES_CATALOG_PATH} \
-		restrictionsPath=$(shell realpath "${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.owl") \
-		corePath=$(shell realpath ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl)
+		corePath=$(shell realpath ${CORE_OWL_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl) \
+		restrictionsPath=$(shell realpath "${RESTR_OWL_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.owl")
 
 
 # A generic recipe for converting RDF data from one serialization format to 
