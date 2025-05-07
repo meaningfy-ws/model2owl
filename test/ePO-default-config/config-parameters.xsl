@@ -16,7 +16,6 @@
     </xd:doc>
 
 
-
     <!-- a set of prefix-baseURI definitions -->
     <xsl:variable name="namespacePrefixes" select="fn:doc('namespaces.xml')"/>
 
@@ -72,30 +71,66 @@
     <!--    This variable controls whether the enumerations are transformed into skos schemes or ignored-->
     <xsl:variable name="enableGenerationOfConceptSchemes" select="fn:false()"/>
     
-    
+<!--    Property used for constraint level for enumerations-->
+    <xsl:variable name="cvConstraintLevelProperty" select="'epo:constraintLevel'"/>
+
 
     <!--Allowed characters for a normalized string-->
     <xsl:variable name="allowedStrings" select="'^[\w\d-_:]+$'"/>
-    <!--    Generate reused classes, attributes and connectors-->
-    <xsl:variable name="generateReusedConcepts" select="fn:true()"/>
-
-
-
-    <xsl:variable name="reference-to-external-classes-in-glossary" select="fn:false()"/>
-    <xsl:variable name="generateObjectsAndRealisations" select="fn:false()"/>
+    <!--    Generate reused classes, attributes and connectors. Concepts with these prefixes will be included in the generated artefacts. -->
+    <xsl:variable name="includedPrefixesList" select="('epo', 'epo-not', 'epo-ord', 'epo-cat', 'epo-con', 'epo-ful')"/>
+    <!-- This set of variables controls the generation of reused concepts within artifacts. -->
+    <xsl:variable name="generateReusedConceptsSHACL" select="fn:true()"/>
+    <xsl:variable name="generateReusedConceptsOWLcore" select="fn:true()"/>
+    <xsl:variable name="generateReusedConceptsOWLrestrictions" select="fn:true()"/>
+    <xsl:variable name="generateReusedConceptsGlossary" select="fn:true()"/>
     
+<!--    This set of variables controls generation of comments and how they will generate in the output -->
+    <xsl:variable name="commentsGeneration" select="fn:true()"/>
+    <xsl:variable name="commentProperty" select="'skos:editorialNote'"/>
+    
+     <!--    Tag names/keys that are excluded from output -->
+    <xsl:variable name="excludedTagNamesList" select="($statusProperty, $cvConstraintLevelProperty)"/>
+    
+    <!-- Variables for status filtering:  
+     - The property used to indicate the status  
+     - A list of valid statuses  
+     - A list of statuses to be excluded from the output  
+     - The default status value interpretation for elements without a status set -->
+    <xsl:variable name="statusProperty" select="'epo:status'"/>
+    <xsl:variable name="validStatusesList" select="('proposed', 'approved', 'implemented')"/>
+    <xsl:variable name="excludedElementStatusesList" select="('proposed', 'approved')"/>
+    <xsl:variable name="unspecifiedStatusInterpretation" select="'implemented'"/>
+    
+
+    <!-- This variable control if Object and Realisation are generated -->
+    <xsl:variable name="generateObjectsAndRealisations" select="fn:false()"/>
+<!--    Set of variables for convention report-->
     <xsl:variable name="conventionReportCopyrightText" select="'Publications Office of the European Union, 2023'"/>
     <xsl:variable name="conventionReportAuthor" select="'Publications Office of the European Union'"/>
     <xsl:variable name="conventionReportAuthorLocation" select="'Luxembourg'"/>
     <xsl:variable name="conventionReportAuthorWebsite" select="'https://op.europa.eu'"/>
     <xsl:variable name="conventionReportUMLModelName" select="'eProcurement'"/>
-    
+    <!-- URIs list of UML versions supported by model2owl -->
+    <xsl:variable name="supportedUmlVersions"
+        select="('http://www.omg.org/spec/UML/20131001',
+            'https://www.omg.org/spec/UML/20131001',
+            'http://www.omg.org/spec/UML/20161101',
+            'https://www.omg.org/spec/UML/20161101'
+        )"/>
+
+    <!-- If enabled then any occurence of rdf:PlainLiteral datatype will be
+    replaced in a SHACL shape. A list of the two string datatypes will be used
+    instead: (xsd:string, rdf:langString).
+    -->
+    <xsl:variable name="translatePlainLiteralToStringTypesInSHACL" select="fn:true()"/>
+
     <!-- _______________________________________________________________________   -->
     <!--                            METADATA SECTION                               -->
     <!-- _______________________________________________________________________   -->
     <!--    This section contains the variables used to build the ontology metadata-->
     <xsl:variable name="moduleReference" select="'core'"/>
-    <!--    dct:title-->
+    <!--    dct:title -->
     <xsl:variable name="ontologyTitleCore" select="'ePO Core core'"/>
     <xsl:variable name="ontologyTitleRestrictions" select="'ePO Core restrictions'"/>
     <xsl:variable name="ontologyTitleShapes" select="'ePO Core shapes'"/>
@@ -106,32 +141,36 @@
         This artefact excludes the restrictions.
         The eProcurement Ontology describes objects and concepts, with definitions, attributes and relationships which are present within the European public procurement domain.
         The provision of these concepts provides the basis for a common understanding of the domain for all stakeholders ensuring the quality of data exchange and transparency.'"/>
+
+        <xsl:variable name="ontologyDescriptionRestrictions"
+        select="
+        'This artefact provides the restrictions and inference-related specifications for the eProcurement Ontology Core.
+        This artefact excludes the definitions of concepts.
+        The eProcurement Ontology describes objects and concepts, with definitions, attributes and relationships which are present within the European public procurement domain.
+        The provision of these concepts provides the basis for a common understanding of the domain for all stakeholders ensuring the quality of data exchange and transparency.'"/>
+
+    <xsl:variable name="ontologyDescriptionShapes"
+        select="
+        'This artefact provides the generic datashape specifications for the eProcurement Ontology Core.
+        The eProcurement Ontology describes objects and concepts, with definitions, attributes and relationships which are present within the European public procurement domain.
+        The provision of these concepts provides the basis for a common understanding of the domain for all stakeholders ensuring the quality of data exchange and transparency.'"/>
+
+    
+    <!--    rdfs:label-->
     <xsl:variable name="ontologyLabelCore"
         select="
         'This artefact provides the definitions for the eProcurement Ontology Core.
         This artefact excludes the restrictions.
         The eProcurement Ontology describes objects and concepts, with definitions, attributes and relationships which are present within the European public procurement domain.
         The provision of these concepts provides the basis for a common understanding of the domain for all stakeholders ensuring the quality of data exchange and transparency.'"/>
-    
-    <xsl:variable name="ontologyDescriptionRestrictions"
-        select="
-        'This artefact provides the restrictions and inference-related specifications for the eProcurement Ontology Core.
-        This artefact excludes the definitions of concepts.
-        The eProcurement Ontology describes objects and concepts, with definitions, attributes and relationships which are present within the European public procurement domain.
-        The provision of these concepts provides the basis for a common understanding of the domain for all stakeholders ensuring the quality of data exchange and transparency.'"/>
+        
     <xsl:variable name="ontologyLabelRestrictions"
         select="
         'This artefact provides the restrictions and inference-related specifications for the eProcurement Ontology Core.
         This artefact excludes the definitions of concepts.
         The eProcurement Ontology describes objects and concepts, with definitions, attributes and relationships which are present within the European public procurement domain.
         The provision of these concepts provides the basis for a common understanding of the domain for all stakeholders ensuring the quality of data exchange and transparency.'"/>
-    
-    <xsl:variable name="ontologyDescriptionShapes"
-        select="
-        'This artefact provides the generic datashape specifications for the eProcurement Ontology Core.
-        The eProcurement Ontology describes objects and concepts, with definitions, attributes and relationships which are present within the European public procurement domain.
-        The provision of these concepts provides the basis for a common understanding of the domain for all stakeholders ensuring the quality of data exchange and transparency.'"/>
-   
+
     <xsl:variable name="ontologyLabelShapes"
         select="
         'This artefact provides the generic datashape specifications for the eProcurement Ontology Core.
@@ -161,7 +200,7 @@
     <!--    vann:preferredNamespacePrefix -->
     <xsl:variable name="preferredNamespacePrefix" select="'epo'"/>
     
-    
+<!--    dct:license-->
     <xsl:variable name="licenseLiteral" select="'The Commission’s reuse policy is implemented by Commission Decision2011/833/EU of 12 December 2011 on the reuse of Commission documents 
         (OJ L 330,14.12.2011, p. 39 – https://eur-lex.europa.eu/eli/dec/2011/833/oj). Unlessotherwise noted, the reuse of this document is authorised under the 
         CreativeCommons Attribution 4.0 International (CC BY 4.0) licence (https://creativecommons.org/licenses/by/4.0/).This means that reuse is allowed, provided 

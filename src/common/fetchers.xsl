@@ -329,4 +329,23 @@
         <xsl:sequence select="$element/tags/tag"/>
     </xsl:function>
     
+    <xd:doc>
+        <xd:desc>Fetch all tags for a connector, including source, target, and connector-level tags</xd:desc>
+        <xd:param name="connector"/>
+    </xd:doc>
+    <xsl:function name="f:getConnectorTags">
+        <xsl:param name="connector"/>
+        <!-- Fetch all tags from source, target, and connector level -->
+        <xsl:sequence select="$connector//tags/tag" />
+    </xsl:function>
+    
+    <xd:doc>
+        <xd:desc> Fetch role name value from a connector. It can be either in source or in target</xd:desc>
+        <xd:param name="connector"/>
+    </xd:doc>
+    <xsl:function name="f:getRoleNameFromConnector" as="xs:string">
+        <xsl:param name="connector"/>
+        <xsl:sequence select="($connector/source/role/@name, $connector/target/role/@name)[1]"/>
+    </xsl:function>
+    
 </xsl:stylesheet>

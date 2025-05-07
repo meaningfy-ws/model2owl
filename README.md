@@ -17,9 +17,9 @@ _Transform a UML model into a formal OWL ontology, and a SHACL shape based on es
 
 ## About 
 
-This project comprises a set of tools for transforming an UML (v2.5) model from its XMI (v2.5.1) serialisation into a formal OWL ontology, and a SHACL shape. This approach is conformant to the [SEMIC Style Guide](https://semiceu.github.io/style-guide/1.0.0/index.html) and with [eProcurement Ontology Architecture specification](https://github.com/meaningfy-ws/model2owl/blob/master/docs/ontology-architecture/ontology-architecture.pdf). 
+This project comprises a set of tools for transforming an UML (v2.5) model from its XMI (v2.5.1) serialisation into a formal OWL ontology, and a SHACL shape. This approach is conformant to the [SEMIC Style Guide](https://semiceu.github.io/style-guide/1.0.0/index.html) and with [eProcurement Ontology Architecture specification](https://github.com/OP-TED/model2owl/blob/master/docs/ontology-architecture/ontology-architecture.pdf). 
 
-The UML transformation is performed using XSLT stylesheets under the assumption that the UML model conforms to the set of conventions outlined in the [EPO UML conventions documentation](https://meaningfy-ws.github.io/model2owl-docs/public-review/uml/conceptual-model-conventions.html). This set of UML conventions is an extension to the UML conventions specified in [SEMIC Style Guide](https://semiceu.github.io/style-guide/1.0.0/index.html). 
+The UML transformation is performed using XSLT stylesheets under the assumption that the UML model conforms to the set of conventions outlined in the [EPO UML conventions documentation](https://docs.ted.europa.eu/M2O/latest/uml/conceptual-model-conventions.html). This set of UML conventions is an extension to the UML conventions specified in [SEMIC Style Guide](https://semiceu.github.io/style-guide/1.0.0/index.html). 
 
 The following capabilities are addressed:
 
@@ -28,29 +28,31 @@ The following capabilities are addressed:
 * UML -> OWL 2 (lightweight ontology suitable as a Core Vocabulary)
 * UML -> OWL 2 (heavyweight ontology with additional axioms suitable for reasoning purposes)
 * UML -> SHACL (data shapes suitable for validation)
+* UML -> SVRL (Compliance report in SVRL format)
 
 This work is developed in the context of [eProcurement ontology project](https://github.com/eprocurementontology/eprocurementontology) financed by the Digital Europe Programme and led by the [Publications Office of the European Union](https://op.europa.eu/en/).
 
 ### Documents
-* The **architectural design** and the formal specifications are provided in the [eProcurement Ontology Architecture specification](https://github.com/meaningfy-ws/model2owl/blob/master/docs/ontology-architecture/ontology-architecture.pdf).  
-* The technical **conventions** for the UML representation of the conceptual model are provided in [EPO UML conventions documentation](https://meaningfy-ws.github.io/model2owl-docs/public-review/uml/conceptual-model-conventions.html).
-* An **inventory** of conformance tests derived from the UML conventions document are provided in the [EPO UML conventions checking specification](https://meaningfy-ws.github.io/model2owl-docs/public-review/checkers/model2owl-checkers.html).
-* The **transformation rules** from UML into OWL and SHACL are provided in the [UML2OWL transformation rules](https://meaningfy-ws.github.io/model2owl-docs/public-review/transformation/uml2owl-transformation.html).
+* The **architectural design** and the formal specifications are provided in the [eProcurement Ontology Architecture specification](https://github.com/OP-TED/model2owl/blob/master/docs/ontology-architecture/ontology-architecture.pdf).  
+* The technical **conventions** for the UML representation of the conceptual model are provided in [EPO UML conventions documentation](https://docs.ted.europa.eu/M2O/latest/uml/conceptual-model-conventions.html).
+* An **inventory** of conformance tests derived from the UML conventions document are provided in the [EPO UML conventions checking specification](https://docs.ted.europa.eu/M2O/latest/checkers/model2owl-checkers.html).
+* The **transformation rules** from UML into OWL and SHACL are provided in the [UML2OWL transformation rules](https://docs.ted.europa.eu/M2O/latest/transformation/uml2owl-transformation.html).
 
 ### Scripts
-* [html-conventions-report.xsl](src/html-conventions-report.xsl) is the script checking the conformance to the technical conventions of the conceptual model.
+* [html-conventions-report.xsl](src/html-conventions-report.xsl) is the script checking the conformance to the technical conventions of the conceptual model. (HTML)
 * [html-model-glossary.xsl](src/html-model-glossary.xsl) is the script for creating a glossary of the conceptual model.
 * [owl-core.xsl](src/owl-core.xsl) is the transformation script for the core OWL ontology.
 * [shacl-shapes.xsl](src/shacl-shapes.xsl) is the transformation script for the SHACL data shape constraints.
 * [owl-restrictions.xsl](src/owl-restrictions.xsl) is the transformation script for the restrictions of OWL ontology (on classes and properties).
+* [svrl-conventions-report.xsl](src/svrl-conventions-report.xsl) is the script checking the conformance to the technical conventions of the conceptual model. (SVRL)
 
 ### Script unit tests
 
 * [test/unitTest/test-html-conventions-lib](
-https://github.com/meaningfy-ws/model2owl/tree/master/test/unitTests/test-html-conventions-lib) is the location of the unit tests for the script checking the conformance to the technical conventions of the conceptual model are
-* [test/unitTest/test-owl-core-lib](https://github.com/meaningfy-ws/model2owl/tree/master/test/unitTests/test-owl-core-lib) is the location of the unit tests for the transformation script for the core OWL ontology.
-* [test/unitTest/test-shacl-shape-lib](https://github.com/meaningfy-ws/model2owl/tree/master/test/unitTests/test-shacl-shape-lib) is the location of the unit tests for the transformation script for the SHACL data shape constraints.
-* [test/unitTest/test-reasoning-layer-lib](https://github.com/meaningfy-ws/model2owl/tree/master/test/unitTests/test-reasoning-layer-lib) is the location of the unit tests for the transformation script for the restrictions of OWL ontology (on classes and properties).
+https://github.com/OP-TED/model2owl/tree/master/test/unitTests/test-html-conventions-lib) is the location of the unit tests for the script checking the conformance to the technical conventions of the conceptual model are
+* [test/unitTest/test-owl-core-lib](https://github.com/OP-TED/model2owl/tree/master/test/unitTests/test-owl-core-lib) is the location of the unit tests for the transformation script for the core OWL ontology.
+* [test/unitTest/test-shacl-shape-lib](https://github.com/OP-TED/model2owl/tree/master/test/unitTests/test-shacl-shape-lib) is the location of the unit tests for the transformation script for the SHACL data shape constraints.
+* [test/unitTest/test-reasoning-layer-lib](https://github.com/OP-TED/model2owl/tree/master/test/unitTests/test-reasoning-layer-lib) is the location of the unit tests for the transformation script for the restrictions of OWL ontology (on classes and properties).
 
 # How to use
 This project can be used in 2 different ways as follows.
@@ -83,7 +85,11 @@ make owl-core XMI_INPUT_FILE_PATH=/home/mypc/work/model2owl/file1.xml OUTPUT_FOL
   * parameters:
     * XMI_INPUT_FILE_PATH - path to the xmi file
     * OUTPUT_GLOSSARY_PATH - path to the folder that stores the output
-* **generate-convention-report** - this generates the compliance report from the UML export (xml/xmi)
+* **generate-convention-report** - this generates the compliance report from the UML export (xml/xmi) in HTML format
+  * parameters:
+    * XMI_INPUT_FILE_PATH - path to the xmi file
+    * OUTPUT_CONVENTION_REPORT_PATH - path to the folder that stores the output
+* **generate-convention-SVRL-report** - this generates the compliance report from the UML export (xml/xmi) in SVRL format
   * parameters:
     * XMI_INPUT_FILE_PATH - path to the xmi file
     * OUTPUT_CONVENTION_REPORT_PATH - path to the folder that stores the output
@@ -152,6 +158,38 @@ already work with having one config folder with all config files.
 * If the variable is a list, and you don't need any values just leave an empty list
 ``<xsl:variable name="stereotypeValidOnAssociations" select="()"/>``
 
+**Example for controlling the generation of reused concepts in artefacts with the config parameters
+variables**
+
+The following variables determine the inclusion or exclusion of reused concepts within each artifact:
+```shell
+
+<!-- This variable stores the concept prefixes that should be excluded from being treated as external or reused. Concepts with these prefixes will be included in the generated artefacts. -->
+<xsl:variable name="includedPrefixesList" select="('epo', 'epo-not', 'epo-ord', 'epo-cat', 'epo-con', 'epo-ful')"/>
+
+<!-- Controls whether reused concepts are generated in SHACL artefact -->
+<xsl:variable name="generateReusedConceptsSHACL" select="fn:true()"/>
+
+<!-- Controls whether reused concepts are generated in OWL core artefact -->
+<xsl:variable name="generateReusedConceptsOWLcore" select="fn:false()"/>
+
+<!-- Controls whether reused concepts are generated in OWL restrictions artefact -->
+<xsl:variable name="generateReusedConceptsOWLrestrictions" select="fn:false()"/>
+
+<!-- Controls whether reused concepts are generated in the glossary -->
+<xsl:variable name="generateReusedConceptsGlossary" select="fn:true()"/>
+```
+
+Explanation
+
+* includedPrefixesList: Concepts with the specified prefixes in this list will be treated as internal to the model and will not be excluded from the artefacts, regardless of the settings for generating reused concepts controls (see below).
+* generateReusedConceptsSHACL: Set to true, reused concepts will be included in SHACL artefact.
+* generateReusedConceptsOWLcore: Set to false, reused concepts will be excluded from OWL core artefact.
+* generateReusedConceptsOWLrestrictions: Set to false, reused concepts will be excluded from OWL restrictions artefact.
+* generateReusedConceptsGlossary: Set to true, reused concepts will be included in the glossary.
+
+By adjusting these variables, it is possible to customize whether specific artefacts contain reused concepts, 
+providing fine control over the content of each output.
 
 #### Namespaces configuration
 In the namespaces.xml file you can add the namespaces that you use in UML model and also can control which of them should
@@ -214,7 +252,7 @@ Example
 make owl-core XMI_INPUT_FILE_PATH=/home/mypc/work/model2owl/file1.xml OUTPUT_FOLDER_PATH=./my-folder
 ```
 ## Online
-To use model2owl in an automatic way, we have created a github repository [model2owl-boilerplate](https://github.com/meaningfy-ws/model2owl-boilerplate) that will no longer require for you to install or to execute anything.
+To use model2owl in an automatic way, we have created a github repository [model2owl-boilerplate](https://github.com/OP-TED/model2owl-boilerplate) that will no longer require for you to install or to execute anything.
 Follow the instructions found there for using this model2owl automation.
 
 # Contributing

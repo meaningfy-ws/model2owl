@@ -72,9 +72,6 @@
                 <xsl:call-template name="connectorTargetTags">
                     <xsl:with-param name="connector" select="."/>
                 </xsl:call-template>
-                <xsl:call-template name="connectorTags">
-                    <xsl:with-param name="connector" select="."/>
-                </xsl:call-template>
                 <xsl:call-template name="connectorGeneralNameProvided">
                     <xsl:with-param name="connector" select="."/>
                 </xsl:call-template>
@@ -111,8 +108,9 @@
                     <xsl:with-param name="connector" select="."/>
                     <xsl:with-param name="isDependency" select="fn:true()"/>
                 </xsl:call-template>
-                <!--    End of specific checker rules-->
             </xsl:if>
+                <!--    End of specific checker rules-->
+            
         </xsl:variable>
         <xsl:if test="boolean($dependencyChecks)">
             <xsl:choose>
