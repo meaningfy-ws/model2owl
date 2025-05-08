@@ -359,13 +359,13 @@ _generate-catalog:
 		-s:<(echo "<s/>") \
 		-xsl:${MODEL2OWL_FOLDER}/src/xml/robot-catalog.xsl \
 		-o:${RESTR_CATALOG_PATH} \
-		corePath=$(shell realpath ${CORE_OWL_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl)
+		corePath=$(shell realpath ${CORE_OWL_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${CORE_OWL_FILE_SUFFIX}.owl)
 	@java -jar ${SAXON} \
 		-s:<(echo "<s/>") \
 		-xsl:${MODEL2OWL_FOLDER}/src/xml/robot-catalog.xsl \
 		-o:${SHAPES_CATALOG_PATH} \
-		corePath=$(shell realpath ${CORE_OWL_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.owl) \
-		restrictionsPath=$(shell realpath "${RESTR_OWL_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.owl")
+		corePath=$(shell realpath ${CORE_OWL_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${CORE_OWL_FILE_SUFFIX}.owl) \
+		restrictionsPath=$(shell realpath "${RESTR_OWL_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${RESTRICTION_OWL_FILE_SUFFIX}.owl")
 
 
 # A generic recipe for converting RDF data from one serialization format to 
