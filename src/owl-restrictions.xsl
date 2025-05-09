@@ -58,35 +58,94 @@
                 <owl:imports rdf:resource="{.}"/>
             </xsl:for-each>      
             <owl:imports rdf:resource="{$coreArtefactURI}"/>
-            <dct:title xml:lang="en">
-                <xsl:value-of select="$ontologyTitleRestrictions"/>
-            </dct:title>
-            <rdfs:label xml:lang="en">
-                <xsl:value-of select="$ontologyLabelRestrictions"/>
-            </rdfs:label>
-            <dct:publisher>
-                <xsl:value-of select="$publisher"/>
-            </dct:publisher>
-            <dct:description xml:lang="en">
-                <xsl:value-of select="$ontologyDescriptionRestrictions"/>
-            </dct:description>
-            <rdfs:comment>This version is automatically generated from <xsl:value-of select="tokenize(base-uri(.), '/')[last()]"/> on 
+            <xsl:if test="normalize-space($ontologyTitleRestrictions) != ''">
+                <dct:title xml:lang="en">
+                    <xsl:value-of select="$ontologyTitleRestrictions"/>
+                </dct:title>
+            </xsl:if>
+            
+            <xsl:if test="normalize-space($ontologyLabelRestrictions) != ''">
+                <rdfs:label xml:lang="en">
+                    <xsl:value-of select="$ontologyLabelRestrictions"/>
+                </rdfs:label>
+            </xsl:if>
+            
+            <xsl:if test="normalize-space($publisher) != ''">
+                <dct:publisher>
+                    <xsl:value-of select="$publisher"/>
+                </dct:publisher>
+            </xsl:if>
+            
+            <xsl:if test="normalize-space($ontologyDescriptionRestrictions) != ''">
+                <dct:description xml:lang="en">
+                    <xsl:value-of select="$ontologyDescriptionRestrictions"/>
+                </dct:description>
+            </xsl:if>
+            
+            <rdfs:comment>
+                This version is automatically generated from
+                <xsl:value-of select="tokenize(base-uri(.), '/')[last()]"/>
+                on
                 <xsl:value-of select="format-date(current-date(),'[Y0001]-[M01]-[D01]')"/>
-                </rdfs:comment>
-            <xsl:for-each select="$seeAlsoResources">
-                <rdfs:seeAlso rdf:resource="{.}"/>
-            </xsl:for-each>
-
-            <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date"><xsl:value-of select="$issuedDate"/></dct:issued>
-            <dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date"><xsl:value-of select="$createdDate"/></dct:created>
-            <owl:versionInfo><xsl:value-of select="$versionInfo"/></owl:versionInfo>   
-            <owl:incompatibleWith><xsl:value-of select="$incompatibleWith"/></owl:incompatibleWith>
-            <owl:versionIRI rdf:resource="{fn:concat($restrictionsArtefactURI,'-',$versionInfo)}"/>
-<!--            <bibo:status><xsl:value-of select="$ontologyStatus"/></bibo:status>-->
-            <owl:priorVersion><xsl:value-of select="fn:concat($restrictionsArtefactURI,'-',$priorVersion)"/></owl:priorVersion>
-            <vann:preferredNamespaceUri><xsl:value-of select="$preferredNamespaceUri"/></vann:preferredNamespaceUri>
-            <vann:preferredNamespacePrefix><xsl:value-of select="$preferredNamespacePrefix"/></vann:preferredNamespacePrefix>
-            <dct:license><xsl:value-of select="$licenseLiteral"/></dct:license>
+            </rdfs:comment>
+            
+            <xsl:if test="exists($seeAlsoResources)">
+                <xsl:for-each select="$seeAlsoResources">
+                    <rdfs:seeAlso rdf:resource="{.}"/>
+                </xsl:for-each>
+            </xsl:if>
+            
+            <xsl:if test="normalize-space($issuedDate) != ''">
+                <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">
+                    <xsl:value-of select="$issuedDate"/>
+                </dct:issued>
+            </xsl:if>
+            
+            <xsl:if test="normalize-space($createdDate) != ''">
+                <dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">
+                    <xsl:value-of select="$createdDate"/>
+                </dct:created>
+            </xsl:if>
+            
+            <xsl:if test="normalize-space($versionInfo) != ''">
+                <owl:versionInfo>
+                    <xsl:value-of select="$versionInfo"/>
+                </owl:versionInfo>
+            </xsl:if>
+            
+            <xsl:if test="normalize-space($incompatibleWith) != ''">
+                <owl:incompatibleWith>
+                    <xsl:value-of select="$incompatibleWith"/>
+                </owl:incompatibleWith>
+            </xsl:if>
+            
+            <xsl:if test="normalize-space($versionInfo) != ''">
+                <owl:versionIRI rdf:resource="{fn:concat($restrictionsArtefactURI, '-', $versionInfo)}"/>
+            </xsl:if>
+            
+            <xsl:if test="normalize-space($priorVersion) != ''">
+                <owl:priorVersion>
+                    <xsl:value-of select="fn:concat($restrictionsArtefactURI, '-', $priorVersion)"/>
+                </owl:priorVersion>
+            </xsl:if>
+            
+            <xsl:if test="normalize-space($preferredNamespaceUri) != ''">
+                <vann:preferredNamespaceUri>
+                    <xsl:value-of select="$preferredNamespaceUri"/>
+                </vann:preferredNamespaceUri>
+            </xsl:if>
+            
+            <xsl:if test="normalize-space($preferredNamespacePrefix) != ''">
+                <vann:preferredNamespacePrefix>
+                    <xsl:value-of select="$preferredNamespacePrefix"/>
+                </vann:preferredNamespacePrefix>
+            </xsl:if>
+            
+            <xsl:if test="normalize-space($licenseLiteral) != ''">
+                <dct:license>
+                    <xsl:value-of select="$licenseLiteral"/>
+                </dct:license>
+            </xsl:if>
             
         </owl:Ontology>
     </xsl:template>
