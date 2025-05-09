@@ -32,6 +32,7 @@ MERGE_XMIS_FOLDER_NAME?=$(shell dirname ${FIRST_XMI_TO_BE_MERGED_FILE_PATH})
 # Variables for converting in ttl/rdf
 ONTOLOGY_FOLDER_PATH?=${OUTPUT_FOLDER_PATH}
 RDF_FILELIST=$(shell ls ${ONTOLOGY_FOLDER_PATH}/*.rdf)
+OWL_FILELIST=$(shell ls ${ONTOLOGY_FOLDER_PATH}/*.owl)
 TURTLE_FILELIST=$(shell ls ${ONTOLOGY_FOLDER_PATH}/*.ttl)
 # Widoco variables
 WIDOCO_RDF_INPUT_FILE_PATH?=test/reasoning-investigation/model-2020-12-16/ePO_restrictions.rdf
@@ -320,6 +321,31 @@ convert-rdf-to-jsonld:
 		echo " ==> Output in JSON-LD format";  \
 		ls -lh $${FILE_PATH%.*}.json;  \
 	done
+
+# A recipe for converting a single OWL file (OWL API flavor) to Turtle format.
+# make convert-ontology-rdfxml-to-turtle [ONTOLOGY_FOLDER_PATH=./my-folder] 
+#	[NAMESPACES_USER_XML_FILE_PATH=/path/to/namespaces.xml]
+# where:
+# ONTOLOGY_FOLDER_PATH: the path to the folder containing .owl files for 
+#						converting to turtle
+# NAMESPACES_USER_XML_FILE_PATH: path to the *.xml file provided by a user	
+convert-ontology-rdfxml-to-turtle:
+	@make gen-enriched-ns-file
+	@for FILE_PATH in ${OWL_FILELIST}; do \
+		echo Converting $${FILE_PATH} into Turtle; \
+		source model2owl-venv/bin/activate; \
+		make convert-between-serialization-formats \
+			INPUT_FORMAT=${RDF_XML_MIME_TYPE} \
+			OUTPUT_FORMAT=${TURTLE_MIME_TYPE}  \
+			FILE_PATH=$${FILE_PATH}  \
+			OUTPUT_FILE_PATH=$${FILE_PATH%.*}-ttl.owl \
+			USE_NAMESPACES=1; \
+		echo Input in RDF/XML format;  \
+		echo $${FILE_PATH};  \
+		echo " ==> Output in Turtle format";  \
+		ls -lh $${FILE_PATH%.*}-ttl.owl;  \
+	done
+
 # A recipe for converting a single RDF/XML file to RDF/XML (OWL API flavor) format.	
 convert-single-rdf-to-owl:
 	@echo "Converting ${FILE_PATH} ontology into RDF/XML (OWL API flavor)"
