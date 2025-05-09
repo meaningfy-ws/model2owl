@@ -45,14 +45,14 @@ TURTLE_MIME_TYPE:='turtle'
 get-saxon:
 	@echo Installing saxon
 	@mkdir -p ${MODEL2OWL_FOLDER}/saxon
-	@cd ${MODEL2OWL_FOLDER}/saxon  && curl -L -o saxon.zip "https://kumisystems.dl.sourceforge.net/project/saxon/Saxon-HE/10/Java/SaxonHE10-6J.zip" && unzip saxon.zip && rm -rf saxon.zip
+	@cd ${MODEL2OWL_FOLDER}/saxon  && curl -L -o saxon.zip "https://sourceforge.net/projects/saxon/files/Saxon-HE/10/Java/SaxonHE10-6J.zip" && unzip saxon.zip && rm -rf saxon.zip
 	@cd ${MODEL2OWL_FOLDER}/saxon && mv saxon-he-10.6.jar saxon.jar
 	@echo 'Saxon path is ${SAXON}'
 
 get-jena-cli-tools:
 	@echo Installing jena-cli-tools
 	@mkdir -p ${MODEL2OWL_FOLDER}/jena
-	@cd ${MODEL2OWL_FOLDER}/jena  && curl -L -o jena.zip "https://dlcdn.apache.org/jena/binaries/apache-jena-4.10.0.zip" && unzip jena.zip && rm -rf jena.zip
+	@cd ${MODEL2OWL_FOLDER}/jena  && curl -L -o jena.zip "https://archive.apache.org/dist/jena/binaries/apache-jena-5.3.0.zip" && unzip jena.zip && rm -rf jena.zip
 	@echo 'Jena riot tool path is ${JENA_RIOT_TOOL}'
 
 # install rdflib
