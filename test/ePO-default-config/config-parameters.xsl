@@ -102,6 +102,10 @@
     <xsl:variable name="excludedElementStatusesList" select="('proposed', 'approved')"/>
     <xsl:variable name="unspecifiedStatusInterpretation" select="'implemented'"/>
     
+<!--    If true, this will annotate all OWL concepts defined in the current ontology
+    with the name of the core ontology using rdfs:isDefinedBy.-->
+    
+    <xsl:variable name="annotateDefinedConceptsWithOntology" select="fn:true()"/>
 
     <!-- This variable control if Object and Realisation are generated -->
     <xsl:variable name="generateObjectsAndRealisations" select="fn:false()"/>
