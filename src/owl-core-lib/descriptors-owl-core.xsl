@@ -79,7 +79,7 @@
     </xd:doc>
     <xsl:template name="coreDefinedBy">
         <xsl:param name="elementUri"/>
-        <xsl:if test="fn:contains($elementUri, $base-ontology-uri)">
+        <xsl:if test="fn:contains($elementUri, $base-ontology-uri) and $annotateDefinedConceptsWithOntology">
             <rdf:Description rdf:about="{$elementUri}">
                 <rdfs:isDefinedBy rdf:resource="{$coreArtefactURI}"/>
             </rdf:Description>
