@@ -1,0 +1,53 @@
+@prefix onto: <http://www.example.org/testmodels#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/xmlschema#> .
+
+# Shape for ex:toB
+onto:toBShape
+    a sh:NodeShape ;
+    sh:targetNode onto:toB ;
+    sh:property [
+        sh:path rdfs:domain ;
+        sh:hasValue onto:A ;
+    ] ;
+    sh:property [
+        sh:path rdfs:range ;
+        sh:hasValue onto:B ;
+    ] .
+
+# Shape for ex:toA
+onto:toAShape
+    a sh:NodeShape ;
+    sh:targetNode onto:toA ;
+    sh:property [
+        sh:path rdfs:domain ;
+        sh:hasValue onto:B ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path rdfs:range ;
+        sh:hasValue onto:A ;
+        sh:maxCount 1 ;
+    ] .
+
+# Shape for ex:attributeA
+onto:attributeAShape
+    a sh:NodeShape ;
+    sh:targetNode onto:attributeA ;
+    sh:property [
+        sh:path rdfs:domain ;
+        sh:hasValue onto:A ;
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path rdfs:range ;
+        sh:hasValue onto:int ;  # should be: xsd:int
+        sh:maxCount 1 ;
+    ] ;
+    sh:property [
+        sh:path rdf:type ;
+        sh:hasValue owl:FunctionalProperty ;
+    ] .
