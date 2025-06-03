@@ -30,10 +30,6 @@
             <xsl:sort select="." lang="en"/>
                 <xsl:if test="fn:count(f:getConnectorByName(., $root)) > 1">
                     <xsl:variable name="connectorsChecks" as="item()*">
-                        <xsl:call-template name="checkMultiplicityOfConnectorsWithSameName">
-                            <xsl:with-param name="connectorName" select="."/>
-                            <xsl:with-param name="root" select="$root"/>
-                        </xsl:call-template>
                         <xsl:call-template name="checkDefinitionOfConnectorsWithSameName">
                             <xsl:with-param name="connectorName" select="."/>
                             <xsl:with-param name="root" select="$root"/>
@@ -65,37 +61,6 @@
     </xsl:template>
 
 
-
-    <xd:doc>
-        <xd:desc>[connectors-with-same-name-multiplicity-1] - Check the multiplicity values from a
-            group of connectors with same name</xd:desc>
-        <xd:param name="connectorName"/>
-        <xd:param name="root"/>
-    </xd:doc>
-    <xsl:template name="checkMultiplicityOfConnectorsWithSameName">
-        <xsl:param name="connectorName"/>
-        <xsl:param name="root"/>
-        <xsl:variable name="connectorsWithSameName"
-            select="f:getConnectorByName($connectorName, $root)"/>
-        <xsl:variable name="multiplicityValues"
-            select="$connectorsWithSameName/*[role/@name = $connectorName]/type/@multiplicity"/>
-        <xsl:variable name="allConnectorsHaveMultiplicityValue"
-            select="fn:count($connectorsWithSameName) = fn:count($multiplicityValues)"/>
-        <xsl:sequence
-            select="
-                if (f:areStringsEqual($multiplicityValues) and $allConnectorsHaveMultiplicityValue) then
-                    ()
-                else
-                    f:generateWarningMessage(
-                    'When a property is reused in multiple contexts the multiplicity is expected to be the same.',
-                    '//connectors',
-                    'connectors-with-same-name-multiplicity-1',
-                    'CMC-R12',
-                    '&lt;a href=&quot;https://semiceu.github.io/style-guide/1.0.0/gc-conceptual-model-conventions.html#sec:cmc-r12&quot; target=&quot;_blank&quot;&gt;CMC-R12&lt;/a&gt;'
-                    
-                    )"
-        />
-    </xsl:template>
 
 
     <xd:doc>
