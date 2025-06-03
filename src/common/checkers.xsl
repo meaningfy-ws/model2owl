@@ -680,6 +680,26 @@
     </xsl:function>
     
     
+    <xd:doc>
+        <xd:desc>
+            Determines whether a given UML connector element represents an N-ary (e.g. ternary) association.
+            This requires:
+            - the connector's properties/@ea_type to be 'Association', and
+            - the source/model/@type also to be 'Association'.
+        </xd:desc>
+        <xd:param name="connector">The UML connector element to test.</xd:param>
+        <xd:return>true if the connector is an N-ary association; false otherwise.</xd:return>
+    </xd:doc>
+    <xsl:function name="f:isNaryAssociation" as="xs:boolean">
+        <xsl:param name="connector" as="element()"/>
+        
+        <xsl:sequence select="
+            if ($connector/properties/@ea_type = 'Association') 
+            then $connector/source/model/@type = 'Association'
+            else false()
+            "/>
+    </xsl:function>
+    
     
     
 
