@@ -564,5 +564,25 @@
         </x:scenario>
     </x:scenario>
     
+    <x:scenario label="Check isNaryAssociation - positive case">
+        <x:call function="f:isNaryAssociation">
+            <x:param name="connector"
+                href="../../testData/prettyModel-cleaned.xmi"
+                select="/xmi:XMI/xmi:Extension[1]/connectors[1]/connector[16]"                
+            />
+        </x:call>
+        <x:expect label="result" select="true()"/>
+    </x:scenario>
+    
+    <x:scenario label="Check isNaryAssociation - negative case">
+        <x:call function="f:isNaryAssociation">
+            <x:param name="connector"
+                href="../../testData/ePO-CM-v2.0.1-2020-03-27_test.eap.xmi"
+                select="/xmi:XMI/xmi:Extension[1]/connectors[1]/connector[10]"                
+            />
+        </x:call>
+        <x:expect label="result" select="false()"/>
+    </x:scenario>
+    
 </x:description>
 

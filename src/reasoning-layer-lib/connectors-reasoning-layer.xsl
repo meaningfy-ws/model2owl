@@ -95,13 +95,15 @@
         <xsl:variable name="distinctNames" select="f:getDistinctConnectorsNames($root)"/>
         <!--        TODO Figure out dependencies to Objects -->
         <xsl:for-each select="$distinctNames">
-            <xsl:if test="not(f:isExcludedByStatus(f:getConnectorByName(., $root)[1]))">
+            <xsl:variable name="connectorElement" select="f:getConnectorByName(., $root)[1]"/>
+            <xsl:if test="not(f:isExcludedByStatus($connectorElement))">
             <xsl:if
-                test="f:getConnectorByName(., $root)[1]/properties/@ea_type = ('Dependency', 'Association') and f:getConnectorByName(., $root)[1]/target/model/@type != 'Object'">
-                <xsl:variable name="connectorElement" select="f:getConnectorByName(., $root)"/>
+                test="$connectorElement/properties/@ea_type = ('Dependency', 'Association') and $connectorElement/target/model/@type != 'Object'">
+
                 <xsl:variable name="connectorRoleName" select="f:getRoleNameFromConnector($connectorElement)"/>
                 <xsl:if
                     test="$generateReusedConceptsOWLrestrictions or fn:substring-before($connectorRoleName, ':') = $includedPrefixesList">
+                    <xsl:if test="not(f:isNaryAssociation($connectorElement))">
                     <xsl:call-template name="connectorDomain">
                         <xsl:with-param name="connectorName" select="."/>
                         <xsl:with-param name="root" select="$root"/>
@@ -114,6 +116,7 @@
                         <xsl:with-param name="connectorName" select="."/>
                         <xsl:with-param name="root" select="$root"/>
                     </xsl:call-template>
+                    </xsl:if>
                 </xsl:if>
             </xsl:if>
             </xsl:if>

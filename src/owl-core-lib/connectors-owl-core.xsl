@@ -20,7 +20,7 @@
                 statements</xd:p>
         </xd:desc>
     </xd:doc>
-
+    <xsl:import href="../common/checkers.xsl"/>
     <xsl:import href="../common/fetchers.xsl"/>
     <xsl:import href="../common/formatters.xsl"/>
     <xsl:import href="descriptors-owl-core.xsl"/>
@@ -204,20 +204,21 @@
         <xsl:variable name="root" select="root()"/>
         <xsl:variable name="distinctNames" select="f:getDistinctConnectorsNames($root)"/>
         <xsl:for-each select="$distinctNames">
-            <xsl:if test="not(f:isExcludedByStatus(f:getConnectorByName(., $root)[1]))">
+            <xsl:variable name="connectorElement" select="f:getConnectorByName(., $root)[1]"/>
+            <xsl:if test="not(f:isExcludedByStatus($connectorElement))">
             <xsl:if
                 test="
-                    f:getConnectorByName(., $root)/source/model/@type != 'ProxyConnector' and f:getConnectorByName(., $root)/target/model/@type != 'ProxyConnector'
-                    and f:getConnectorByName(., $root)/properties/@ea_type = ('Association', 'Dependency')">
-                <xsl:variable name="connectorElement" select="f:getConnectorByName(., $root)"/>
+                $connectorElement/source/model/@type != 'ProxyConnector' and $connectorElement/target/model/@type != 'ProxyConnector'
+                and $connectorElement/properties/@ea_type = ('Association', 'Dependency')">
                 <xsl:variable name="connectorRoleName" select="f:getRoleNameFromConnector($connectorElement)"/>
                 <xsl:if
                     test="$generateReusedConceptsOWLcore or fn:substring-before($connectorRoleName, ':') = $includedPrefixesList">
-
+                    <xsl:if test="not(f:isNaryAssociation($connectorElement))">
                     <xsl:call-template name="genericConnector">
                         <xsl:with-param name="connectorName" select="."/>
                         <xsl:with-param name="root" select="$root"/>
                     </xsl:call-template>
+                    </xsl:if>
                 </xsl:if>
 
             </xsl:if>
