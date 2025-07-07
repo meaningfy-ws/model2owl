@@ -36,7 +36,7 @@ WIDOCO_OUTPUT_FOLDER_PATH?=output/widoco
 get-saxon:
 	@echo Installing saxon
 	@mkdir -p ${MODEL2OWL_FOLDER}/saxon
-	@cd ${MODEL2OWL_FOLDER}/saxon  && curl -L -o saxon.zip "https://kumisystems.dl.sourceforge.net/project/saxon/Saxon-HE/10/Java/SaxonHE10-6J.zip" && unzip saxon.zip && rm -rf saxon.zip
+	@cd ${MODEL2OWL_FOLDER}/saxon  && curl -L -o saxon.zip "https://sourceforge.net/projects/saxon/files/Saxon-HE/10/Java/SaxonHE10-6J.zip" && unzip saxon.zip && rm -rf saxon.zip
 	@cd ${MODEL2OWL_FOLDER}/saxon && mv saxon-he-10.6.jar saxon.jar
 	@echo 'Saxon path is ${SAXON}'
 
