@@ -57,11 +57,11 @@
                     </goals>
                     <configuration>
                         <executable>sh</executable>
-                        <workingDirectory>${project.basedir}/test/e2e</workingDirectory>
+                        <workingDirectory>${project.basedir}</workingDirectory>
                         <arguments>
                         <argument>-c</argument>
                         <argument>
-                            source model2owl-venv/bin/activate &amp;&amp; pytest --junitxml=../../target/surefire-reports/test-pytest.xml || true
+                            . model2owl-venv/bin/activate &amp;&amp; pytest test/e2e --junitxml=../../target/surefire-reports/test-pytest.xml || true
                         </argument>
                         </arguments>
                     </configuration>
