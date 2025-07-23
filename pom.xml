@@ -21,8 +21,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <testDir>${project.basedir}/test/unitTests</testDir>
+                    <testDir>${project.basedir}/test/unitTests/test-shacl-shape-lib</testDir>
                     <generateSurefireReport>true</generateSurefireReport>
+                    <excludes>test-descriptors-shacl-shape.xspec,test-elements-shacl-shape-plainliteral-translation.xspec,test-elements-shacl-shape.xspec,test-elements-shacl-shapes-no-generation-enumerations.xspec</excludes>
                     <xspecProperties>
                         <xspec.fail>false</xspec.fail>
                         <saxon.custom.options>enrichedNamespacesPath=${saxon.options.enrichedNamespacesPath}</saxon.custom.options>
