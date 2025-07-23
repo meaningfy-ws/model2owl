@@ -61,7 +61,7 @@
                         <arguments>
                         <argument>-c</argument>
                         <argument>
-                            pytest --junitxml=../../target/surefire-reports/test-pytest.xml || true
+                            source model2owl-venv/bin/activate && pytest --junitxml=../../target/surefire-reports/test-pytest.xml || true
                         </argument>
                         </arguments>
                     </configuration>
