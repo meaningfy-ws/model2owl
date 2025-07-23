@@ -3,4 +3,4 @@ def func(x):
 
 
 def test_answer():
-    assert func(3) == 5, "Expected 3 + 1 to equal 5"
+    assert func(3) == 4, "Expected 3 + 1 to equal 4"
