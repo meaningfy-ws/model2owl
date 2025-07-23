@@ -66,6 +66,10 @@ model2owl-venv/bin/rdfpipe: model2owl-venv
 	@echo Installing rdflib
 	source model2owl-venv/bin/activate && pip install rdflib
 
+get-pytest: model2owl-venv
+	@echo Installing pytest
+	source model2owl-venv/bin/activate && pip install pytest
+
 get-widoco: widoco/widoco.jar
 
 widoco/widoco.jar:
@@ -76,7 +80,7 @@ widoco/widoco.jar:
 ######################################################################################
 # Download, install saxon, xspec, rdflib and other dependencies
 ######################################################################################
-install:  get-saxon get-rdflib get-widoco get-jena-cli-tools
+install:  get-saxon get-rdflib get-widoco get-jena-cli-tools get-pytest
 
 ############################ Main tasks ##############################################
 # Run unit_tests
