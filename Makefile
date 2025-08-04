@@ -14,6 +14,8 @@ OUTPUT_GLOSSARY_PATH?=output
 OUTPUT_CONVENTION_REPORT_PATH?=output
 # Output folder path
 OUTPUT_FOLDER_PATH?=output
+CORE_OWL_FOLDER_PATH?=${OUTPUT_FOLDER_PATH}
+RESTR_OWL_FOLDER_PATH?=${OUTPUT_FOLDER_PATH}
 # Input XMI/XML UML file path
 XMI_INPUT_FILE_PATH?=test/test-multi-xmi/ePO_CM.xml
 #Input filename without extension
@@ -30,17 +32,30 @@ MERGE_XMIS_FOLDER_NAME?=$(shell dirname ${FIRST_XMI_TO_BE_MERGED_FILE_PATH})
 # Variables for converting in ttl/rdf
 ONTOLOGY_FOLDER_PATH?=${OUTPUT_FOLDER_PATH}
 RDF_FILELIST=$(shell ls ${ONTOLOGY_FOLDER_PATH}/*.rdf)
+OWL_FILELIST=$(shell ls ${ONTOLOGY_FOLDER_PATH}/*.owl)
 TURTLE_FILELIST=$(shell ls ${ONTOLOGY_FOLDER_PATH}/*.ttl)
 # Widoco variables
 WIDOCO_RDF_INPUT_FILE_PATH?=test/reasoning-investigation/model-2020-12-16/ePO_restrictions.rdf
 WIDOCO_OUTPUT_FOLDER_PATH?=output/widoco
 NAMESPACES_USER_XML_FILE_PATH?=${MODEL2OWL_FOLDER}/test/ePO-default-config/namespaces.xml
 INTERM_FOLDER_PATH?=${ABSOLUTE_MODEL2OWL_FOLDER}/.temp
+CATALOG_DIR?=${INTERM_FOLDER_PATH}
+CORE_CATALOG_PATH?=${CATALOG_DIR}/catalog-core.xml
+RESTR_CATALOG_PATH?=${CATALOG_DIR}/catalog-restrictions.xml
+SHAPES_CATALOG_PATH?=${CATALOG_DIR}/catalog-shapes.xml
 ENRICHED_NAMESPACES_XML_PATH:=${INTERM_FOLDER_PATH}/enriched-namespaces.xml
 NAMESPACES_AS_RDFPIPE_ARGS=$(shell ${MODEL2OWL_FOLDER}/scripts/get_namespaces.sh ${ENRICHED_NAMESPACES_XML_PATH})
 RDF_XML_MIME_TYPE:='application/rdf+xml'
 TURTLE_MIME_TYPE:='turtle'
 JSONLD_CONTEXT_INDENTATION?=2
+
+# Output files suffixes
+CORE_RDF_FILE_SUFFIX?=
+CORE_OWL_FILE_SUFFIX?=
+RESTRICTION_RDF_FILE_SUFFIX?=_restrictions
+RESTRICTION_OWL_FILE_SUFFIX?=_restrictions
+SHACL_RDF_FILE_SUFFIX?=_shapes
+SHACL_OWL_FILE_SUFFIX?=_shapes
 
 # download saxon library
 get-saxon: saxon/saxon.jar
@@ -78,10 +93,20 @@ get-python-test-deps:
 	@echo Installing test dependencies
 	source model2owl-venv/bin/activate && pip install -r requirements-test.txt
 
+get-robot: robot/robot.jar
+
+robot/robot.jar:
+	@echo Installing robot
+	mkdir -p robot
+	cd robot \
+		&& curl -L -o robot.jar "https://github.com/ontodev/robot/releases/download/v1.9.7/robot.jar" \
+		&& chmod +x robot.jar
+	@echo 'robot path is robot/robot.jar'
+
 ######################################################################################
 # Download, install saxon, xspec, rdflib and other dependencies
 ######################################################################################
-install:  get-saxon get-rdflib get-widoco get-jena-cli-tools
+install:  get-saxon get-rdflib get-robot get-widoco get-jena-cli-tools
 
 ############################ Main tasks ##############################################
 # Run all tests
@@ -184,6 +209,8 @@ generate-convention-SVRL-report:
 # make (owl-core | owl-restrictions | shacl) [XMI_INPUT_FILE_PATH=/path/to/cm.xmi] 
 #	[OUTPUT_FOLDER_PATH=/output/directory]
 #	[NAMESPACES_USER_XML_FILE_PATH=/path/to/namespaces.xml]
+#	[CORE_OWL_FOLDER_PATH=/path/to/core.owl]
+#	[RESTR_OWL_FOLDER_PATH=/path/to/restrictions.owl]
 # where:
 #   NAMESPACES_USER_XML_FILE_PATH: path to the *.xml file provided by a user
 #
@@ -192,41 +219,56 @@ generate-convention-SVRL-report:
 owl-core:
 	@make gen-enriched-ns-file
 	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/owl-core.xsl \
-		-o:${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.tmp.rdf \
+		-o:${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${CORE_RDF_FILE_SUFFIX}.tmp.rdf \
 		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}"
 	@make convert-between-serialization-formats INPUT_FORMAT=${RDF_XML_MIME_TYPE} \
 		OUTPUT_FORMAT=${RDF_XML_MIME_TYPE} \
-		FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.tmp.rdf \
-		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.rdf
+		FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${CORE_RDF_FILE_SUFFIX}.tmp.rdf \
+  		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${CORE_RDF_FILE_SUFFIX}.rdf
+	@make convert-single-rdf-to-owl \
+		FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${CORE_RDF_FILE_SUFFIX}.tmp.rdf \
+  		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${CORE_OWL_FILE_SUFFIX}.owl \
+		CATALOG_PATH=${CORE_CATALOG_PATH}
 	@echo Output owl core file:
-	@ls -lh ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.rdf
-	@rm -f ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}.tmp.rdf
+	@ls -lh ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${CORE_RDF_FILE_SUFFIX}.rdf
+	@ls -lh ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${CORE_OWL_FILE_SUFFIX}.owl
+	@rm -f ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${CORE_RDF_FILE_SUFFIX}.tmp.rdf
 
 owl-restrictions:
 	@make gen-enriched-ns-file
 	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/owl-restrictions.xsl \
-		-o:${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.tmp.rdf \
+		-o:${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${RESTRICTION_RDF_FILE_SUFFIX}.tmp.rdf \
 		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}"
 	@make convert-between-serialization-formats INPUT_FORMAT=${RDF_XML_MIME_TYPE} \
 		OUTPUT_FORMAT=${RDF_XML_MIME_TYPE} \
-		FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.tmp.rdf \
-		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.rdf
+		FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${RESTRICTION_RDF_FILE_SUFFIX}.tmp.rdf \
+		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${RESTRICTION_RDF_FILE_SUFFIX}.rdf
+	@make convert-single-rdf-to-owl \
+		FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${RESTRICTION_RDF_FILE_SUFFIX}.tmp.rdf \
+		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${RESTRICTION_OWL_FILE_SUFFIX}.owl \
+		CATALOG_PATH=${RESTR_CATALOG_PATH}
 	@echo Output owl restrictions file:
-	@ls -lh ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.rdf
-	@rm -f ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_restrictions.tmp.rdf
+	@ls -lh ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${RESTRICTION_RDF_FILE_SUFFIX}.rdf
+	@ls -lh ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${RESTRICTION_OWL_FILE_SUFFIX}.owl
+	@rm -f ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${RESTRICTION_RDF_FILE_SUFFIX}.tmp.rdf
 
 shacl:
 	@make gen-enriched-ns-file
 	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/shacl-shapes.xsl \
-		-o:${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_shapes.tmp.rdf \
+		-o:${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${SHACL_RDF_FILE_SUFFIX}.tmp.rdf \
 		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}"
 	@make convert-between-serialization-formats INPUT_FORMAT=${RDF_XML_MIME_TYPE} \
 		OUTPUT_FORMAT=${RDF_XML_MIME_TYPE} \
-		FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_shapes.tmp.rdf \
-		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_shapes.rdf
+		FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${SHACL_RDF_FILE_SUFFIX}.tmp.rdf \
+		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${SHACL_RDF_FILE_SUFFIX}.rdf
+	@make convert-single-rdf-to-owl \
+		FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${SHACL_RDF_FILE_SUFFIX}.tmp.rdf \
+		OUTPUT_FILE_PATH=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${SHACL_OWL_FILE_SUFFIX}.owl \
+		CATALOG_PATH=${SHAPES_CATALOG_PATH}
 	@echo Output shacl file location:
-	@ls -lh ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_shapes.rdf
-	@rm -f ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_shapes.tmp.rdf
+	@ls -lh ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${SHACL_RDF_FILE_SUFFIX}.rdf
+	@ls -lh ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${SHACL_OWL_FILE_SUFFIX}.owl
+	@rm -f ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${SHACL_RDF_FILE_SUFFIX}.tmp.rdf
 
 # make generate-jsonld-context [XMI_INPUT_FILE_PATH=/path/to/cm.xmi] 
 #	[OUTPUT_FOLDER_PATH=/output/directory]
@@ -318,6 +360,41 @@ convert-rdf-to-jsonld:
 		echo " ==> Output in JSON-LD format";  \
 		ls -lh $${FILE_PATH%.*}.json;  \
 	done
+
+# A recipe for converting a single OWL file (OWL API flavor) to Turtle format.
+# make convert-ontology-rdfxml-to-turtle [ONTOLOGY_FOLDER_PATH=./my-folder] 
+#	[NAMESPACES_USER_XML_FILE_PATH=/path/to/namespaces.xml]
+# where:
+# ONTOLOGY_FOLDER_PATH: the path to the folder containing .owl files for 
+#						converting to turtle
+# NAMESPACES_USER_XML_FILE_PATH: path to the *.xml file provided by a user	
+convert-ontology-rdfxml-to-turtle:
+	@make gen-enriched-ns-file
+	@for FILE_PATH in ${OWL_FILELIST}; do \
+		echo Converting $${FILE_PATH} into Turtle; \
+		source model2owl-venv/bin/activate; \
+		make convert-between-serialization-formats \
+			INPUT_FORMAT=${RDF_XML_MIME_TYPE} \
+			OUTPUT_FORMAT=${TURTLE_MIME_TYPE}  \
+			FILE_PATH=$${FILE_PATH}  \
+			OUTPUT_FILE_PATH=$${FILE_PATH%.*}-ttl.owl \
+			USE_NAMESPACES=1; \
+		echo Input in RDF/XML format;  \
+		echo $${FILE_PATH};  \
+		echo " ==> Output in Turtle format";  \
+		ls -lh $${FILE_PATH%.*}-ttl.owl;  \
+	done
+
+# A recipe for converting a single RDF/XML file to RDF/XML (OWL API flavor) format.	
+convert-single-rdf-to-owl:
+	@echo "Converting ${FILE_PATH} ontology into RDF/XML (OWL API flavor)"
+	@make _generate-catalog
+	@java -jar robot/robot.jar convert \
+		-i ${FILE_PATH} \
+		--format owl \
+		-o ${OUTPUT_FILE_PATH} \
+		--catalog ${CATALOG_PATH}
+
 convert-rdf-to-rdf:
 	@for FILE_PATH in ${RDF_FILELIST}; do \
 		echo Converting $${FILE_PATH} into RDF/XML; \
@@ -329,6 +406,32 @@ convert-rdf-to-rdf:
 		echo " ==> Output in RDF/XML format";  \
 		ls -lh $${FILE_PATH%.*}.rdf;  \
 	done
+
+# The recipe generates catalog XML files that are needed for Robot to correctly
+# resolve internal and external imports. This is a temporary workaround and it's
+# needed because both ePO and ADMS published versions are faulty/invalid.
+# Usage: make _generate-catalog
+#	CORE_OWL_FOLDER_PATH=/path/to/core.owl-dir/
+#	RESTR_OWL_FOLDER_PATH=/path/to/restrictions.owl-dir/
+_generate-catalog:
+	@# the command uses dummy input
+	@mkdir -p ${CATALOG_DIR}
+	@java -jar ${SAXON} \
+		-s:<(echo "<s/>") \
+		-xsl:${MODEL2OWL_FOLDER}/src/xml/robot-catalog.xsl \
+		-o:${CORE_CATALOG_PATH}	
+	@java -jar ${SAXON} \
+		-s:<(echo "<s/>") \
+		-xsl:${MODEL2OWL_FOLDER}/src/xml/robot-catalog.xsl \
+		-o:${RESTR_CATALOG_PATH} \
+		corePath=$(shell realpath ${CORE_OWL_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${CORE_OWL_FILE_SUFFIX}.owl)
+	@java -jar ${SAXON} \
+		-s:<(echo "<s/>") \
+		-xsl:${MODEL2OWL_FOLDER}/src/xml/robot-catalog.xsl \
+		-o:${SHAPES_CATALOG_PATH} \
+		corePath=$(shell realpath ${CORE_OWL_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${CORE_OWL_FILE_SUFFIX}.owl) \
+		restrictionsPath=$(shell realpath "${RESTR_OWL_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${RESTRICTION_OWL_FILE_SUFFIX}.owl")
+
 
 # A generic recipe for converting RDF data from one serialization format to 
 # another. It can also be used to regenerate a file using the same format.
