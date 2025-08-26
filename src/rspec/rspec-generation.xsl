@@ -93,7 +93,7 @@
                 <xsl:text>{&#xA;</xsl:text>
                 "uri": "<xsl:value-of select="f:buildURIfromLexicalQName(./@name)"/>",&#xA;
                 "name": "<xsl:value-of select="./@name"/>",&#xA;
-                "label": {&#xA;    "en": "<xsl:value-of select="f:lexicalQNameToWords(./@name)"/>"&#xA;},&#xA;
+                "label": {&#xA;    "en": "<xsl:value-of select="fn:lower-case(f:lexicalQNameToWords(./@name))"/>"&#xA;},&#xA;
                 "description": {&#xA;    "en": "<xsl:value-of select="fn:normalize-space(f:formatDocStringForJson(./documentation/@value))"/>"&#xA; },&#xA;
                 "usage": {&#xA; },&#xA;
                 "domain": [
@@ -128,7 +128,7 @@
                 <xsl:text>{&#xA;</xsl:text>
                 "uri": "<xsl:value-of select="f:buildURIfromLexicalQName(./target/role/@name)"/>",&#xA;
                 "name": "<xsl:value-of select="./target/role/@name"/>",&#xA;
-                "label": {&#xA;    "en": "<xsl:value-of select="f:lexicalQNameToWords(./target/role/@name)"/>"&#xA;},&#xA;
+                "label": {&#xA;    "en": "<xsl:value-of select="fn:lower-case(f:lexicalQNameToWords(./target/role/@name))"/>"&#xA;},&#xA;
                 "description": {&#xA;    "en": "<xsl:value-of select="fn:normalize-space(f:formatDocStringForJson(./target/documentation/@value))"/>"&#xA; },&#xA;
                 "usage": {&#xA; },&#xA;
                 "domain": [
@@ -163,7 +163,7 @@
                 <xsl:text>{&#xA;</xsl:text>
                 "uri": "<xsl:value-of select="f:buildURIfromLexicalQName(./target/role/@name)"/>",&#xA;
                 "name": "<xsl:value-of select="./target/role/@name"/>",&#xA;
-                "label": {&#xA;    "en": "<xsl:value-of select="f:lexicalQNameToWords(./target/role/@name)"/>"&#xA;},&#xA;
+                "label": {&#xA;    "en": "<xsl:value-of select="fn:lower-case(f:lexicalQNameToWords(./target/role/@name))"/>"&#xA;},&#xA;
                 "description": {&#xA;    "en": "<xsl:value-of select="fn:normalize-space(f:formatDocStringForJson(./target/documentation/@value))"/>"&#xA; },&#xA;
                 "usage": {&#xA; },&#xA;
                 "domain": [

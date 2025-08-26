@@ -17,11 +17,7 @@
     <xsl:template name="footer">
         <footer class="text-center">
             <br/><br/>
-            <p> This document is generated automatically by the <a
-                    href="https://github.com/costezki/model2owl" target="_blank">model2owl tool</a>
-                developed in the context of <a
-                    href="https://joinup.ec.europa.eu/solution/eprocurement-ontology">the
-                    eProcurement Ontology initiative</a>.</p>
+            <p> This document is generated automatically by the <strong>model2owl tool</strong> </p>
             <p>The template of this report is based on the <a
                     href="https://github.com/thomaspark/pubcss">PubCSS library</a>.</p>
             <p>&#169; <xsl:value-of select="$conventionReportCopyrightText"/></p>

@@ -29,6 +29,12 @@
         "classes" : [
         <xsl:apply-templates select="/xmi:XMI/xmi:Extension/elements"/>
         ]
+        <xsl:text>,&#xA;</xsl:text>
+        "datatypes" : [
+        <xsl:apply-templates
+            select="/xmi:XMI/xmi:Extension/elements/element[@xmi:type = 'uml:DataType']"
+            mode="datatype"/>
+        ]
         <xsl:text>}</xsl:text>
     </xsl:template>
     
@@ -71,6 +77,19 @@
         }
     </xsl:template>
     
-    
+    <xsl:template match="element[@xmi:type = 'uml:DataType']" mode="datatype">
+        <!-- Prefer properties/@documentation; fall back to common tag names if needed -->
+        <xsl:variable name="raw-doc"
+            select="(normalize-space(string(properties/@documentation)),
+            normalize-space(string(tags/tag[@name = ('documentation','description','definition')][1]/@value)))[. != ''][1]"/>
+        <xsl:text>{&#xA;</xsl:text>
+        "label": "<xsl:value-of select="@name"/>",&#xA;
+        "uri": "<xsl:value-of select="f:buildURIfromLexicalQName(@name)"/>",&#xA;
+        "description": "<xsl:value-of select="fn:normalize-space(f:formatDocStringForJson($raw-doc))"/>"&#xA;
+        <xsl:text>}</xsl:text>
+        <xsl:if test="following-sibling::element[@xmi:type = 'uml:DataType']">
+            <xsl:text>,&#xA;</xsl:text>
+        </xsl:if>
+    </xsl:template>
     
 </xsl:stylesheet>

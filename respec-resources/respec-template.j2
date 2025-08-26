@@ -124,7 +124,7 @@
        Copyright must be specified otherwise Respec generates a value
      #}
     <p class="copyright">
-        Copyright © 2023
+        Copyright © 2025
     </p>
     {# <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">SEMIC Editor's Draft</a><time class="dt-published" datetime="2022-11-07">07 November 2022</time></p> #}
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -303,6 +303,59 @@ The main entities are those that form the core of the Application Profile.
    {{ renderentity(entity) }}
 {#{% endif %}#}
 {% endfor %}
+</section>
+
+
+        <section>
+        <h2>
+            Datatypes
+        </h2>
+
+	The following datatypes are used within this specification.
+
+	<table class="data-table simple" id="table-mandatory-classes">
+	    <thead>
+		<tr class="data-table__header">
+			<!--
+		    <th class="data-table__header-title--sortable">
+		    </th>
+			-->
+		    <th class="data-table__header-title--sortable data-table__header-title--sortable-active">
+			Class
+		    </th>
+		    <th class="data-table__header-title--sortable">
+			Definition
+		    </th>
+		</tr>
+	    </thead>
+	    <tbody class="supertype">
+            {% for entity in datatypes | sort(attribute=sortattr)%}
+		<tr>
+
+		<td>
+                {% if entity.scopeduri %}
+                    <div id="{{ entity.label[language] | replace(" ","") | urlencode }}">
+                        <a href="{{ entity.scopeduri }}"
+                           data-toggle="tooltip"
+                           data-content="{{ entity.uri }}"
+                           data-placement="right">{{ entity.label[language] }}</a>
+                    </div>
+                {% else %}
+                    <div id="{{ entity.label | replace(" ","") | urlencode }}">
+                        <a href="{{ entity.uri }}"
+                           data-toggle="tooltip"
+                           data-content="{{ entity.uri }}"
+                           data-placement="right">{{ entity.label }}</a>
+                    </div>
+                {% endif %}
+		</td><td>
+                    {{ entity.description | safe }}
+		</td></tr>
+            {%- endfor %}
+            </tbody>
+	</table>
+
+
 </section>
 
 </body>

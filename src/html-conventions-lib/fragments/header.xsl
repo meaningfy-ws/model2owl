@@ -18,7 +18,7 @@
             <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
             <meta charset="utf-8"/>
             <meta name="description" content="UML Comformance Report"/>
-            <meta name="author" content="Publications Office of the European Union"/>
+<!--            <meta name="author" content="Publications Office of the European Union"/>-->
             <meta name="viewport" content="width=device-width, initial-scale=1"/>
             
             <link rel="stylesheet" href="static/css/jquery-ui.min.css"/>  
