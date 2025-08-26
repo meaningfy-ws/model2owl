@@ -305,7 +305,7 @@ The main entities are those that form the core of the Application Profile.
 {% endfor %}
 </section>
 
-
+{% if datatypes is defined and datatypes %}
         <section>
         <h2>
             Datatypes
@@ -357,7 +357,7 @@ The main entities are those that form the core of the Application Profile.
 
 
 </section>
-
+{% endif %}
 </body>
 
 <!-- This must be at the end of the template, to ensure that the iterator properly works -->
