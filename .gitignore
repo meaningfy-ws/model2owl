@@ -335,3 +335,9 @@ pyvenv.cfg
 jq/jq
 .output*
 rdf-differ-ws/
+
+# Claude Code local-only files (leak-guard mechanism — see CLAUDE.local.md)
+.claude/CLAUDE.local.md
+.claude/topic-denylist
+.claude/settings.local.json
+.claude/hooks/
