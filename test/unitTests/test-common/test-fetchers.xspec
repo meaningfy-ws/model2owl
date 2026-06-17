@@ -391,6 +391,21 @@
             select="'Reveals the winner to whom the tender award outcome is attributed.'"/>
     </x:scenario>
 
+    <!-- Regression: the n-ary (ternary) association spine connector has ProxyConnector ends
+         (empty source name / target role name). f:getRelationsFromConnector must skip such
+         connectors and return an empty sequence rather than fatally erroring via f:isRelationValid.
+         Selected by label: the only Association connector whose both ends are ProxyConnectors in
+         the prettyModel (the TernaryTest spine). -->
+    <x:scenario label="Get relations from connector - n-ary ProxyConnector spine is skipped (empty, no error)">
+        <x:call function="f:getRelationsFromConnector">
+            <x:param name="connector"
+                href="../../testData/prettyModel-cleaned.xmi"
+                select="(//connector[properties/@ea_type = 'Association']
+                            [source/model/@type = 'ProxyConnector' and target/model/@type = 'ProxyConnector'])[1]"/>
+        </x:call>
+        <x:expect label="no relations produced" test="empty($x:result)"/>
+    </x:scenario>
+
     <x:scenario label="isConnectorBidirectional - non-bidirectional direction does not crash (Boat -&gt; Insurance, direction Unspecified)">
         <x:call function="f:isConnectorBidirectional">
             <x:param name="connector"

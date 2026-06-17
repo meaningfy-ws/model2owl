@@ -496,6 +496,12 @@
         <xsl:param name="connector"/>
         <xsl:variable name="source" select="$connector/source"/>
         <xsl:variable name="target" select="$connector/target"/>
+        <!-- Skip n-ary (e.g. ternary) association spine connectors: their source/target ends are
+             ProxyConnectors with no class name / role name, so they do not encode a binary relation.
+             Returning an empty sequence here protects EVERY caller (ReSpec, glossary, convention
+             report, reasoning layer) from the fatal f:isRelationValid error these connectors raise. -->
+        <xsl:if test="not($source/model/@type = 'ProxyConnector'
+                          or $target/model/@type = 'ProxyConnector')">
         <xsl:variable name="connectorIdRef" select="$connector/@xmi:idref"/>
         <xsl:variable name="connectorType" select="$connector/properties/@ea_type"/>
         <xsl:variable name="connectorDocs" select="$connector/documentation/@value"/>
@@ -530,6 +536,7 @@
                 </xsl:if>
             </xsl:if>
         </xsl:sequence>
+        </xsl:if>
     </xsl:function>
 
     <xd:doc>
