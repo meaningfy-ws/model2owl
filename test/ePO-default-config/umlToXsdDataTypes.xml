@@ -57,6 +57,7 @@
     <mapping><from qname="Double"/>           <to qname="xsd:double"/></mapping>
     <mapping><from qname="Int"/>              <to qname="xsd:int"/></mapping>
     <mapping><from qname="Char"/>             <to qname="xsd:string"/></mapping>
+    <mapping><from qname="Character"/>        <to qname="xsd:string"/></mapping>
     <mapping><from qname="String"/>           <to qname="xsd:string"/></mapping>
     <mapping><from qname="Byte"/>             <to qname="xsd:byte"/></mapping>
     <mapping><from qname="Short"/>            <to qname="xsd:short"/></mapping>
@@ -74,6 +75,7 @@
     <mapping><from qname="integer"/>          <to qname="xsd:integer"/></mapping>
     <mapping><from qname="int"/>              <to qname="xsd:int"/></mapping>
     <mapping><from qname="char"/>             <to qname="xsd:string"/></mapping>
+    <mapping><from qname="character"/>        <to qname="xsd:string"/></mapping>
     <mapping><from qname="string"/>           <to qname="xsd:string"/></mapping>
     <mapping><from qname="byte"/>             <to qname="xsd:byte"/></mapping>
     <mapping><from qname="short"/>            <to qname="xsd:short"/></mapping>
