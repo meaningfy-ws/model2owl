@@ -504,13 +504,12 @@
                 <x:expect label="array is empty" test="array:size($x:result) = 0"/>
             </x:scenario>
             
-            <x:scenario catch="yes" label="Get non-existent array throws error">
+            <x:scenario label="Get non-existent array returns an empty array (optional metadata)">
                 <x:call function="f:getMetadataArray">
                     <x:param name="keyName" select="'nonExistentArray'"/>
                 </x:call>
-                <x:expect label="err:code" test="$x:result?err?code" select="xs:QName('keyNotFoundError')"/>
-                <x:expect label="err:description" test="$x:result?err?description" 
-                    select="'Error: Key ''nonExistentArray'' not found in metadata JSON.'"/>
+                <x:expect label="result is array" test="$x:result instance of array(*)"/>
+                <x:expect label="array is empty" test="array:size($x:result) = 0"/>
             </x:scenario>
             
             <x:scenario catch="yes" label="Get non-array value throws error">
@@ -582,6 +581,20 @@
             <x:expect label="returns false" select="fn:false()"/>
         </x:scenario>
 
+    </x:scenario>
+
+    <x:scenario label="getMetadataValue returns an empty sequence for a missing key">
+        <x:call function="f:getMetadataValue">
+            <x:param name="keyName" select="'aKeyThatDoesNotExistInMetadata'"/>
+        </x:call>
+        <x:expect label="empty sequence, no error" select="()"/>
+    </x:scenario>
+
+    <x:scenario label="getMetadataValue still returns a present value">
+        <x:call function="f:getMetadataValue">
+            <x:param name="keyName" select="'versionInfo'"/>
+        </x:call>
+        <x:expect label="present value returned" select="'3.1.0'"/>
     </x:scenario>
 
 

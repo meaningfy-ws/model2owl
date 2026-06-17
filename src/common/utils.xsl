@@ -958,18 +958,9 @@
     </xd:doc>
     <xsl:function name="f:getMetadataValue" as="item()?">
         <xsl:param name="keyName" as="xs:string"/>
-        <xsl:variable name="value" select="$metadataJson?metadata?($keyName)"/>
-        <xsl:choose>
-            <xsl:when test="exists($value)">
-                <xsl:sequence select="$value"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:sequence select="fn:error(
-                    xs:QName('keyNotFoundError'),
-                    concat('Error: Key ''', $keyName, ''' not found in metadata JSON.')
-                    )"/>
-            </xsl:otherwise>
-        </xsl:choose>
+        <!-- All metadata.json fields are optional: a missing key yields an empty
+             sequence so generators can omit the corresponding triple/element. -->
+        <xsl:sequence select="$metadataJson?metadata?($keyName)"/>
     </xsl:function>
     
     <xd:doc>
@@ -990,10 +981,8 @@
                     )"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:sequence select="fn:error(
-                    xs:QName('keyNotFoundError'),
-                    concat('Error: Key ''', $keyName, ''' not found in metadata JSON.')
-                    )"/>
+                <!-- Missing array-valued metadata is optional: return an empty array. -->
+                <xsl:sequence select="[]"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
