@@ -628,7 +628,7 @@
         </xd:desc>
         <xd:param name="generalisation"/>
     </xd:doc>
-    <xsl:function name="f:generalisationMissingOrIncorrect">
+    <xsl:function name="f:generalisationMissingOrIncorrect" as="xs:boolean">
         <xsl:param name="generalisation"/>
         <xsl:variable name="targetConnector"
             select="f:getTargetConnectorFromGeneralisation($generalisation)"/>
@@ -642,6 +642,17 @@
         <!-- Extract source model names -->
         <xsl:variable name="sourceFromTargetConnector" select="$targetConnector/source/model/@name"/>
         <xsl:variable name="sourceFromSourceConnector" select="$sourceConnector/source/model/@name"/>
+        <!-- Guard: when both associations connect the SAME source class AND the SAME target class,
+             there is no distinct class pair for which a class generalisation could be expected
+             (analogous to the single-class-end situations), so the association generalisation is
+             valid. This guard also makes the three cases below mutually exclusive (exactly one
+             fires), so the function always returns a single boolean and never triggers FORG0006. -->
+        <xsl:choose>
+            <xsl:when test="$sourceFromTargetConnector = $sourceFromSourceConnector
+                            and $targetFromTargetConnector = $targetFromSourceConnector">
+                <xsl:sequence select="false()"/>
+            </xsl:when>
+            <xsl:otherwise>
         <!-- Case 1: Same Target, Different Sources -->
         <xsl:if test="$targetFromTargetConnector = $targetFromSourceConnector">
             <xsl:sequence
@@ -675,8 +686,8 @@
                     )"
             />
         </xsl:if>
-
-
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:function>
     
     

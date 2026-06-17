@@ -562,6 +562,24 @@
             </x:call>
             <x:expect label="boolean-false" select="false()"/>
         </x:scenario>
+
+        <!-- Regression for the FORG0006 crash: a generalisation between two associations that
+             both connect the SAME pair of classes (epo:SubmissionStatisticalInformation -> epo:MonetaryValue).
+             Selected by class labels (not idref) via the connector resolvers. Expected: valid (false),
+             returned as a single boolean. -->
+        <x:scenario label="association generalisation with identical source and target classes - valid (single boolean, no FORG0006)">
+            <x:call function="f:generalisationMissingOrIncorrect">
+                <x:param name="generalisation" href="../../testData/ePO-core-4.2.0.xml"
+                    select="(/xmi:XMI/xmi:Extension/connectors/connector
+                                [properties/@ea_type = 'Generalization']
+                                [source/model/@type = 'ProxyConnector' and target/model/@type = 'ProxyConnector']
+                                [f:getSourceConnectorFromGeneralisation(.)/source/model/@name = 'epo:SubmissionStatisticalInformation'
+                                 and f:getSourceConnectorFromGeneralisation(.)/target/model/@name = 'epo:MonetaryValue'
+                                 and f:getTargetConnectorFromGeneralisation(.)/source/model/@name = 'epo:SubmissionStatisticalInformation'
+                                 and f:getTargetConnectorFromGeneralisation(.)/target/model/@name = 'epo:MonetaryValue'])[1]"/>
+            </x:call>
+            <x:expect label="boolean-false" select="false()"/>
+        </x:scenario>
     </x:scenario>
     
     <x:scenario label="Check isNaryAssociation - positive case">
