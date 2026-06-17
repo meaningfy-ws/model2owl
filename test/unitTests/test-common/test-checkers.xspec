@@ -580,8 +580,30 @@
             </x:call>
             <x:expect label="boolean-false" select="false()"/>
         </x:scenario>
+
+        <!-- Regression for XTTE0780: a generalisation between ProxyConnector spines whose resolved
+             connectors have EMPTY source/target class names (an n-ary association spine pointing at
+             another such spine). None of the three cases fire, so the old code returned an empty
+             sequence and raised XTTE0780 against as="xs:boolean". The function must instead return a
+             single boolean (false: an unresolvable/empty-name connector generalisation is treated as
+             not-missing/not-incorrect). Selected by label: the Generalization connector whose both
+             ends are ProxyConnectors AND whose resolved source/target connectors have empty class
+             names. -->
+        <x:scenario label="association generalisation between empty-name ProxyConnector spines - valid (single boolean, no XTTE0780)">
+            <x:call function="f:generalisationMissingOrIncorrect">
+                <x:param name="generalisation" href="../../testData/ePO_core.xml"
+                    select="(/xmi:XMI/xmi:Extension/connectors/connector
+                                [properties/@ea_type = 'Generalization']
+                                [source/model/@type = 'ProxyConnector' and target/model/@type = 'ProxyConnector']
+                                [string-length(string(f:getSourceConnectorFromGeneralisation(.)/source/model/@name)) = 0
+                                 and string-length(string(f:getSourceConnectorFromGeneralisation(.)/target/model/@name)) = 0
+                                 and string-length(string(f:getTargetConnectorFromGeneralisation(.)/source/model/@name)) = 0
+                                 and string-length(string(f:getTargetConnectorFromGeneralisation(.)/target/model/@name)) = 0])[1]"/>
+            </x:call>
+            <x:expect label="boolean-false" select="false()"/>
+        </x:scenario>
     </x:scenario>
-    
+
     <x:scenario label="Check isNaryAssociation - positive case">
         <x:call function="f:isNaryAssociation">
             <x:param name="connector"

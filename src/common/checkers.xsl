@@ -662,40 +662,52 @@
                             and $targetFromTargetConnector = $targetFromSourceConnector">
                 <xsl:sequence select="false()"/>
             </xsl:when>
+            <!-- The three cases below are mutually exclusive but may ALL be false when the
+                 connector ends resolve to empty model/@name (e.g. the ProxyConnector spines of an
+                 n-ary association). Using an xsl:choose with a final xsl:otherwise guarantees the
+                 function always returns exactly one boolean and never yields an empty sequence
+                 (which would raise XTTE0780 against as="xs:boolean"). -->
             <xsl:otherwise>
-        <!-- Case 1: Same Target, Different Sources -->
-        <xsl:if test="$targetFromTargetConnector = $targetFromSourceConnector">
-            <xsl:sequence
-                select="not(fn:exists(root($generalisation)//connector[./properties/@ea_type = 'Generalization' and ./source/model/@name = $sourceFromSourceConnector and ./target/model/@name = $sourceFromTargetConnector]))"
-            />
-        </xsl:if>
-        <!-- Case 2: Same Source, Different Targets -->
-        <xsl:if test="$sourceFromTargetConnector = $sourceFromSourceConnector">
-            <xsl:sequence
-                select="not(fn:exists(root($generalisation)//connector[./properties/@ea_type = 'Generalization' and ./source/model/@name = $targetFromSourceConnector and ./target/model/@name = $targetFromTargetConnector]))"
-            />
-        </xsl:if>
-
-        <!-- Case 3: Different Sources, Different Targets -->
-        <xsl:if
-            test="$sourceFromTargetConnector != $sourceFromSourceConnector and $targetFromTargetConnector != $targetFromSourceConnector">
-            <xsl:sequence
-                select="
-                    not(
-                    fn:exists(root($generalisation)//connector[
-                    ./properties/@ea_type = 'Generalization'
-                    and ./source/model/@name = $sourceFromSourceConnector
-                    and ./target/model/@name = $sourceFromTargetConnector
-                    ])
-                    and
-                    fn:exists(root($generalisation)//connector[
-                    ./properties/@ea_type = 'Generalization'
-                    and ./source/model/@name = $targetFromSourceConnector
-                    and ./target/model/@name = $targetFromTargetConnector
-                    ])
-                    )"
-            />
-        </xsl:if>
+                <xsl:choose>
+                    <!-- Case 1: Same Target, Different Sources -->
+                    <xsl:when test="$targetFromTargetConnector = $targetFromSourceConnector">
+                        <xsl:sequence
+                            select="not(fn:exists(root($generalisation)//connector[./properties/@ea_type = 'Generalization' and ./source/model/@name = $sourceFromSourceConnector and ./target/model/@name = $sourceFromTargetConnector]))"
+                        />
+                    </xsl:when>
+                    <!-- Case 2: Same Source, Different Targets -->
+                    <xsl:when test="$sourceFromTargetConnector = $sourceFromSourceConnector">
+                        <xsl:sequence
+                            select="not(fn:exists(root($generalisation)//connector[./properties/@ea_type = 'Generalization' and ./source/model/@name = $targetFromSourceConnector and ./target/model/@name = $targetFromTargetConnector]))"
+                        />
+                    </xsl:when>
+                    <!-- Case 3: Different Sources, Different Targets -->
+                    <xsl:when
+                        test="$sourceFromTargetConnector != $sourceFromSourceConnector and $targetFromTargetConnector != $targetFromSourceConnector">
+                        <xsl:sequence
+                            select="
+                                not(
+                                fn:exists(root($generalisation)//connector[
+                                ./properties/@ea_type = 'Generalization'
+                                and ./source/model/@name = $sourceFromSourceConnector
+                                and ./target/model/@name = $sourceFromTargetConnector
+                                ])
+                                and
+                                fn:exists(root($generalisation)//connector[
+                                ./properties/@ea_type = 'Generalization'
+                                and ./source/model/@name = $targetFromSourceConnector
+                                and ./target/model/@name = $targetFromTargetConnector
+                                ])
+                                )"
+                        />
+                    </xsl:when>
+                    <!-- Fallback: connector ends do not resolve to comparable class names
+                         (e.g. empty-name ProxyConnector spines of an n-ary association).
+                         Treat as not-missing/not-incorrect, i.e. not flagged. -->
+                    <xsl:otherwise>
+                        <xsl:sequence select="false()"/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
