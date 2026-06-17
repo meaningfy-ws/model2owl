@@ -25,7 +25,7 @@
     
     <xsl:template match="connector[./properties/@ea_type = 'Association']">
         <xsl:variable name="associationChecks" as="item()*">
-            <xsl:if test="f:checkIfConnectorTargetAndSourceElementsExists(.)">
+            <xsl:if test="f:checkIfConnectorTargetAndSourceElementsExists(.) and not(f:isNaryAssociation(.))">
                 <!--    Start of common connectors checkers rules     -->
                 <xsl:call-template name="connectorNamingFormat">
                     <xsl:with-param name="connector" select="."/>

@@ -63,8 +63,14 @@
         <x:call template="associationSourceTargetTypes">
             <x:param name="connector" href="../../testData/ePO-CM-v2.0.1-2020-03-27_test.eap.xmi"
                 select="/xmi:XMI/xmi:Extension[1]/connectors[1]/connector[17]"/>
-        </x:call>   
-        <x:expect label="expect to do nothing" test="boolean(/dd)"/> 
+        </x:call>
+        <x:expect label="expect to do nothing" test="boolean(/dd)"/>
     </x:scenario>
-    
+
+    <x:scenario label="Scenario for an n-ary (ternary) association connector - convention checks must be skipped (consistent with the RDF side)">
+        <x:context href="../../testData/prettyModel-cleaned.xmi"
+            select="//connector[source/model/@name = 'TernaryTest' and source/model/@type = 'Association'][1]"/>
+        <x:expect label="n-ary association connector triggers no association convention warnings" select="()"/>
+    </x:scenario>
+
 </x:description>
