@@ -96,12 +96,27 @@
         <x:expect label="there is a rdf:Description for classes" test="count(rdf:Description/rdfs:range/owl:Class/owl:unionOf/rdf:Description) = 2"/>
     </x:scenario>
 
-    
+
+    <x:scenario label="Scenario for attribute multiplicity bounded range with distinct min and max (1..3) emits well-formed RDF/XML (crash #3)">
+        <x:call template="attributeMultiplicity">
+            <x:param name="attribute" href="../../testData/prettyModel-cleaned.xmi"
+                select="/xmi:XMI/xmi:Extension[1]/elements[1]/element[@name = 'Cycle']/attributes[1]/attribute[@name = 'colour']"/>
+        </x:call>
+        <x:expect label="the two restrictions are direct children of rdf:Description, not wrapped in owl:Class"
+            test="count(rdf:Description/rdfs:subClassOf/owl:Restriction) = 2"/>
+        <x:expect label="there is no spurious owl:Class wrapper"
+            test="not(boolean(rdf:Description/owl:Class))"/>
+        <x:expect label="there is a owl:minQualifiedCardinality with the lower bound"
+            test="rdf:Description/rdfs:subClassOf/owl:Restriction/owl:minQualifiedCardinality/text() = '1'"/>
+        <x:expect label="there is a owl:maxQualifiedCardinality with the upper bound"
+            test="rdf:Description/rdfs:subClassOf/owl:Restriction/owl:maxQualifiedCardinality/text() = '3'"/>
+    </x:scenario>
+
     <x:scenario label="Scenario for attribute multiplicity min value is any (*) (0..1)">
         <x:call template="attributeMultiplicity">
-            <x:param name="attribute" href="../../testData/ePO-CM_v.3.0.1.eap.xmi" 
+            <x:param name="attribute" href="../../testData/ePO-CM_v.3.0.1.eap.xmi"
                 select="/xmi:XMI/xmi:Extension[1]/elements[1]/element[54]/attributes[1]/attribute[1]"/>
-        </x:call>   
+        </x:call>
         <x:expect label="there is a rdf:Description" 
             test="rdf:Description/@rdf:about ='http://data.europa.eu/a4g/ontology#ProcurementObject'"/>
         <x:expect label="there is a rdfs:subClassOf" 
