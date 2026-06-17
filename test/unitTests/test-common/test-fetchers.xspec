@@ -391,4 +391,13 @@
             select="'Reveals the winner to whom the tender award outcome is attributed.'"/>
     </x:scenario>
 
+    <x:scenario label="isConnectorBidirectional - non-bidirectional direction does not crash (Boat -&gt; Insurance, direction Unspecified)">
+        <x:call function="f:isConnectorBidirectional">
+            <x:param name="connector"
+                href="../../testData/prettyModel-cleaned.xmi"
+                select="//connector[source/model/@name = 'Boat' and target/model/@name = 'Insurance']"/>
+        </x:call>
+        <x:expect label="treated as non-bidirectional" test="$x:result = false()"/>
+    </x:scenario>
+
 </x:description>
