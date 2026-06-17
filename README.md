@@ -61,6 +61,8 @@ https://github.com/OP-TED/model2owl/tree/master/test/unitTests/test-html-convent
 * [test/unitTest/test-reasoning-layer-lib](https://github.com/OP-TED/model2owl/tree/master/test/unitTests/test-reasoning-layer-lib) is the location of the unit tests for the transformation script for the restrictions of OWL ontology (on classes and properties).
 * [test/unitTest/test-jsonld-context-lib](https://github.com/OP-TED/model2owl/tree/master/test/unitTests/test-jsonld-context-lib) is the location of the unit tests for the transformation script for the JSON-LD context.
 
+> **Reading test results:** `make unit-tests` prints `BUILD SUCCESS` and exits 0 even when XSpec assertions fail. The real outcome lives in the JUnit XML under `target/surefire-reports/*.xml`. The `reading-xspec-test-results` skill ([.claude/skills/reading-xspec-test-results/SKILL.md](.claude/skills/reading-xspec-test-results/SKILL.md)) provides a copy-paste command that lists every failing report and testcase.
+
 # How to use
 This project can be used in 2 different ways as follows.
 ## Locally

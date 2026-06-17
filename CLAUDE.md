@@ -118,9 +118,38 @@ Tests are in `test/unitTests/` and mirror `src/`:
 
 XSpec tests reference real UML fixture models from `test/testData/*.xmi`. Each test calls XSLT templates with a selected UML node as context and asserts on generated XML output.
 
-**Select fixture nodes by label, not by `xmi:idref`.** When pointing a test at a node, prefer stable, human-readable selectors — class/connector **names** (e.g. `connector[...][f:...(.)/source/model/@name = 'epo:Buyer']`) — over opaque EA identifiers like `xmi:idref="EAID_…"`. Idrefs are unreadable and not guaranteed to survive a re-export, making such tests fragile and hard to review.
+### Selecting fixture nodes: by label, not by position or idref
 
-**`make unit-tests` exit code is misleading.** It returns 0 / prints `BUILD SUCCESS` even when XSpec assertions fail. To know whether tests actually passed, inspect `target/surefire-reports/*.xml` for `failures="N"` with N>0 (or `status="failed"` testcases) — do not trust the exit code.
+When pointing a test at a fixture node, select it by a **stable, human-readable label** — this is the convention for all new and edited tests.
+
+RECOMMENDED — select by name:
+- A class by its **name**: `…/elements/element[@name='epo:Buyer']`
+  (real example: `test/unitTests/test-common/test-fetchers.xspec:350`, `element[@name='epo:Technique']`).
+- A connector by the **names of the classes it relates** — match on `source/model/@name`, `target/model/@name`, or a `source/role/@name` / `target/role/@name` role name. The cleanest real example is the scenario *"association generalisation with identical source and target classes …"* in `test/unitTests/test-common/test-checkers.xspec:570-582`: it resolves the connector through `f:getSourceConnectorFromGeneralisation` / `f:getTargetConnectorFromGeneralisation` and predicates on `…/source/model/@name = 'epo:SubmissionStatisticalInformation'` etc., never on an idref.
+
+ANTI-PATTERNS — do not introduce these (many existing tests still use them; treat that as legacy, not a model to copy):
+- Positional indices, e.g. `…/connectors[1]/connector[27]` or `connector[453]` (real examples: `test/unitTests/test-common/test-checkers.xspec:238,248`). They break the moment a connector is added/removed or the export reorders nodes, and a reviewer cannot tell which model element is meant.
+- Opaque EA identifiers, e.g. `xmi:idref="EAID_…"`. They are unreadable and are **not** guaranteed to survive a re-export of the UML model, making the test silently point at the wrong node — or nothing — after a model refresh.
+
+Why labels win: a name-based selector is self-documenting (the reviewer sees `epo:Buyer`, not `connector[453]`), survives re-exports and reordering, and fails loudly (selects empty) rather than silently shifting to a different node.
+
+### Reading test outcomes: trust the JUnit XML, not the exit code
+
+`make unit-tests` (and `make test`) print `[INFO] BUILD SUCCESS` and return **exit code 0 even when XSpec assertions fail**. The Maven build "succeeds" as long as it ran the tests; assertion failures do not fail the build. **Never** judge pass/fail from the exit code or the `BUILD SUCCESS` line.
+
+The authoritative result is the JUnit XML under `target/surefire-reports/*.xml` (one file per `.xspec`). Structure: a `<testsuites>` root wraps one `<testsuite name="…" tests="…" failures="N">` per scenario; each `<x:expect>` becomes a `<testcase name="…" status="passed|failed">`. A red test is:
+- a `<testsuite … failures="N">` with **N>0**, and
+- inside it a `<testcase name="…" status="failed">` containing `<failure message="expect assertion failed">Expected: …</failure>`.
+
+Note attributes may wrap across lines and the wrapper is `<testsuites>`, so parse the XML rather than grepping a single line. Use the `reading-xspec-test-results` skill (`.claude/skills/reading-xspec-test-results/SKILL.md`) for a copy-paste command that lists every failing report file and each failed testcase with its message.
+
+Worked example — a test that is RED while `make unit-tests` exited 0:
+```xml
+<testcase name="… valid (single boolean, no FORG0006) boolean-false" status="failed">
+  <failure message="expect assertion failed">Expected: xs:boolean('false')</failure>
+</testcase>
+```
+The build printed `BUILD SUCCESS` and returned 0, but this scenario failed — only the surefire XML reveals it.
 
 `make unit-tests` automatically calls `make test-prerequisites` first, which generates `enriched-namespaces.xml` — a required preprocessing artifact. Never skip this step when running tests manually.
 
