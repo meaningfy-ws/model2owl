@@ -25,7 +25,16 @@
     </xd:doc>
 
     <xsl:template match="connector[./properties/@ea_type = 'Association']">
-        <xsl:if test="not(f:isExcludedByStatus(.))">
+        <!-- Skip n-ary associations and their ProxyConnector spine connectors,
+             mirroring the owl-core side (connectors-owl-core.xsl). These
+             synthetic connectors carry no usable source/target role names, so
+             passing them to f:getRelationsFromConnector would fatally error in
+             f:isRelationValid. The rest of the pipeline already ignores n-ary
+             associations. -->
+        <xsl:if test="not(f:isExcludedByStatus(.))
+                      and not(f:isNaryAssociation(.))
+                      and ./source/model/@type != 'ProxyConnector'
+                      and ./target/model/@type != 'ProxyConnector'">
             <xsl:variable name="relations" select="f:getRelationsFromConnector(.)"/>
             <xsl:for-each select="$relations">
                     <xsl:variable name="sourceClassCurie" select="./source/@name"/>

@@ -59,9 +59,16 @@
             test="rdf:Description/rdfs:subClassOf/owl:Restriction/owl:maxQualifiedCardinality = '1'"/>
         <x:expect label="there is a owl:onClass"
             test="rdf:Description/rdfs:subClassOf/owl:Restriction/owl:onClass/@rdf:resource = 'http://data.europa.eu/a4g/ontology#Tenderer'"/>
-        
+
     </x:scenario>
-    
+
+    <x:scenario
+        label="Scenario for testing the Association template on the ProxyConnector spine of the n-ary 'TernaryTest' association - it must be skipped, not error">
+        <x:context href="../../testData/prettyModel-cleaned.xmi"
+            select="/xmi:XMI/xmi:Extension/connectors/connector[source/model/@name = 'ProxyConnector' and target/model/@type = 'ProxyConnector']"/>
+        <x:expect label="produces no reasoning-layer output (skipped, no fatal error)"/>
+    </x:scenario>
+
     <x:scenario
         label="Scenario for testing template with match 'connector[./properties/@ea_type = 'Generalization']">
         <x:context href="../../testData/ePO-CM-v2.0.2-2020-05-17_test.eap.xmi"
