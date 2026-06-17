@@ -187,9 +187,19 @@
     </xd:doc>
     <xsl:function name="f:isAttributeTypeValidForDatatypeProperty">
         <xsl:param name="attributeElement"/>
+        <xsl:variable name="attributeType" select="$attributeElement/properties/@type"/>
+        <!-- Normalise the raw UML type through the UML->XSD mapping table first
+             (as the SHACL/JSON-LD range logic does), then test the mapped qname.
+             Falls back to the raw type when no mapping exists. -->
+        <xsl:variable name="resolvedType"
+            select="
+                if (boolean(f:getUmlDataTypeValues($attributeType, $umlDataTypesMapping))) then
+                    f:getUmlDataTypeValues($attributeType, $umlDataTypesMapping)
+                else
+                    $attributeType"/>
         <xsl:sequence
             select="
-                if (f:isValidDataType($attributeElement/properties/@type)) then
+                if (f:isValidDataType($resolvedType)) then
                     fn:true()
                 else
                     fn:false()"

@@ -601,6 +601,38 @@
         </x:call>
         <x:expect label="result" select="false()"/>
     </x:scenario>
-    
+
+    <!-- ISS-015 / M-8: UML primitive attribute types must be recognised as valid
+         ranges for owl:DatatypeProperty. Fixture attributes are selected BY NAME. -->
+    <x:scenario label="isAttributeTypeValidForDatatypeProperty - primitive int attribute (engravedID)">
+        <x:call function="f:isAttributeTypeValidForDatatypeProperty">
+            <x:param name="attributeElement"
+                href="../../testData/prettyModel-cleaned.xmi"
+                select="//attribute[@name = 'engravedID'][properties/@type = 'int']"
+            />
+        </x:call>
+        <x:expect label="result" select="true()"/>
+    </x:scenario>
+
+    <x:scenario label="isAttributeTypeValidForDatatypeProperty - primitive short attribute (colour)">
+        <x:call function="f:isAttributeTypeValidForDatatypeProperty">
+            <x:param name="attributeElement"
+                href="../../testData/prettyModel-cleaned.xmi"
+                select="//attribute[@name = 'colour'][properties/@type = 'short']"
+            />
+        </x:call>
+        <x:expect label="result" select="true()"/>
+    </x:scenario>
+
+    <x:scenario label="isAttributeTypeValidForDatatypeProperty - primitive long attribute (nickName)">
+        <x:call function="f:isAttributeTypeValidForDatatypeProperty">
+            <x:param name="attributeElement"
+                href="../../testData/prettyModel-cleaned.xmi"
+                select="//attribute[@name = 'nickName'][properties/@type = 'long']"
+            />
+        </x:call>
+        <x:expect label="result" select="true()"/>
+    </x:scenario>
+
 </x:description>
 
