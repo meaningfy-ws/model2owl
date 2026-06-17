@@ -144,6 +144,24 @@
         <x:expect label="expect to do nothing" select="()"/>
     </x:scenario>
 
+    <x:scenario
+        label="Scenario for a connector (ProxyConnector) generalisation does not emit the class single-child message (bug M-4)">
+        <x:context href="../../testData/prettyModel-cleaned.xmi"
+            select="/xmi:XMI/xmi:Extension[1]/connectors[1]/connector[properties/@ea_type = 'Generalization'][source/model/@type = 'ProxyConnector'][target/model/@type = 'ProxyConnector']"/>
+        <x:expect label="no class single-child message is produced for an association (ProxyConnector) generalisation"
+            test="not(contains(string-join(//text(), ' '), 'has only one sub-class'))"/>
+    </x:scenario>
+
+    <x:scenario
+        label="Scenario for the class single-child check skips connector (ProxyConnector) generalisations (bug M-4)">
+        <x:call template="generalizationClassWithSingleChild">
+            <x:param name="generalizationConnector"
+                href="../../testData/prettyModel-cleaned.xmi"
+                select="/xmi:XMI/xmi:Extension[1]/connectors[1]/connector[properties/@ea_type = 'Generalization'][source/model/@type = 'ProxyConnector'][target/model/@type = 'ProxyConnector']"/>
+        </x:call>
+        <x:expect label="expect to do nothing for a ProxyConnector generalisation" select="()"/>
+    </x:scenario>
+
     <x:scenario label="Scenario for finding a Generalization between 2 classes">
         <x:call template="generalizationSourceTargetTypes">
             <x:param name="generalizationConnector"
@@ -188,7 +206,7 @@
             </x:call>
             <x:expect label="expect to find a Description Details element" test="boolean(/dd)"/>
             <x:expect label="expect correct error text"
-                test="dd[@class='filter errors']/text() = 'The generalisation between epo:Notice -&gt; epo:Procedure and epo:SimplifiedNotice -&gt; epo:Procedure is missing or has invalid direction'"
+                test="dd[@class='filter errors']/text() = 'The generalisation between the connectors epo:Notice -&gt; epo:Procedure and epo:SimplifiedNotice -&gt; epo:Procedure is declared incorrectly: their source and target must be compatible, or the generalisation is declared on the wrong (inverse) object property'"
             />
         </x:scenario>
         

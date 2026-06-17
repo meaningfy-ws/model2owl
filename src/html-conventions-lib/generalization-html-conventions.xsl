@@ -88,9 +88,13 @@
         <xsl:variable name="idRefTarget" select="$generalizationConnector/target/@xmi:idref"/>
         <xsl:variable name="targetElement"
             select="f:getElementByIdRef($idRefTarget, root($generalizationConnector))"/>
+        <xsl:variable name="isConnectorGeneralization"
+            select="$generalizationConnector/source/model/@type = 'ProxyConnector' and $generalizationConnector/target/model/@type = 'ProxyConnector'"/>
         <xsl:sequence
             select="
-                if (count(f:getIncommingConnectors($targetElement)[properties/@ea_type = 'Generalization']) > 1) then
+                if ($isConnectorGeneralization) then
+                    ()
+                else if (count(f:getIncommingConnectors($targetElement)[properties/@ea_type = 'Generalization']) > 1) then
                     ()
                 else
                     f:generateInfoMessage(fn:concat('The class ', $generalizationConnector/target/model/@name, ' has only one sub-class ',
@@ -324,7 +328,7 @@
             if (not(f:generalisationMissingOrIncorrect($generalizationConnector))) then
             ()
             else
-            f:generateErrorMessage(fn:concat('The generalisation between ',$targetConnectorString, ' and ', $sourceConnectorString,' is missing or has invalid direction'),
+            f:generateErrorMessage(fn:concat('The generalisation between the connectors ',$targetConnectorString, ' and ', $sourceConnectorString,' is declared incorrectly: their source and target must be compatible, or the generalisation is declared on the wrong (inverse) object property'),
             path($generalizationConnector),
             'generalisation-connector-unidirectional-connector-direction-8',
             '',
