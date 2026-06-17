@@ -27,16 +27,24 @@
         <x:call template="elementTypes">
             <x:param name="root" href="../../testData/ePO-CM_v.3.0.1.eap.xmi"
                 select="/"/>
-        </x:call>   
-        <x:expect label="expect to do nothing" test="boolean(/dd)"/> 
+        </x:call>
+        <x:expect label="a warning is produced" test="boolean(/dd)"/>
+        <x:expect label="message is softened guidance"
+            test="contains(/dd, 'Model2Owl supports Class, Package, Datatype, Enumeration, and Object elements')"/>
+        <x:expect label="message points to the unsupported-constructs documentation"
+            test="contains(/dd, 'unsupported UML constructs')"/>
     </x:scenario>
-    
+
     <x:scenario label="Scenario for finding unsupported connector types">
         <x:call template="connectorTypes">
             <x:param name="root" href="../../testData/ePO-CM_v.3.0.1.eap.xmi"
                 select="/"/>
-        </x:call>   
-        <x:expect label="expect to do nothing" test="boolean(/dd)"/> 
+        </x:call>
+        <x:expect label="a warning is produced" test="boolean(/dd)"/>
+        <x:expect label="message is softened guidance"
+            test="contains(/dd, 'Model2Owl supports association, dependency, generalisation and realisation connectors')"/>
+        <x:expect label="message points to the unsupported-constructs documentation"
+            test="contains(/dd, 'unsupported UML constructs')"/>
     </x:scenario>
     
 </x:description>

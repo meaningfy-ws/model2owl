@@ -61,11 +61,11 @@
         <xsl:sequence
             select="
                 if (count($unsupportedConnectorTypes) > 0) then
-                    f:generateFormattedWarningMessage('Only associations, dependecies, generalisations and realisation connectors are supported. The following connector types were found in model and are not supported', $unsupportedConnectorTypes,
+                    f:generateFormattedWarningMessage('Model2Owl supports association, dependency, generalisation and realisation connectors. The following connector types were found in the model and are not transformed. For guidance, see the documentation on unsupported UML constructs', $unsupportedConnectorTypes,
                     '//connectors/connector/properties/@ea_type',
                     'general-connector-type-1',
-                    'CMC-R2',
-                    '&lt;a href=&quot;https://semiceu.github.io/style-guide/1.0.0/gc-conceptual-model-conventions.html#sec:cmc-r2&quot; target=&quot;_blank&quot;&gt;CMC-R2&lt;/a&gt;'
+                    'unsupported UML constructs',
+                    '&lt;a href=&quot;https://meaningfy-ws.github.io/model2owl-docs/public-review/uml/unsupported-uml-constructs.html#sec:unsupported-uml-constructs&quot; target=&quot;_blank&quot;&gt;Unsupported UML constructs&lt;/a&gt;'
                     )
                 else
                     ()
@@ -90,11 +90,11 @@
         <xsl:sequence
             select="
                 if (count($unsupportedElementTypes) > 0) then
-                    f:generateFormattedWarningMessage('Only Class, Package, Datatype, Enumeration, and Object elements are supported. The following element types were found in model and are not supported', $unsupportedElementTypes,
+                    f:generateFormattedWarningMessage('Model2Owl supports Class, Package, Datatype, Enumeration, and Object elements. The following element types were found in the model and are not transformed. For guidance, see the documentation on unsupported UML constructs', $unsupportedElementTypes,
                     '//elements/element/@xmi:type',
                     'general-element-type-2',
-                    'CMC-R2',
-                    '&lt;a href=&quot;https://semiceu.github.io/style-guide/1.0.0/gc-conceptual-model-conventions.html#sec:cmc-r2&quot; target=&quot;_blank&quot;&gt;CMC-R2&lt;/a&gt;'
+                    'unsupported UML constructs',
+                    '&lt;a href=&quot;https://meaningfy-ws.github.io/model2owl-docs/public-review/uml/unsupported-uml-constructs.html#sec:unsupported-uml-constructs&quot; target=&quot;_blank&quot;&gt;Unsupported UML constructs&lt;/a&gt;'
                     )
                 else
                     ()
