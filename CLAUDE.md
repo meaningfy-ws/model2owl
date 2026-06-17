@@ -118,6 +118,10 @@ Tests are in `test/unitTests/` and mirror `src/`:
 
 XSpec tests reference real UML fixture models from `test/testData/*.xmi`. Each test calls XSLT templates with a selected UML node as context and asserts on generated XML output.
 
+**Select fixture nodes by label, not by `xmi:idref`.** When pointing a test at a node, prefer stable, human-readable selectors — class/connector **names** (e.g. `connector[...][f:...(.)/source/model/@name = 'epo:Buyer']`) — over opaque EA identifiers like `xmi:idref="EAID_…"`. Idrefs are unreadable and not guaranteed to survive a re-export, making such tests fragile and hard to review.
+
+**`make unit-tests` exit code is misleading.** It returns 0 / prints `BUILD SUCCESS` even when XSpec assertions fail. To know whether tests actually passed, inspect `target/surefire-reports/*.xml` for `failures="N"` with N>0 (or `status="failed"` testcases) — do not trust the exit code.
+
 `make unit-tests` automatically calls `make test-prerequisites` first, which generates `enriched-namespaces.xml` — a required preprocessing artifact. Never skip this step when running tests manually.
 
 **Two test tiers.** `make test` runs both:
