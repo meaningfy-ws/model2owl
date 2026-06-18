@@ -7,6 +7,17 @@
     <groupId>ws.meaningfy.model2owl</groupId>
     <artifactId>model2owl</artifactId>
     <version>1</version>
+
+    <properties>
+        <!-- XSpec file selection. Default runs the whole suite; override on the
+             command line to run a subset without editing this pom, e.g.:
+               mvn xspec:run-xspec -Dxspec.includes='**/test-checkers.xspec'
+             Comma-separate to run several modules:
+               -Dxspec.includes='**/test-checkers.xspec,**/test-fetchers.xspec'
+             See `make unit-test-one INCLUDE=...` for the convenient wrapper. -->
+        <xspec.includes>**/*.xspec</xspec.includes>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -23,6 +34,7 @@
                 <configuration>
                     <testDir>${project.basedir}/test/unitTests</testDir>
                     <generateSurefireReport>true</generateSurefireReport>
+                    <includes>${xspec.includes}</includes>
                     <xspecProperties>
                         <xspec.fail>false</xspec.fail>
                         <saxon.custom.options>enrichedNamespacesPath=${saxon.options.enrichedNamespacesPath}</saxon.custom.options>

@@ -39,10 +39,12 @@ make unit-tests       # Run all XSpec tests via Maven; JUnit XML → target/sure
 
 `make install` only fetches jars/tools — it assumes **Java 11+, Maven, Python 3, curl, and unzip** are already on PATH.
 
-**Single test file** (requires Saxon on PATH after `make install`):
+**Single test module** (there is no standalone `xspec` CLI installed here — runs go through Maven):
 ```bash
-xspec test/unitTests/test-owl-core-lib/test-elements-owl-core.xspec
+make unit-test-one MODULE=test-elements-owl-core   # bare name, no path/extension; prints a summary
+make unit-tests INCLUDE='**/test-checkers.xspec,**/test-fetchers.xspec'   # a few modules
 ```
+A selective run only refreshes its own reports, so `make test-summary` (run automatically after `make test` / `make unit-test-one`) scopes its 15-minute freshness window to just what you ran. See the `running-xspec-tests` skill.
 
 **Transformations** (all require `config-proxy.xsl` to point to a valid config):
 ```bash

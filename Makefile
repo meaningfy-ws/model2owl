@@ -148,6 +148,14 @@ install:  get-saxon get-rdflib get-robot get-widoco get-jena-cli-tools get-jinja
 # Run all tests
 test: unit-tests functional-tests
 	@mvn surefire-report:report-only
+	-@make test-summary
+
+# Summarise XSpec results from target/surefire-reports (skips reports older than
+# TEST_SUMMARY_MAX_AGE_MIN minutes; set to 0 to consider all). Exits non-zero on
+# failures so it is safe to gate scripts/CI on this target.
+TEST_SUMMARY_MAX_AGE_MIN ?= 15
+test-summary:
+	@python3 scripts/summarize_xspec_results.py --max-age-min=${TEST_SUMMARY_MAX_AGE_MIN}
 
 # Run functional tests in Python
 functional-tests: .deps_installed
@@ -157,12 +165,26 @@ functional-tests: .deps_installed
 	@make get-python-test-deps
 	touch .deps_installed
 
-# Run unit tests in XSpec
+# Run unit tests in XSpec.
+# INCLUDE selects which .xspec files run (Ant glob, comma-separated for several);
+# defaults to the whole suite. Examples:
+#   make unit-tests
+#   make unit-tests INCLUDE='**/test-checkers.xspec'
+#   make unit-tests INCLUDE='**/test-checkers.xspec,**/test-fetchers.xspec'
+INCLUDE ?= **/*.xspec
 unit-tests:
 	@make test-prerequisites
 	@mvn xspec:run-xspec \
 		-Dsaxon.options.enrichedNamespacesPath=${ENRICHED_NAMESPACES_XML_PATH} \
-		-Dsaxon.options.importsPath=${IMPORTS_XML_FILE_PATH}
+		-Dsaxon.options.importsPath=${IMPORTS_XML_FILE_PATH} \
+		-Dxspec.includes='${INCLUDE}'
+
+# Convenience wrapper: run a single module by bare name (no path, no extension)
+# and print the summary for just that module. Example:
+#   make unit-test-one MODULE=test-checkers
+unit-test-one:
+	@make unit-tests INCLUDE='**/${MODULE}.xspec'
+	@make test-summary
 
 # Actions required in order to setup the environment for testing purposes.
 # Usage (`[]` denotes an optional argument; if omited, default value will be used):
