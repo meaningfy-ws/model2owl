@@ -30,7 +30,7 @@
         </x:call>
         <x:expect label="a warning is produced" test="boolean(/dd)"/>
         <x:expect label="message is softened guidance"
-            test="contains(/dd, 'Model2Owl supports Class, Package, Datatype, Enumeration, and Object elements')"/>
+            test="contains(/dd, 'Model2owl supports Class, Package, Datatype, Enumeration, and Object elements')"/>
         <x:expect label="message points to the unsupported-constructs documentation"
             test="contains(/dd, 'unsupported UML constructs')"/>
     </x:scenario>
@@ -42,7 +42,7 @@
         </x:call>
         <x:expect label="a warning is produced" test="boolean(/dd)"/>
         <x:expect label="message is softened guidance"
-            test="contains(/dd, 'Model2Owl supports association, dependency, generalisation and realisation connectors')"/>
+            test="contains(/dd, 'Model2owl supports association, dependency, generalisation and realisation connectors')"/>
         <x:expect label="message points to the unsupported-constructs documentation"
             test="contains(/dd, 'unsupported UML constructs')"/>
     </x:scenario>
