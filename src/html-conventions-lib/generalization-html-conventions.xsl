@@ -330,7 +330,7 @@
             else
             f:generateErrorMessage(fn:concat('The generalisation between the connectors ',$targetConnectorString, ' and ', $sourceConnectorString,' is declared incorrectly: their source and target must be compatible, or the generalisation is declared on the wrong (inverse) object property'),
             path($generalizationConnector),
-            'generalisation-connector-unidirectional-connector-direction-8',
+            'generalisation-connector-and-missing-class-generalisation-9',
             '',
             ''
             )"
