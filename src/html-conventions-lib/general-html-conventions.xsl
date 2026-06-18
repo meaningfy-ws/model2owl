@@ -61,11 +61,11 @@
         <xsl:sequence
             select="
                 if (count($unsupportedConnectorTypes) > 0) then
-                    f:generateFormattedWarningMessage('Model2Owl supports association, dependency, generalisation and realisation connectors. The following connector types were found in the model and are not transformed. For guidance, see the documentation on unsupported UML constructs', $unsupportedConnectorTypes,
+                    f:generateFormattedWarningMessage('Model2owl supports association, dependency, generalisation and realisation connectors. The following connector types were found in the model and are not transformed. For guidance, see the documentation on unsupported UML constructs', $unsupportedConnectorTypes,
                     '//connectors/connector/properties/@ea_type',
                     'general-connector-type-1',
                     'unsupported UML constructs',
-                    '&lt;a href=&quot;https://meaningfy-ws.github.io/model2owl-docs/public-review/uml/unsupported-uml-constructs.html#sec:unsupported-uml-constructs&quot; target=&quot;_blank&quot;&gt;Unsupported UML constructs&lt;/a&gt;'
+                    '&lt;a href=&quot;https://meaningfy-ws.github.io/model2owl-docs-gh-pages/public-review/uml/unsupported-uml-constructs.html#sec:unsupported-uml-constructs&quot; target=&quot;_blank&quot;&gt;Unsupported UML constructs&lt;/a&gt;'
                     )
                 else
                     ()
@@ -90,11 +90,11 @@
         <xsl:sequence
             select="
                 if (count($unsupportedElementTypes) > 0) then
-                    f:generateFormattedWarningMessage('Model2Owl supports Class, Package, Datatype, Enumeration, and Object elements. The following element types were found in the model and are not transformed. For guidance, see the documentation on unsupported UML constructs', $unsupportedElementTypes,
+                    f:generateFormattedWarningMessage('Model2owl supports Class, Package, Datatype, Enumeration, and Object elements. The following element types were found in the model and are not transformed. For guidance, see the documentation on unsupported UML constructs', $unsupportedElementTypes,
                     '//elements/element/@xmi:type',
                     'general-element-type-2',
                     'unsupported UML constructs',
-                    '&lt;a href=&quot;https://meaningfy-ws.github.io/model2owl-docs/public-review/uml/unsupported-uml-constructs.html#sec:unsupported-uml-constructs&quot; target=&quot;_blank&quot;&gt;Unsupported UML constructs&lt;/a&gt;'
+                    '&lt;a href=&quot;https://meaningfy-ws.github.io/model2owl-docs-gh-pages/public-review/uml/unsupported-uml-constructs.html#sec:unsupported-uml-constructs&quot; target=&quot;_blank&quot;&gt;Unsupported UML constructs&lt;/a&gt;'
                     )
                 else
                     ()
