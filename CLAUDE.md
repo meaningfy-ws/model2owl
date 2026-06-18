@@ -195,6 +195,27 @@ paths; only hand-rolled `java -jar saxon.jar` calls hit this.
 - **Reused-concepts filtering**: Config flags like `$generateReusedConceptsOWLcore` filter out elements not in the project's own namespace. This is intentional — one combined multi-namespace UML model can produce scoped per-module artifacts.
 - **OWL catalog workaround**: Some ePO/ADMS ontologies have broken `owl:imports` URIs. `robot-catalog.xsl` generates a ROBOT-compatible catalog file so ROBOT can still resolve and validate imports.
 
+## Editorial content is mirrored in the docs repo — keep it in sync
+
+Some **editorial / user-facing text is duplicated** between this codebase and the
+documentation repo (`ted-model2owl-docs`, see Related Repositories). The clearest
+example: every convention-check message and severity emitted from
+`src/html-conventions-lib/**` (via `f:generateErrorMessage` / `…InfoMessage` /
+`…WarningMessage`, each tagged with a rule ID) is mirrored, keyed by that rule ID, in
+the docs table `modules/ROOT/pages/checkers/model2owl-checkers.adoc`. The
+"unsupported UML constructs" warnings and the transformation-rule descriptions are
+mirrored similarly. **Whenever you change such editorial text in the code (message
+wording, severity, rule ID, short description), the corresponding docs entry must be
+updated in the same change** — the two must never drift. The docs repo is the
+published source of truth for these strings, so a stale message there is a real
+defect, not a cosmetic one.
+
+For any change that may touch this editorial code, use the
+**`syncing-editorial-text-with-docs`** skill
+(`.claude/skills/syncing-editorial-text-with-docs/SKILL.md`): it maps every linked
+code↔docs place, and supports both the impact analysis (which docs entry a change
+touches) and making the matching docs edit.
+
 ## Related Repositories
 
 **Forking workflow:** the canonical upstreams live under the **`OP-TED`** org; the
