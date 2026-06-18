@@ -834,12 +834,30 @@
                 </xsl:if>
             </xsl:when>
 
-            <!-- Date and Time Types -->
-            <xsl:when test="$datatypeQName = $dateTimeDatatypes">
+            <!-- Date and Time Types: validate each value against its OWN XSD type.
+                 (e.g. 2020-01-01 is a valid xsd:date but is NOT castable as xs:dateTime,
+                 so the previous single xs:dateTime check produced false-positive errors.) -->
+            <xsl:when test="$datatypeQName = ('xsd:dateTime', 'xsd:dateTimeStamp')">
                 <xsl:if test="not($tagValue castable as xs:dateTime)">
                     <xsl:sequence select="fn:error(
                         xs:QName('invalidValueError'),
                         concat('Error: Value ', $tagValue, ' is not valid for date/time type ', $datatypeQName, '.')
+                        )"/>
+                </xsl:if>
+            </xsl:when>
+            <xsl:when test="$datatypeQName = 'xsd:date'">
+                <xsl:if test="not($tagValue castable as xs:date)">
+                    <xsl:sequence select="fn:error(
+                        xs:QName('invalidValueError'),
+                        concat('Error: Value ', $tagValue, ' is not valid for date type ', $datatypeQName, '.')
+                        )"/>
+                </xsl:if>
+            </xsl:when>
+            <xsl:when test="$datatypeQName = 'xsd:time'">
+                <xsl:if test="not($tagValue castable as xs:time)">
+                    <xsl:sequence select="fn:error(
+                        xs:QName('invalidValueError'),
+                        concat('Error: Value ', $tagValue, ' is not valid for time type ', $datatypeQName, '.')
                         )"/>
                 </xsl:if>
             </xsl:when>

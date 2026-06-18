@@ -394,6 +394,38 @@
             <x:expect label="err:description" test="boolean($x:result?err?description)"/>
         </x:scenario>
 
+        <x:scenario label="valid date (xsd:date value 2020-01-01 must not be rejected as xs:dateTime)">
+            <x:call function="f:validateTagValue">
+                <x:param name="tagValue" select="'2020-01-01'"/>
+                <x:param name="datatypeQName" select="'xsd:date'"/>
+            </x:call>
+            <x:expect label="result" select="fn:true()"/>
+        </x:scenario>
+
+        <x:scenario label="valid time">
+            <x:call function="f:validateTagValue">
+                <x:param name="tagValue" select="'10:30:00'"/>
+                <x:param name="datatypeQName" select="'xsd:time'"/>
+            </x:call>
+            <x:expect label="result" select="fn:true()"/>
+        </x:scenario>
+
+        <x:scenario label="valid dateTime">
+            <x:call function="f:validateTagValue">
+                <x:param name="tagValue" select="'2020-01-01T10:30:00'"/>
+                <x:param name="datatypeQName" select="'xsd:dateTime'"/>
+            </x:call>
+            <x:expect label="result" select="fn:true()"/>
+        </x:scenario>
+
+        <x:scenario label="invalid date" catch="yes">
+            <x:call function="f:validateTagValue">
+                <x:param name="tagValue" select="'not-a-date'"/>
+                <x:param name="datatypeQName" select="'xsd:date'"/>
+            </x:call>
+            <x:expect label="err:description" test="boolean($x:result?err?description)"/>
+        </x:scenario>
+
     </x:scenario>
 
 
