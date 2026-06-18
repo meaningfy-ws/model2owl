@@ -971,14 +971,33 @@
     </xsl:function>
     
     <xd:doc>
-        <xd:desc>Extract a value from the JSON metadata by key name (preserves original type)</xd:desc>
+        <xd:desc>Treat a blank (empty or whitespace-only) string value as absent.
+            Returns the value unchanged unless it is a string that normalises to '',
+            in which case the empty sequence is returned. Non-string values (numbers,
+            booleans, arrays, maps) are passed through untouched so that meaningful
+            falsy values such as 0 or false are preserved.</xd:desc>
+        <xd:param name="value">The value to normalise.</xd:param>
+    </xd:doc>
+    <xsl:function name="f:nonBlankValue" as="item()?">
+        <xsl:param name="value" as="item()?"/>
+        <xsl:sequence select="
+            if (empty($value)) then ()
+            else if ($value instance of xs:string and normalize-space($value) = '') then ()
+            else $value
+            "/>
+    </xsl:function>
+
+    <xd:doc>
+        <xd:desc>Extract a value from the JSON metadata by key name (preserves original type).
+            All metadata.json fields are optional: a missing key OR a blank
+            (empty / whitespace-only) value yields an empty sequence, so generators can
+            omit the corresponding triple/element instead of emitting an empty or
+            lexically invalid one (e.g. an empty xsd:date).</xd:desc>
         <xd:param name="keyName">The key name to extract from the JSON metadata</xd:param>
     </xd:doc>
     <xsl:function name="f:getMetadataValue" as="item()?">
         <xsl:param name="keyName" as="xs:string"/>
-        <!-- All metadata.json fields are optional: a missing key yields an empty
-             sequence so generators can omit the corresponding triple/element. -->
-        <xsl:sequence select="$metadataJson?metadata?($keyName)"/>
+        <xsl:sequence select="f:nonBlankValue($metadataJson?metadata?($keyName))"/>
     </xsl:function>
     
     <xd:doc>

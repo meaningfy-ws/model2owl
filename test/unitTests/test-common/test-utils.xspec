@@ -629,5 +629,40 @@
         <x:expect label="present value returned" select="'3.1.0'"/>
     </x:scenario>
 
+    <x:scenario label="nonBlankValue treats an empty string as absent">
+        <x:call function="f:nonBlankValue">
+            <x:param name="value" select="''"/>
+        </x:call>
+        <x:expect label="empty sequence" select="()"/>
+    </x:scenario>
+
+    <x:scenario label="nonBlankValue treats a whitespace-only string as absent">
+        <x:call function="f:nonBlankValue">
+            <x:param name="value" select="'   '"/>
+        </x:call>
+        <x:expect label="empty sequence" select="()"/>
+    </x:scenario>
+
+    <x:scenario label="nonBlankValue passes an empty sequence through">
+        <x:call function="f:nonBlankValue">
+            <x:param name="value" select="()"/>
+        </x:call>
+        <x:expect label="empty sequence" select="()"/>
+    </x:scenario>
+
+    <x:scenario label="nonBlankValue keeps a non-blank string">
+        <x:call function="f:nonBlankValue">
+            <x:param name="value" select="'ePO Core'"/>
+        </x:call>
+        <x:expect label="value returned unchanged" select="'ePO Core'"/>
+    </x:scenario>
+
+    <x:scenario label="nonBlankValue preserves a meaningful non-string value (0)">
+        <x:call function="f:nonBlankValue">
+            <x:param name="value" select="0"/>
+        </x:call>
+        <x:expect label="zero is kept" select="0"/>
+    </x:scenario>
+
 
 </x:description>

@@ -93,11 +93,15 @@
             <xsl:if test="exists(f:getMetadataValue('createdDate'))">
                 <dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date"><xsl:value-of select="f:getMetadataValue('createdDate')"/></dct:created>
             </xsl:if>
-            <owl:versionInfo><xsl:value-of select="f:getMetadataValue('versionInfo')"/></owl:versionInfo>
+            <xsl:if test="exists(f:getMetadataValue('versionInfo'))">
+                <owl:versionInfo><xsl:value-of select="f:getMetadataValue('versionInfo')"/></owl:versionInfo>
+            </xsl:if>
             <xsl:if test="exists(f:getMetadataValue('incompatibleWith'))">
                 <owl:incompatibleWith><xsl:value-of select="f:getMetadataValue('incompatibleWith')"/></owl:incompatibleWith>
             </xsl:if>
-            <owl:versionIRI rdf:resource="{fn:concat($restrictionsArtefactURI,'-',f:getMetadataValue('versionInfo'))}"/>
+            <xsl:if test="exists(f:getMetadataValue('versionInfo'))">
+                <owl:versionIRI rdf:resource="{fn:concat($restrictionsArtefactURI,'-',f:getMetadataValue('versionInfo'))}"/>
+            </xsl:if>
             <xsl:if test="exists(f:getMetadataValue('priorVersion'))">
                 <owl:priorVersion><xsl:value-of select="fn:concat($restrictionsArtefactURI,'-',f:getMetadataValue('priorVersion'))"/></owl:priorVersion>
             </xsl:if>

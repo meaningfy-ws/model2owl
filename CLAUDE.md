@@ -104,6 +104,15 @@ The default config in `test/ePO-default-config/` contains:
 - `namespaces.xml` — all namespace prefix → URI mappings
 - `umlToXsdDataTypes.xml` — UML type to XSD type mapping
 - `xsdAndRdfDataTypes.xml` — XSD/RDF datatype catalog
+- `metadata.json` — ontology header / report metadata
+
+**metadata.json is read from a hardcoded path.** `config-parameters.xsl` binds
+`$metadataJson` with `fn:json-doc('metadata.json')` (relative to the config dir), so
+`owl-core`, `owl-restrictions`, `shacl`, `generate-jsonld-context`, the convention
+report and the glossary **always** read `test/ePO-default-config/metadata.json`. The
+Makefile's `RESPEC_METADATA_JSON_PATH` var only affects the **ReSpec** targets, not the
+RDF/SHACL/JSON-LD ones. To run those with different metadata you must physically swap the
+file (then restore it, e.g. `git checkout -- test/ePO-default-config/metadata.json`).
 
 This default config relates to e-Procurement ontology that is the main use case for this tool.
 
@@ -172,6 +181,13 @@ Transformations are not single-pass:
 
 
 The `.tmp.rdf` file is the raw output of step 3 (the XSLT transformation) and the *input* to step 4; step 4 converts/normalizes it into the final `.rdf`/`.ttl`/`.owl`/`.jsonld`, then deletes the `.tmp.rdf`. So a leftover `.tmp.rdf` means step 4 did not complete.
+
+**Invoking Saxon directly?** The `enrichedNamespacesPath` (and `importsPath`) stylesheet
+params must be **absolute paths**. They are resolved relative to the *importing
+stylesheet* (e.g. `src/common/utils.xsl`), not the repo root or the input file, so a
+relative value like `.temp/enriched-namespaces.xml` fails with `FODC0002 ... No such file`
+(Saxon looks under `src/common/.temp/...`). The `make` targets already pass absolute
+paths; only hand-rolled `java -jar saxon.jar` calls hit this.
 
 ## Non-Obvious Design Decisions
 
