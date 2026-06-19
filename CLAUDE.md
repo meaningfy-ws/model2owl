@@ -118,6 +118,17 @@ This default config relates to e-Procurement ontology that is the main use case 
 
 For a different project, create a new config directory and update the import in `config-proxy.xsl`. Never hardcode namespace URIs inside library XSLT files — all namespaces flow from config.
 
+**A custom `namespaces.xml` must be wired in two places.** Pointing the config's
+`$namespacePrefixes` (`fn:doc('namespaces.xml')`) at your file is **not enough**: generated
+**term URIs** are resolved through the *enriched-namespaces* file, which `gen-enriched-ns-file`
+builds from `NAMESPACES_USER_XML_FILE_PATH` (default = the ePO `namespaces.xml`). If you only
+swap the config, the ontology IRI/`base-ontology-uri` uses your namespace but every class/property
+URI still resolves via the **empty-prefix entry (`name=""`) of the default `namespaces.xml`**. So
+pass `NAMESPACES_USER_XML_FILE_PATH=<your-namespaces.xml>` to the `make` targets too (the empty
+prefix is what unprefixed model names resolve to). Related: `generate-respec` only regenerates
+`*_respec.json` when it is **absent** (Makefile), so delete a stale one before re-running with a
+changed config, or ReSpec will reuse the old URIs.
+
 ## Testing
 
 Tests are in `test/unitTests/` and mirror `src/`:
