@@ -212,7 +212,7 @@
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:for-each select="$domains">
-                            <rdf:domain rdf:resource="{f:buildURIfromLexicalQName(.)}"/>
+                            <rdfs:domain rdf:resource="{f:buildURIfromLexicalQName(.)}"/>
                         </xsl:for-each>
                     </xsl:otherwise>
                 </xsl:choose>
