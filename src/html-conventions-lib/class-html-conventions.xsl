@@ -181,7 +181,7 @@
 
    
     <xd:doc>
-        <xd:desc>[class-attributes-3] - The class $className$ nas no attributes provided. A class
+        <xd:desc>[class-attribute-3] - The class $className$ has no attributes provided. A class
             should define some attributes.</xd:desc>
         <xd:param name="class"/>
     </xd:doc>
@@ -192,9 +192,9 @@
         <xsl:sequence
             select="
                 if ($classNumberOfAttributes = 0) then
-                    f:generateWarningMessage(fn:concat('The class ', $class/@name, ' has no attributes provided. A class should define some attributes.'),
+                    f:generateInfoMessage(fn:concat('The class ', $class/@name, ' has no attributes provided. A class should define some attributes.'),
                     path($class),
-                    'class-attributes-3',
+                    'class-attribute-3',
                     'CMC-R10',
                     '&lt;a href=&quot;https://semiceu.github.io/style-guide/1.0.0/gc-conceptual-model-conventions.html#sec:cmc-r10&quot; target=&quot;_blank&quot;&gt;CMC-R10&lt;/a&gt;'
                     )
