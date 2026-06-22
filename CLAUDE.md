@@ -106,13 +106,17 @@ The default config in `test/ePO-default-config/` contains:
 - `xsdAndRdfDataTypes.xml` — XSD/RDF datatype catalog
 - `metadata.json` — ontology header / report metadata
 
-**metadata.json is read from a hardcoded path.** `config-parameters.xsl` binds
-`$metadataJson` with `fn:json-doc('metadata.json')` (relative to the config dir), so
-`owl-core`, `owl-restrictions`, `shacl`, `generate-jsonld-context`, the convention
-report and the glossary **always** read `test/ePO-default-config/metadata.json`. The
-Makefile's `RESPEC_METADATA_JSON_PATH` var only affects the **ReSpec** targets, not the
-RDF/SHACL/JSON-LD ones. To run those with different metadata you must physically swap the
-file (then restore it, e.g. `git checkout -- test/ePO-default-config/metadata.json`).
+**metadata.json path — overridable via `METADATA_JSON_PATH`.** `config-parameters.xsl`
+binds `$metadataJson` with `fn:json-doc($metadataJsonPath)`, where the `metadataJsonPath`
+stylesheet param defaults to `'metadata.json'` (relative to the active config dir — so by
+default `owl-core`, `owl-restrictions`, `shacl`, `generate-jsonld-context`, the convention
+report, the glossary **and** ReSpec all read the active config's `metadata.json`). The
+Makefile exposes a single `METADATA_JSON_PATH` variable that drives **all** of those
+targets, so you can point them at a different metadata file without swapping the config
+file: `make owl-core … METADATA_JSON_PATH=/abs/other-metadata.json`. When unset, behaviour
+is unchanged (RDF/SHACL/etc. resolve metadata relative to the config; ReSpec falls back to
+the ePO file). Pass an **absolute** path. (Historical note: this used to be hardcoded, with
+only ReSpec overridable via the now-removed `RESPEC_METADATA_JSON_PATH`.)
 
 This default config relates to e-Procurement ontology that is the main use case for this tool.
 

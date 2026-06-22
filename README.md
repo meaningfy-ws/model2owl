@@ -145,7 +145,7 @@ make owl-core XMI_INPUT_FILE_PATH=/home/mypc/work/model2owl/file1.xml OUTPUT_FOL
   * parameters:
     * RESPEC_OUTPUT_DIR - output directory for the documentation package
     * RESPEC_DATA_JSON_PATH - (optional) path to the ReSpec data JSON file. If not provided, the file will be generated automatically
-    * RESPEC_METADATA_JSON_PATH - path to the metadata JSON file; defaults to [metadata.json](./test/ePO-default-config/metadata.json)
+    * METADATA_JSON_PATH - path to the metadata JSON file shared by all artefacts; for ReSpec it defaults to [metadata.json](./test/ePO-default-config/metadata.json)
     * RESPEC_INPUT_ASSETS_DIR - directory containing static assets (examples, images, etc.); defaults to [assets directory](./respec-resources/assets)
     * XMI_INPUT_FILE_PATH - path to the UML XMI model file
     * MODEL_EAP_FILE_PATH - path to the UML EAP model file
