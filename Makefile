@@ -57,7 +57,14 @@ RESPEC_JSON_INDENTATION?=2
 RESPEC_DATA_JSON_PATH?=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_respec.json
 MODEL_DATA_JSON_PATH?=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_respec.json
 RESPEC_CFG_JSON_PATH?=${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_respec-cfg.json
-RESPEC_METADATA_JSON_PATH?=${ABSOLUTE_MODEL2OWL_FOLDER}/test/ePO-default-config/metadata.json
+# Single, optional override for the metadata JSON consumed by ALL transformations that
+# read it: owl-core/owl-restrictions/shacl, jsonld-context, convention report, glossary,
+# AND ReSpec. Empty by default; the RDF/SHACL/etc. stylesheets then resolve metadata.json
+# relative to the active config (config-proxy.xsl), preserving the original behaviour.
+# Set to an ABSOLUTE path to use a different metadata file without swapping the config.
+METADATA_JSON_PATH ?=
+# Expands to the Saxon stylesheet parameter only when METADATA_JSON_PATH is set.
+SAXON_METADATA_PARAM = $(if $(METADATA_JSON_PATH),metadataJsonPath="$(METADATA_JSON_PATH)",)
 RESPEC_INPUT_ASSETS_DIR=${ABSOLUTE_MODEL2OWL_FOLDER}/respec-resources/assets
 INPUT_SDS_FILES_JSON_LOCATION=.metadata.projectLocalResources
 TARGET_SDS_FILES_JSON_LOCATION=.assets.sdsSection
@@ -219,7 +226,7 @@ generate-glossary:
 	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} \
 		-xsl:${MODEL2OWL_FOLDER}/src/html-model-glossary.xsl \
 		-o:${OUTPUT_GLOSSARY_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_glossary.html \
-		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}"
+		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}" ${SAXON_METADATA_PARAM}
 	@echo The glossary is located at the following location:
 	@echo
 	@ls -lh ${OUTPUT_GLOSSARY_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_glossary.html
@@ -242,7 +249,7 @@ generate-convention-report:
 	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} \
 		-xsl:${MODEL2OWL_FOLDER}/src/html-conventions-report.xsl \
 		-o:${OUTPUT_CONVENTION_REPORT_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_convention_report.html \
-		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}"
+		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}" ${SAXON_METADATA_PARAM}
 	@echo The convention report is located at the following location:
 	@echo
 	@ls -lh ${OUTPUT_CONVENTION_REPORT_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_convention_report.html
@@ -257,7 +264,7 @@ generate-convention-SVRL-report:
 	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} \
 		-xsl:${MODEL2OWL_FOLDER}/src/svrl-conventions-report.xsl \
 		-o:${OUTPUT_CONVENTION_REPORT_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_convention_svrl_report.xml \
-		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}"
+		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}" ${SAXON_METADATA_PARAM}
 	@echo The convention report is located at the following location:
 	@echo
 	@ls -lh ${OUTPUT_CONVENTION_REPORT_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_convention_svrl_report.xml
@@ -282,7 +289,7 @@ owl-core:
 	@make gen-enriched-ns-file
 	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/owl-core.xsl \
 		-o:${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${CORE_RDF_FILE_SUFFIX}.tmp.rdf \
-		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}" \
+		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}" ${SAXON_METADATA_PARAM} \
 		importsPath="${IMPORTS_XML_FILE_PATH}"
 	@make convert-between-serialization-formats INPUT_FORMAT=${RDF_XML_MIME_TYPE} \
 		OUTPUT_FORMAT=${RDF_XML_MIME_TYPE} \
@@ -301,7 +308,7 @@ owl-restrictions:
 	@make gen-enriched-ns-file
 	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/owl-restrictions.xsl \
 		-o:${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${RESTRICTION_RDF_FILE_SUFFIX}.tmp.rdf \
-		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}" \
+		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}" ${SAXON_METADATA_PARAM} \
 		importsPath="${IMPORTS_XML_FILE_PATH}"
 	@make convert-between-serialization-formats INPUT_FORMAT=${RDF_XML_MIME_TYPE} \
 		OUTPUT_FORMAT=${RDF_XML_MIME_TYPE} \
@@ -320,7 +327,7 @@ shacl:
 	@make gen-enriched-ns-file
 	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/shacl-shapes.xsl \
 		-o:${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}${SHACL_RDF_FILE_SUFFIX}.tmp.rdf \
-		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}" \
+		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}" ${SAXON_METADATA_PARAM} \
 		importsPath="${IMPORTS_XML_FILE_PATH}"
 	@make convert-between-serialization-formats INPUT_FORMAT=${RDF_XML_MIME_TYPE} \
 		OUTPUT_FORMAT=${RDF_XML_MIME_TYPE} \
@@ -339,7 +346,7 @@ respec-json:
 	@make gen-enriched-ns-file
 	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/rspec-json-generate.xsl \
 		-o:${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_respec.json.tmp \
-		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}" \
+		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}" ${SAXON_METADATA_PARAM} \
 		importsPath="${IMPORTS_XML_FILE_PATH}"
 	@# reformat the JSON file to be more readable
 	@cat ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_respec.json.tmp \
@@ -354,7 +361,7 @@ respec-json:
 respec-cfg-json:
 	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/rspec-cfg-json-generate.xsl \
 		-o:${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_respec-cfg.json.tmp \
-		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}" \
+		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}" ${SAXON_METADATA_PARAM} \
 		importsPath="${IMPORTS_XML_FILE_PATH}"
 	@# reformat the JSON file to be more readable
 	@cat ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_respec-cfg.json.tmp \
@@ -375,7 +382,7 @@ generate-jsonld-context:
 	@make gen-enriched-ns-file
 	@java -jar ${SAXON} -s:${XMI_INPUT_FILE_PATH} -xsl:${MODEL2OWL_FOLDER}/src/jsonld-context.xsl \
 		-o:${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_context.jsonld.tmp \
-		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}"
+		enrichedNamespacesPath="${ENRICHED_NAMESPACES_XML_PATH}" ${SAXON_METADATA_PARAM}
 	@# reformat the JSON-LD context file to be more readable
 	@cat ${OUTPUT_FOLDER_PATH}/${XMI_INPUT_FILENAME_WITHOUT_EXTENSION}_context.jsonld.tmp \
 		| python3 -c "import sys, json; \
@@ -517,14 +524,15 @@ convert-rdf-to-rdf:
 # make generate-respec-new 
 #	[RESPEC_OUTPUT_DIR=/output/respec_package]
 #	[RESPEC_DATA_JSON_PATH=/path/to/respec-data.json]
-#	[RESPEC_METADATA_JSON_PATH=/path/to/metadata.json]
+#	[METADATA_JSON_PATH=/path/to/metadata.json]
 #	[RESPEC_INPUT_ASSETS_DIR=/path/to/static/assets]
 #	[XMI_INPUT_FILE_PATH=/path/to/model.xmi]
 #	[OUTPUT_FOLDER_PATH=/path/to/generated/model2owl/artefacts]
 # where:
 #   RESPEC_OUTPUT_DIR: Output directory for the documentation package.
 #   RESPEC_DATA_JSON_PATH: (Optional) Path to the ReSpec data JSON file.
-#   RESPEC_METADATA_JSON_PATH: Path to the metadata JSON file.
+#   METADATA_JSON_PATH: Path to the metadata JSON file (shared by all artefacts;
+#                       when unset, ReSpec falls back to the default ePO metadata).
 #   RESPEC_INPUT_ASSETS_DIR: Directory containing static assets (images, examples, etc.).
 #   XMI_INPUT_FILE_PATH: (Optional) Path to the UML XMI model file needed for
 #						 generating the ReSpec data JSON file (if not given).
@@ -566,7 +574,7 @@ generate-respec:
 	\
 	# Copy any provided artefacts to the target directory and update file paths in the metadata JSON \
 	ext_md_json=$$(mktemp --suffix=".json"); \
-	cp -f ${RESPEC_METADATA_JSON_PATH} $$ext_md_json; \
+	cp -f $(or $(METADATA_JSON_PATH),${ABSOLUTE_MODEL2OWL_FOLDER}/test/ePO-default-config/metadata.json) $$ext_md_json; \
 	# Loop over each object in projectLocalResources \
 	jq -c '${INPUT_SDS_FILES_JSON_LOCATION}[]' $$ext_md_json | while read -r item; do \
 		# Extract name and path \

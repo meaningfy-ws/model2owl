@@ -26,8 +26,12 @@
     <!-- XSD datatypes that conform to OWL2 requirements   -->
     <xsl:variable name="xsdAndRdfDataTypes" select="fn:doc('xsdAndRdfDataTypes.xml')"/>
     
-    <!-- JSON metadata configuration -->
-    <xsl:variable name="metadataJson" select="fn:json-doc('metadata.json')"/>
+    <!-- JSON metadata configuration. The path is overridable via the
+         `metadataJsonPath` stylesheet parameter; the default `metadata.json` is
+         resolved relative to this config file, preserving the original behaviour
+         (and following whichever config `config-proxy.xsl` imports). -->
+    <xsl:param name="metadataJsonPath" select="'metadata.json'"/>
+    <xsl:variable name="metadataJson" select="fn:json-doc($metadataJsonPath)"/>
     <!--    set default namespace interpretation for lexical Qnames that are not prefix:localSegment or :localSegment. If this 
     is set to true localSegment will transform to :localSegment-->
     <xsl:variable name="defaultNamespaceInterpretation" select="fn:true()"/>
