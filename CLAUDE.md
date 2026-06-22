@@ -231,6 +231,31 @@ For any change that may touch this editorial code, use the
 code↔docs place, and supports both the impact analysis (which docs entry a change
 touches) and making the matching docs edit.
 
+## The Makefile is a public interface consumed by the boilerplate CI
+
+This repo's **`Makefile` is a contract**, not just local tooling. The
+**model2owl-boilerplate** repo (see Related Repositories) clones model2owl in CI and
+invokes its `make` targets — see `.github/workflows/transform_with_model2owl.yml`
+(plus `diff-combined.yml`), which call targets like `owl-core`, `owl-restrictions`,
+`shacl`, `gen-enriched-ns-file`, `generate-jsonld-context`, `generate-convention-report`,
+`generate-glossary`, `respec-json`, `generate-respec`, `merge-xmi`, `merge-owl-shacl`,
+`run-rdf-diff`, and pass arguments as `KEY=VALUE` overrides (e.g. `XMI_INPUT_FILE_PATH`,
+`OUTPUT_FOLDER_PATH`, `NAMESPACES_USER_XML_FILE_PATH`, `IMPORTS_XML_FILE_PATH`,
+`METADATA_JSON_PATH`, `RESPEC_OUTPUT_DIR`).
+
+**So renaming/removing a target or an overridable `?=` variable is a BREAKING change to
+that interface.** Worse, it fails **silently**: `make` ignores an unknown `KEY=VALUE`
+argument, so the boilerplate CI keeps running but the affected step quietly reverts to a
+default (this is exactly what happened when `RESPEC_METADATA_JSON_PATH` was replaced by
+`METADATA_JSON_PATH` — the CI line set a dead variable and ReSpec fell back to the default
+metadata). **Whenever you rename/remove/repurpose a target or a public variable, grep the
+boilerplate workflows for the old name and update the callers in the same change** (the
+boilerplate has no Makefile of its own; CI is the only caller).
+
+The make targets and their parameters are also documented (keep these in sync too):
+model2owl `README.md`, and the docs repo's `modules/ROOT/pages/user-guide/how-to-use.adoc`
+(target list) and `configuration-file.adoc` (config parameters).
+
 ## Related Repositories
 
 **Forking workflow:** the canonical upstreams live under the **`OP-TED`** org; the
