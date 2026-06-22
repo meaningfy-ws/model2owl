@@ -51,6 +51,14 @@
             </xsl:for-each>
         </xsl:variable>
 
+        <!-- Diagnostic: the model defines classes but none was classified as a 'main'
+             entity. This usually means includedPrefixesList does not match the model's
+             name prefixes; for a model whose terms are unprefixed, set
+             includedPrefixesList to ('') in the config. Warning only — output is unaffected. -->
+        <xsl:if test="exists($classMaps) and empty($classMaps[map:get(map:get(., 'rawTags'), 'class-usage-scope') = 'main'])">
+            <xsl:message>[model2owl] WARNING: <xsl:value-of select="count($classMaps)"/> class(es) found but none classified as a 'main' entity. None of their name prefixes are in includedPrefixesList (<xsl:value-of select="string-join($includedPrefixesList, ', ')"/>). If this model's terms are unprefixed, set includedPrefixesList to ('') in the config.</xsl:message>
+        </xsl:if>
+
         <!-- datatypes as array(*) via mode that returns map(*) per datatype -->
         <!-- Combine UML DataTypes and distinct class attribute types -->
         <xsl:variable name="umlDatatypeMaps" as="map(*)*">
