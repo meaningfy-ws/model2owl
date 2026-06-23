@@ -34,6 +34,12 @@
             <xsl:call-template name="elementTypes">
                 <xsl:with-param name="root" select="$root"/>
             </xsl:call-template>
+            <xsl:call-template name="modifierTypes">
+                <xsl:with-param name="root" select="$root"/>
+            </xsl:call-template>
+            <xsl:call-template name="unsupportedConstructs">
+                <xsl:with-param name="root" select="$root"/>
+            </xsl:call-template>
             <xsl:call-template name="undefinedPrefixes">
                 <xsl:with-param name="root" select="$root"/>
             </xsl:call-template>
@@ -85,12 +91,26 @@
             select="fn:distinct-values($root//elements/element/@xmi:type)"/>
         <xsl:variable name="supportedElementTypes"
             select="('uml:Class', 'uml:Enumeration', 'uml:DataType', 'uml:Package', 'uml:Object')"/>
+        <!-- EA-internal artefacts (e.g. the ProxyConnector spines of n-ary associations and
+             association classes) are an internal representation detail, not user-authored
+             constructs, so they are not reported as unsupported. -->
+        <xsl:variable name="ignoredInternalElementTypes" select="('uml:ProxyConnector')"/>
         <xsl:variable name="unsupportedElementTypes"
-            select="$usedElementTypes[not(. = $supportedElementTypes)]"/>
+            select="$usedElementTypes[not(. = $supportedElementTypes) and not(. = $ignoredInternalElementTypes)]"/>
+        <!-- A uml:Association *element* (as opposed to a binary association connector) is an
+             n-ary association; label it as such for clarity. -->
+        <xsl:variable name="unsupportedElementTypesDisplay" as="xs:string*"
+            select="
+                for $type in $unsupportedElementTypes
+                return
+                    if ($type = 'uml:Association') then
+                        'uml:Association (n-ary association)'
+                    else
+                        $type"/>
         <xsl:sequence
             select="
                 if (count($unsupportedElementTypes) > 0) then
-                    f:generateFormattedWarningMessage('Model2owl supports Class, Package, Datatype, Enumeration, and Object elements. The following element types were found in the model and are not transformed. For guidance, see the documentation on unsupported UML constructs', $unsupportedElementTypes,
+                    f:generateFormattedWarningMessage('Model2owl supports Class, Package, Datatype, Enumeration, and Object elements. The following element types were found in the model and are not transformed. For guidance, see the documentation on unsupported UML constructs', $unsupportedElementTypesDisplay,
                     '//elements/element/@xmi:type',
                     'general-element-type-2',
                     'unsupported UML constructs',
@@ -103,6 +123,72 @@
     </xsl:template>
 
 
+
+    <xd:doc>
+        <xd:desc>[general-modifier-type-4] UML attribute / generalisation-set modifiers
+            ({id}, {complete}, {disjoint}) are not transformed. Reports which kinds occur at
+            least once in the model (presence only, not each occurrence). </xd:desc>
+        <xd:param name="root"/>
+    </xd:doc>
+    <xsl:template name="modifierTypes">
+        <xsl:param name="root"/>
+        <xsl:variable name="foundModifiers" as="xs:string*">
+            <xsl:if
+                test="$root//attributes/attribute/xrefs[contains(@value, 'isID@ENDNAME;@TYPE=Boolean@ENDTYPE;@VALU=1')]">
+                <xsl:sequence select="'{id}'"/>
+            </xsl:if>
+            <xsl:if
+                test="$root//connectors/connector[properties/@ea_type = 'Generalization']/xrefs[contains(@value, 'IsCovering=1')]">
+                <xsl:sequence select="'{complete}'"/>
+            </xsl:if>
+            <xsl:if
+                test="$root//connectors/connector[properties/@ea_type = 'Generalization']/xrefs[contains(@value, 'IsDisjoint=1')]">
+                <xsl:sequence select="'{disjoint}'"/>
+            </xsl:if>
+        </xsl:variable>
+        <xsl:sequence
+            select="
+                if (count($foundModifiers) > 0) then
+                    f:generateFormattedWarningMessage('Model2owl does not transform UML attribute or generalisation-set modifiers. The following were found in the model and carry no meaning in the generated artefacts. For guidance, see the documentation on unsupported UML constructs', $foundModifiers,
+                    '//attributes/attribute/xrefs/@value | //connectors/connector/xrefs/@value',
+                    'general-modifier-type-4',
+                    'unsupported UML constructs',
+                    '&lt;a href=&quot;https://meaningfy-ws.github.io/model2owl-docs-gh-pages/public-review/uml/unsupported-uml-constructs.html#sec:unsupported-uml-constructs&quot; target=&quot;_blank&quot;&gt;Unsupported UML constructs&lt;/a&gt;'
+                    )
+                else
+                    ()"
+        />
+    </xsl:template>
+
+    <xd:doc>
+        <xd:desc>[general-construct-type-5] UML constructs that surface as supported element /
+            connector types but are not transformed (association class, qualified association).
+            Reports presence only, not each occurrence. </xd:desc>
+        <xd:param name="root"/>
+    </xd:doc>
+    <xsl:template name="unsupportedConstructs">
+        <xsl:param name="root"/>
+        <xsl:variable name="foundConstructs" as="xs:string*">
+            <xsl:if test="$root//connectors/connector[extendedProperties/@associationclass != '']">
+                <xsl:sequence select="'association class'"/>
+            </xsl:if>
+            <xsl:if test="$root//connectors/connector[.//qualifiers/qualifier]">
+                <xsl:sequence select="'qualified association'"/>
+            </xsl:if>
+        </xsl:variable>
+        <xsl:sequence
+            select="
+                if (count($foundConstructs) > 0) then
+                    f:generateFormattedWarningMessage('Model2owl does not transform the following UML constructs found in the model. For guidance, see the documentation on unsupported UML constructs', $foundConstructs,
+                    '//connectors/connector',
+                    'general-construct-type-5',
+                    'unsupported UML constructs',
+                    '&lt;a href=&quot;https://meaningfy-ws.github.io/model2owl-docs-gh-pages/public-review/uml/unsupported-uml-constructs.html#sec:unsupported-uml-constructs&quot; target=&quot;_blank&quot;&gt;Unsupported UML constructs&lt;/a&gt;'
+                    )
+                else
+                    ()"
+        />
+    </xsl:template>
 
     <xd:doc>
         <xd:desc>[general-prefix-3] The prefixes $[list of undefined prefixes] are not defined.
