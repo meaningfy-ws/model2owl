@@ -90,10 +90,29 @@
         <x:call template="attributeRange">
             <x:param name="attributeName">epo:Type</x:param>
             <x:param name="root" href="../../testData/ePO-CM-v2.0.1-2020-06-08.eap.xmi" select="/"/>
-        </x:call>   
+        </x:call>
         <x:expect label="there is a rdf:Description" test="boolean(rdf:Description) "/>
         <x:expect label="there is a rdfs:range" test="boolean(rdf:Description/rdfs:range)"/>
         <x:expect label="there is a rdf:Description for classes" test="count(rdf:Description/rdfs:range/owl:Class/owl:unionOf/rdf:Description) = 2"/>
+    </x:scenario>
+
+    <x:scenario label="Scenario for attribute range - reused attribute with several distinct datatypes yields an rdfs:Datatype union (ISS-016)">
+        <x:call template="attributeRange">
+            <x:param name="attributeName">name</x:param>
+            <x:param name="root" href="../../testData/prettyModel-cleaned.xmi" select="/"/>
+        </x:call>
+        <x:expect label="there is a rdf:Description" test="boolean(rdf:Description)"/>
+        <x:expect label="there is a rdfs:range" test="boolean(rdf:Description/rdfs:range)"/>
+        <x:expect label="the union is wrapped as rdfs:Datatype (DataUnionOf), not owl:Class"
+            test="boolean(rdf:Description/rdfs:range/rdfs:Datatype) and not(rdf:Description/rdfs:range/owl:Class)"/>
+        <x:expect label="the union has exactly two datatype members"
+            test="count(rdf:Description/rdfs:range/rdfs:Datatype/owl:unionOf/rdf:Description) = 2"/>
+        <x:expect label="the UML primitive 'short' is normalised to xsd:short"
+            test="rdf:Description/rdfs:range/rdfs:Datatype/owl:unionOf/rdf:Description/@rdf:about = 'http://www.w3.org/2001/XMLSchema#short'"/>
+        <x:expect label="the UML primitive 'long' is normalised to xsd:long"
+            test="rdf:Description/rdfs:range/rdfs:Datatype/owl:unionOf/rdf:Description/@rdf:about = 'http://www.w3.org/2001/XMLSchema#long'"/>
+        <x:expect label="no stray model-namespace types remain (ISS-015 regression)"
+            test="not(rdf:Description/rdfs:range//rdf:Description[contains(@rdf:about, '#long') or contains(@rdf:about, '#short')][not(starts-with(@rdf:about, 'http://www.w3.org/2001/XMLSchema#'))])"/>
     </x:scenario>
 
 

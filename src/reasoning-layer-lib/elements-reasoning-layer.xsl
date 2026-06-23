@@ -188,21 +188,40 @@
                 </rdf:Description>
             </xsl:when>
             <xsl:otherwise>
+                <!-- Reused attribute occurring with several distinct types.
+                     Normalise each type through the UML->XSD map (as the
+                     single-type branch above does) so primitive UML types
+                     (int, short, long, ...) become their xsd:* equivalents
+                     instead of stray model-namespace URIs. When every member
+                     resolves to a datatype, emit an rdfs:Datatype union (OWL 2
+                     DataUnionOf — the correct range for a data property);
+                     otherwise keep the owl:Class union (correct for an
+                     object/class range). -->
+                <xsl:variable name="resolvedTypes" as="xs:string*">
+                    <xsl:for-each select="$distinctAttributeTypesFound">
+                        <xsl:sequence
+                            select="
+                                if (. = $controlledListType) then
+                                    'skos:Concept'
+                                else if (boolean(f:getUmlDataTypeValues(., $umlDataTypesMapping))) then
+                                    f:getUmlDataTypeValues(., $umlDataTypesMapping)
+                                else
+                                    string(.)"/>
+                    </xsl:for-each>
+                </xsl:variable>
+                <xsl:variable name="allMembersAreDatatypes" as="xs:boolean"
+                    select="every $type in $resolvedTypes satisfies f:isValidDataType($type)"/>
                 <rdf:Description rdf:about="{$attributeURI}">
                     <rdfs:range>
-                        <owl:Class>
+                        <xsl:element
+                            name="{if ($allMembersAreDatatypes) then 'rdfs:Datatype' else 'owl:Class'}">
                             <owl:unionOf rdf:parseType="Collection">
-                                <xsl:for-each select="$distinctAttributeTypesFound">
-                                    <xsl:variable name="attributeTypeURI"
-                                        select="
-                                            if (. = $controlledListType) then
-                                                f:buildURIfromLexicalQName('skos:Concept')
-                                            else
-                                                f:buildURIfromLexicalQName(.)"/>
-                                    <rdf:Description rdf:about="{$attributeTypeURI}"/>
+                                <xsl:for-each select="$resolvedTypes">
+                                    <rdf:Description
+                                        rdf:about="{f:buildURIfromLexicalQName(.)}"/>
                                 </xsl:for-each>
                             </owl:unionOf>
-                        </owl:Class>
+                        </xsl:element>
                     </rdfs:range>
                 </rdf:Description>
             </xsl:otherwise>

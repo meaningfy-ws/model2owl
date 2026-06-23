@@ -48,40 +48,11 @@
     </x:scenario>
     
     
-    <x:scenario
-        label="data-type for class attributes with the same name - same data-type values">
-        <x:call template="checkDatatypeOfAttributesWithSameName">
-            <x:param name="attributeName">epo:AdditionalInformation</x:param>
-            <x:param name="root" href="../../testData/ePO-CM-v2.0.1-2020-03-27_test.eap.xmi" select="/"/>
-        </x:call>
-        <x:expect label="expect no warning" select="()"/>
-        
-    </x:scenario>
-    
-    <x:scenario
-        label="data-type for class attributes with the same name - different data-type values">
-        <x:call template="checkDatatypeOfAttributesWithSameName">
-            <x:param name="attributeName">epo:ID</x:param>
-            <x:param name="root" href="../../testData/ePO-CM-v2.0.1-2020-03-27_test.eap.xmi" select="/"/>
-        </x:call>
-        <x:expect label="expect to find a Description Details element" test="boolean(/dd)"/>
-        <x:expect label="expect to find a warning" test="/dd/@class = 'filter warnings'"/>
-        
-    </x:scenario>
-    
-    <x:scenario
-        label="data-type for class attributes with the same name - not all the attributes compared have a data-type">
-        <x:call template="checkDatatypeOfAttributesWithSameName">
-            <x:param name="attributeName">epo:Title</x:param>
-            <x:param name="root" href="../../testData/ePO-CM-v2.0.1-2020-03-27_test.eap.xmi" select="/"/>
-        </x:call>
-  
-        <x:expect label="expect to find a Description Details element" test="boolean(/dd)"/>
-        <x:expect label="expect to find a warning" test="/dd/@class = 'filter warnings'"/>
-        
-    </x:scenario>
-    
-    
+    <!-- Scenarios for checkDatatypeOfAttributesWithSameName
+         ([class-attributes-reuse-data-types-3]) were removed together with the
+         checker: differing datatypes on a reused attribute are now supported as an
+         rdfs:Datatype union range (ISS-016 / ISS-018). -->
+
     <x:scenario
         label="multiplicity for class attributes with the same name - different values">
         <x:call template="checkMultiplicityOfAttributesWithSameName">
@@ -199,9 +170,11 @@
             </x:context>
             <x:call template="classAttributesWithSameName">
             </x:call>
-            <x:expect label="different datatypes"
-                test="contains(/dl[@id='attribute-epo:address-usage']/dd[@class='filter warnings']/text(), 'The attribute epo:address has different datatypes in reuse contexts')"/>
-            <x:expect label="different multiplicities" 
+            <!-- The "different datatypes in reuse contexts" expectation was removed
+                 with the checker (ISS-016 / ISS-018): epo:address here differs only
+                 by datatype (rdfs:Literal vs dct:Address), which is now a supported
+                 union range rather than a reported violation. -->
+            <x:expect label="different multiplicities"
                 test="some $genMsg in /dl[@id='attribute-epo:name-usage']/dd[@class='filter warnings']/text()
                     satisfies contains($genMsg, 'The attribute epo:name has different multiplicities in reuse contexts')"
             />
