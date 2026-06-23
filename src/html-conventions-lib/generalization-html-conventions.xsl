@@ -328,7 +328,7 @@
             if (not(f:generalisationMissingOrIncorrect($generalizationConnector))) then
             ()
             else
-            f:generateErrorMessage(fn:concat('The generalisation between the connectors ',$targetConnectorString, ' and ', $sourceConnectorString,' is declared incorrectly: their source and target must be compatible, or the generalisation is declared on the wrong (inverse) object property'),
+            f:generateErrorMessage(fn:concat('The generalisation between the connectors ',$targetConnectorString, ' and ', $sourceConnectorString,' is declared incorrectly: their same-side ends (source with source, target with target) must each be attached to the same class or to two classes linked by a class generalisation. This usually indicates an inconsistent end orientation of the two associations (which class sits at the source end and which at the target end, independent of navigability), which declares the generalisation on the inverse object property and, under reasoning, produces unintended subclass inferences.'),
             path($generalizationConnector),
             'generalisation-connector-and-missing-class-generalisation-9',
             '',
