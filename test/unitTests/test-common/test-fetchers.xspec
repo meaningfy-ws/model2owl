@@ -510,4 +510,14 @@
         <x:expect label="an ordinary binary-association role 'lends' is kept" test="'lends' = $x:result"/>
     </x:scenario>
 
+    <x:scenario label="getDistinctConnectorsNames - excludes unsupported aggregation roles (part/ppart/whole)">
+        <x:call function="f:getDistinctConnectorsNames">
+            <x:param name="root" href="../../testData/prettyModel-cleaned.xmi" select="/"/>
+        </x:call>
+        <x:expect label="aggregation role 'part' is excluded" test="not('part' = $x:result)"/>
+        <x:expect label="aggregation role 'ppart' is excluded" test="not('ppart' = $x:result)"/>
+        <x:expect label="aggregation role 'whole' is excluded" test="not('whole' = $x:result)"/>
+        <x:expect label="an ordinary binary-association role 'ownedby' is kept" test="'ownedby' = $x:result"/>
+    </x:scenario>
+
 </x:description>

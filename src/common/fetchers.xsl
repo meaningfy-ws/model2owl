@@ -148,7 +148,7 @@
         <xsl:param name="name" as="xs:string"/>
         <xsl:param name="root" as="node()"/>
         <xsl:sequence
-            select="$root//connectors/connector[@name | target/role/@name | source/role/@name = $name][not(f:connectorTouchesAssociationClass(.))][not(f:isNaryAssociation(.))]"
+            select="$root//connectors/connector[@name | target/role/@name | source/role/@name = $name][not(f:connectorTouchesAssociationClass(.))][not(f:isNaryAssociation(.))][not(properties/@ea_type = 'Aggregation')]"
         />
     </xsl:function>
     
@@ -269,7 +269,7 @@
     </xd:doc>
     <xsl:function name="f:getDistinctConnectorsNames" as="xs:string*">
         <xsl:param name="root" as="node()"/>
-        <xsl:sequence select="fn:distinct-values($root//connectors/connector[not(f:connectorTouchesAssociationClass(.))][not(f:isNaryAssociation(.))]/(@name | target/role/@name | source/role/@name))"/>
+        <xsl:sequence select="fn:distinct-values($root//connectors/connector[not(f:connectorTouchesAssociationClass(.))][not(f:isNaryAssociation(.))][not(properties/@ea_type = 'Aggregation')]/(@name | target/role/@name | source/role/@name))"/>
     </xsl:function>
     
     <xd:doc>
