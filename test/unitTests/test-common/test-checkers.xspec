@@ -656,5 +656,26 @@
         <x:expect label="result" select="true()"/>
     </x:scenario>
 
+    <x:scenario label="isInvalidNamePrefix - an unprefixed name (empty prefix) is not an invalid prefix">
+        <x:call function="f:isInvalidNamePrefix">
+            <x:param name="name" select="'Boat'"/>
+        </x:call>
+        <x:expect label="empty prefix is not flagged as invalid (handled by 'prefix not defined')" test="$x:result = false()"/>
+    </x:scenario>
+
+    <x:scenario label="isInvalidNamePrefix - a well-formed prefix is valid">
+        <x:call function="f:isInvalidNamePrefix">
+            <x:param name="name" select="'epo:Buyer'"/>
+        </x:call>
+        <x:expect label="a normal prefix is valid" test="$x:result = false()"/>
+    </x:scenario>
+
+    <x:scenario label="isInvalidNamePrefix - a prefix with illegal characters is invalid">
+        <x:call function="f:isInvalidNamePrefix">
+            <x:param name="name" select="'bad prefix:Buyer'"/>
+        </x:call>
+        <x:expect label="a prefix containing a space is invalid" test="$x:result = true()"/>
+    </x:scenario>
+
 </x:description>
 

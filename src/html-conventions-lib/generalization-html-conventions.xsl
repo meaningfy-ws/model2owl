@@ -297,7 +297,7 @@
             if (not(f:generalisationConnectorsHasOppositeDirections($generalizationConnector))) then
             ()
             else
-            f:generateErrorMessage(fn:concat('The unidirectional connectors ',$targetConnectorString, ' and ', $sourceConnectorString,' associated with the generalisation connector have opposite directions'),
+            f:generateErrorMessage(fn:concat('The connectors ',$targetConnectorString, ' and ', $sourceConnectorString,' associated with the generalisation connector have opposite directions'),
             path($generalizationConnector),
             'generalisation-connector-unidirectional-connector-direction-8',
             '',

@@ -364,7 +364,12 @@
         <xsl:variable name="prefix" select="fn:substring-before($name, ':')"/>
         <xsl:sequence
             select="
-                if (fn:matches($prefix, '^[a-zA-Z0-9-_]+$'))
+                if ($prefix = '')
+                then
+                    (: an empty/absent prefix is not an *invalid* prefix; the missing prefix is
+                       reported by the separate 'prefix not defined' checker :)
+                    fn:false()
+                else if (fn:matches($prefix, '^[a-zA-Z0-9-_]+$'))
                 then
                     fn:false()
                 else

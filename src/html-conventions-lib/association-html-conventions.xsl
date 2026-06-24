@@ -25,7 +25,11 @@
     
     <xsl:template match="connector[./properties/@ea_type = 'Association']">
         <xsl:variable name="associationChecks" as="item()*">
-            <xsl:if test="f:checkIfConnectorTargetAndSourceElementsExists(.) and not(f:isNaryAssociation(.))">
+            <!-- Skip connectors with ProxyConnector ends (the association-class link and n-ary
+                 spines): they are EA-internal representation artefacts, not user associations,
+                 and are not transformed. -->
+            <xsl:if test="f:checkIfConnectorTargetAndSourceElementsExists(.) and not(f:isNaryAssociation(.))
+                          and not(./source/model/@type = 'ProxyConnector' or ./target/model/@type = 'ProxyConnector')">
                 <!--    Start of common connectors checkers rules     -->
                 <xsl:call-template name="connectorNamingFormat">
                     <xsl:with-param name="connector" select="."/>

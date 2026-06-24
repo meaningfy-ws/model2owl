@@ -182,7 +182,7 @@
             </x:call>
             <x:expect label="expect to find a Description Details element" test="boolean(/dd)"/>
             <x:expect label="expect correct error text"
-                test="dd[@class='filter errors']/text() = 'The unidirectional connectors epo:SubmissionStatisticalInformation -&gt; epo:MonetaryValue and epo:MonetaryValue -&gt; epo:SubmissionStatisticalInformation associated with the generalisation connector have opposite directions'"
+                test="dd[@class='filter errors']/text() = 'The connectors epo:SubmissionStatisticalInformation -&gt; epo:MonetaryValue and epo:MonetaryValue -&gt; epo:SubmissionStatisticalInformation associated with the generalisation connector have opposite directions'"
             />
         </x:scenario>
 
