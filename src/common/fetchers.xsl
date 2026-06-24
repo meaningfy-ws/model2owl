@@ -121,6 +121,24 @@
     </xsl:function>
 
     <xd:doc>
+        <xd:desc>Determines whether a given UML connector element represents an N-ary (e.g.
+            ternary) association. This requires the connector's properties/@ea_type to be
+            'Association' and its source/model/@type also to be 'Association' (the n-ary spine).
+            N-ary associations are not transformed, so n-ary connectors are excluded from the
+            connector fetchers below.</xd:desc>
+        <xd:param name="connector">The UML connector element to test.</xd:param>
+    </xd:doc>
+    <xsl:function name="f:isNaryAssociation" as="xs:boolean">
+        <xsl:param name="connector" as="element()"/>
+        <xsl:sequence
+            select="
+                if ($connector/properties/@ea_type = 'Association')
+                then $connector/source/model/@type = 'Association'
+                else false()"
+        />
+    </xsl:function>
+
+    <xd:doc>
         <xd:desc>fetch the xmi:conenctor with a given name (connectors attached to an association
             class are excluded, since association classes are not transformed)</xd:desc>
         <xd:param name="name"/>
@@ -130,7 +148,7 @@
         <xsl:param name="name" as="xs:string"/>
         <xsl:param name="root" as="node()"/>
         <xsl:sequence
-            select="$root//connectors/connector[@name | target/role/@name | source/role/@name = $name][not(f:connectorTouchesAssociationClass(.))]"
+            select="$root//connectors/connector[@name | target/role/@name | source/role/@name = $name][not(f:connectorTouchesAssociationClass(.))][not(f:isNaryAssociation(.))]"
         />
     </xsl:function>
     
@@ -251,7 +269,7 @@
     </xd:doc>
     <xsl:function name="f:getDistinctConnectorsNames" as="xs:string*">
         <xsl:param name="root" as="node()"/>
-        <xsl:sequence select="fn:distinct-values($root//connectors/connector[not(f:connectorTouchesAssociationClass(.))]/(@name | target/role/@name | source/role/@name))"/>
+        <xsl:sequence select="fn:distinct-values($root//connectors/connector[not(f:connectorTouchesAssociationClass(.))][not(f:isNaryAssociation(.))]/(@name | target/role/@name | source/role/@name))"/>
     </xsl:function>
     
     <xd:doc>
@@ -482,7 +500,7 @@
         <xsl:param name="connectorTypes" as="xs:string*"/>
         <xsl:param name="root" as="node()"/>
         <relations>
-            <xsl:for-each select="$root//connector[properties/@ea_type = $connectorTypes]">
+            <xsl:for-each select="$root//connector[properties/@ea_type = $connectorTypes][not(f:isNaryAssociation(.))][not(f:connectorTouchesAssociationClass(.))]">
                 <xsl:sequence select="f:getRelationsFromConnector(.)"/>
             </xsl:for-each>
         </relations>

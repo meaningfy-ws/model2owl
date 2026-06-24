@@ -502,4 +502,12 @@
         <x:expect label="a plain association between regular classes is not flagged" test="$x:result = false()"/>
     </x:scenario>
 
+    <x:scenario label="getDistinctConnectorsNames - excludes n-ary association roles (toIns)">
+        <x:call function="f:getDistinctConnectorsNames">
+            <x:param name="root" href="../../testData/prettyModel-cleaned.xmi" select="/"/>
+        </x:call>
+        <x:expect label="the n-ary role 'toIns' (TernaryTest) is excluded" test="not('toIns' = $x:result)"/>
+        <x:expect label="an ordinary binary-association role 'lends' is kept" test="'lends' = $x:result"/>
+    </x:scenario>
+
 </x:description>
