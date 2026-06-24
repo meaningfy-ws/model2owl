@@ -108,7 +108,7 @@
         <xd:desc> Selector to run core layer transformation rules for classes</xd:desc>
     </xd:doc>
     <xsl:template match="element[@xmi:type = 'uml:Class']">
-        <xsl:if test="not(f:isExcludedByStatus(.))">
+        <xsl:if test="not(f:isExcludedByStatus(.)) and not(f:isAssociationClass(.))">
             <xsl:variable name="classPrefix" select="fn:substring-before(./@name, ':')"/>
             <!-- Check if the class should be processed -->
             <xsl:if test="$generateReusedConceptsOWLcore or $classPrefix = $includedPrefixesList">

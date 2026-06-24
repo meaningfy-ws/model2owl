@@ -111,7 +111,7 @@
         <xsl:variable name="classAttributeConventions" as="item()*">
             <xsl:apply-templates select="attributes/attribute"/>
         </xsl:variable>
-        <xsl:if test="boolean($classConventions) or boolean($classAttributeConventions)">
+        <xsl:if test="(boolean($classConventions) or boolean($classAttributeConventions)) and not(f:isAssociationClass(.))">
             <xsl:choose>
                 <xsl:when test="$reportType = 'HTML'">
                     <h2 id="{$className}">

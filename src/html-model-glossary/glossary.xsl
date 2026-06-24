@@ -72,7 +72,7 @@
             <xsl:sort select="." lang="en"/>
             <xsl:if test="$generateReusedConceptsGlossary or fn:substring-before(., ':') = $includedPrefixesList">
                 <xsl:variable name="classElement" select="f:getElementByName(., $root)"/>
-                <xsl:if test="not(f:isExcludedByStatus($classElement))">
+                <xsl:if test="not(f:isExcludedByStatus($classElement)) and not(f:isAssociationClass($classElement))">
                     <tr>
                         <td>
                             <xsl:value-of select="."/>

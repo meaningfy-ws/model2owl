@@ -38,7 +38,7 @@
         <!-- classes as array(*) via mode that returns map(*) per class -->
         <xsl:variable name="classMapsUnsorted" as="map(*)*">
             <xsl:apply-templates
-                select="/xmi:XMI/xmi:Extension/elements/element[@xmi:type = 'uml:Class']"
+                select="/xmi:XMI/xmi:Extension/elements/element[@xmi:type = 'uml:Class'][not(f:isAssociationClass(.))]"
                 mode="class-json"/>
 
         </xsl:variable>

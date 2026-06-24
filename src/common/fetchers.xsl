@@ -104,7 +104,25 @@
     </xsl:function>
     
     <xd:doc>
-        <xd:desc>fetch the xmi:conenctor with a given name</xd:desc>
+        <xd:desc>Returns true when one of the connector's ends is attached to an association class.
+            Such connectors (e.g. an ordinary association from a regular class to an association
+            class) are not transformed, since association classes are ignored.</xd:desc>
+        <xd:param name="connector"/>
+    </xd:doc>
+    <xsl:function name="f:connectorTouchesAssociationClass" as="xs:boolean">
+        <xsl:param name="connector" as="node()?"/>
+        <xsl:variable name="associationClassIds"
+            select="root($connector)//connectors/connector/extendedProperties/@associationclass[. != '']"/>
+        <xsl:sequence
+            select="
+                boolean($connector/source/@xmi:idref[. = $associationClassIds])
+                or boolean($connector/target/@xmi:idref[. = $associationClassIds])"
+        />
+    </xsl:function>
+
+    <xd:doc>
+        <xd:desc>fetch the xmi:conenctor with a given name (connectors attached to an association
+            class are excluded, since association classes are not transformed)</xd:desc>
         <xd:param name="name"/>
         <xd:param name="root"/>
     </xd:doc>
@@ -112,7 +130,7 @@
         <xsl:param name="name" as="xs:string"/>
         <xsl:param name="root" as="node()"/>
         <xsl:sequence
-            select="$root//connectors/connector[@name | target/role/@name | source/role/@name = $name]"
+            select="$root//connectors/connector[@name | target/role/@name | source/role/@name = $name][not(f:connectorTouchesAssociationClass(.))]"
         />
     </xsl:function>
     
@@ -176,24 +194,45 @@
     </xsl:function>
     
     <xd:doc>
-        <xd:desc>fetch the class attribute with a given name</xd:desc>
+        <xd:desc>Returns true when the element is an association class. An association class is a
+            uml:AssociationClass in the logical model but surfaces as a uml:Class in the EA
+            extension, so it would otherwise be transformed as an ordinary class. It is
+            identified by a connector that references it through
+            extendedProperties/@associationclass. Association classes are not supported and are
+            ignored across all artefacts (no class, no attributes/properties, no connectors to
+            them).</xd:desc>
+        <xd:param name="element"/>
+    </xd:doc>
+    <xsl:function name="f:isAssociationClass" as="xs:boolean">
+        <xsl:param name="element" as="node()?"/>
+        <xsl:sequence
+            select="
+                $element/@xmi:idref != ''
+                and boolean(root($element)//connectors/connector/extendedProperties[@associationclass = $element/@xmi:idref])"
+        />
+    </xsl:function>
+
+    <xd:doc>
+        <xd:desc>fetch the class attribute with a given name (association-class attributes are
+            excluded, since association classes are not transformed)</xd:desc>
         <xd:param name="name"/>
         <xd:param name="root"/>
     </xd:doc>
     <xsl:function name="f:getClassAttributeByName" as="node()*">
         <xsl:param name="name" as="xs:string"/>
         <xsl:param name="root" as="node()"/>
-        <xsl:sequence select="$root//element[@xmi:type = 'uml:Class']/attributes/attribute[@name=$name]"/>
+        <xsl:sequence select="$root//element[@xmi:type = 'uml:Class'][not(f:isAssociationClass(.))]/attributes/attribute[@name=$name]"/>
     </xsl:function>
-    
-    
+
+
     <xd:doc>
-        <xd:desc>fetch all distinct class attribute names</xd:desc>
+        <xd:desc>fetch all distinct class attribute names (association-class attributes are
+            excluded, since association classes are not transformed)</xd:desc>
         <xd:param name="root"/>
     </xd:doc>
     <xsl:function name="f:getDistinctClassAttributeNames" as="xs:string*">
         <xsl:param name="root" as="node()"/>
-        <xsl:sequence select="fn:distinct-values($root//element[@xmi:type = 'uml:Class']/attributes/attribute/@name)"/>
+        <xsl:sequence select="fn:distinct-values($root//element[@xmi:type = 'uml:Class'][not(f:isAssociationClass(.))]/attributes/attribute/@name)"/>
     </xsl:function>
     
     <xd:doc>
@@ -212,7 +251,7 @@
     </xd:doc>
     <xsl:function name="f:getDistinctConnectorsNames" as="xs:string*">
         <xsl:param name="root" as="node()"/>
-        <xsl:sequence select="fn:distinct-values($root//connectors/connector/(@name | target/role/@name | source/role/@name))"/>
+        <xsl:sequence select="fn:distinct-values($root//connectors/connector[not(f:connectorTouchesAssociationClass(.))]/(@name | target/role/@name | source/role/@name))"/>
     </xsl:function>
     
     <xd:doc>
@@ -221,7 +260,7 @@
     </xd:doc>
     <xsl:function name="f:getDistinctClassNames" as="xs:string*">
         <xsl:param name="root" as="node()"/>
-        <xsl:sequence select="fn:distinct-values($root//element[@xmi:type = 'uml:Class']/@name)"/>
+        <xsl:sequence select="fn:distinct-values($root//element[@xmi:type = 'uml:Class'][not(f:isAssociationClass(.))]/@name)"/>
     </xsl:function>
 
     <xd:doc>

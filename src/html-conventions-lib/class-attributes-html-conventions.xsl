@@ -113,7 +113,7 @@
                 <!--    End of specific checker rules-->
             
         </xsl:variable>
-        <xsl:if test="boolean($classAttributeChecks)">
+        <xsl:if test="boolean($classAttributeChecks) and not(f:isAssociationClass(./../..))">
             <xsl:choose>
                 <xsl:when test="$reportType = 'HTML'">
                     <dl id="attribute-{$classAttributeName}">

@@ -106,7 +106,7 @@
             deterministically generated from the UML Class name. </xd:desc>
     </xd:doc>
     <xsl:template match="element[@xmi:type = 'uml:Class']">
-        <xsl:if test="not(f:isExcludedByStatus(.))">
+        <xsl:if test="not(f:isExcludedByStatus(.)) and not(f:isAssociationClass(.))">
         <xsl:variable name="class" select="."/>
         <xsl:variable name="className" select="$class/@name"/>
         <xsl:variable name="classNamePrefix" select="fn:substring-before($className, ':')"/>
@@ -160,7 +160,7 @@
         <xd:desc>Applying shape layer rules to attributes</xd:desc>
     </xd:doc>
     <xsl:template match="element[@xmi:type = 'uml:Class']/attributes/attribute">
-        <xsl:if test="not(f:isExcludedByStatus(.))">
+        <xsl:if test="not(f:isExcludedByStatus(.)) and not(f:isAssociationClass(./../..))">
         <xsl:variable name="className" select="./../../@name" as="xs:string"/>
         <xsl:variable name="attributePrefix" select="fn:substring-before(./@name, ':')"/>
         <!--        <xsl:variable name="attributeNormalizedLocalName"

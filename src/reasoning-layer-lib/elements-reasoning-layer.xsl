@@ -39,7 +39,7 @@
         <xsl:if test="$generateReusedConceptsOWLrestrictions or
                       fn:substring-before($className, ':') = $includedPrefixesList">
             <xsl:variable name="attributeName" select="./@name"/>
-            <xsl:if test="not(f:isExcludedByStatus(.))">
+            <xsl:if test="not(f:isExcludedByStatus(.)) and not(f:isAssociationClass(./../..))">
                 <xsl:call-template name="attributeMultiplicity">
                     <xsl:with-param name="attribute" select="."/>
                 </xsl:call-template>

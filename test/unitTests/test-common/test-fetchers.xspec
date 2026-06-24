@@ -415,4 +415,91 @@
         <x:expect label="treated as non-bidirectional" test="$x:result = false()"/>
     </x:scenario>
 
+    <x:scenario label="isAssociationClass - true for an association class (AssocClass1)">
+        <x:call function="f:isAssociationClass">
+            <x:param name="element" href="../../testData/prettyModel-cleaned.xmi"
+                select="//elements/element[@name = 'AssocClass1']"/>
+        </x:call>
+        <x:expect label="AssocClass1 is recognised as an association class" test="$x:result = true()"/>
+    </x:scenario>
+
+    <x:scenario label="isAssociationClass - false for an ordinary class (Vehicle)">
+        <x:call function="f:isAssociationClass">
+            <x:param name="element" href="../../testData/prettyModel-cleaned.xmi"
+                select="//elements/element[@name = 'Vehicle']"/>
+        </x:call>
+        <x:expect label="an ordinary class is not an association class" test="$x:result = false()"/>
+    </x:scenario>
+
+    <x:scenario label="getDistinctClassAttributeNames - excludes association-class-only attributes (date)">
+        <x:call function="f:getDistinctClassAttributeNames">
+            <x:param name="root" href="../../testData/prettyModel-cleaned.xmi" select="/"/>
+        </x:call>
+        <x:expect label="'date' (only on AssocClass1) is excluded" test="not('date' = $x:result)"/>
+        <x:expect label="'name' (also on Vehicle/RentalCompany) is kept" test="'name' = $x:result"/>
+    </x:scenario>
+
+    <x:scenario label="getClassAttributeByName - association-class attributes are excluded from the reused 'name' group">
+        <x:call function="f:getClassAttributeByName">
+            <x:param name="name" select="'name'"/>
+            <x:param name="root" href="../../testData/prettyModel-cleaned.xmi" select="/"/>
+        </x:call>
+        <x:expect label="no 'name' attribute is owned by AssocClass1"
+            test="not($x:result[../../@name = 'AssocClass1'])"/>
+        <x:expect label="the 'name' attributes of Vehicle and RentalCompany remain"
+            test="boolean($x:result[../../@name = 'Vehicle']) and boolean($x:result[../../@name = 'RentalCompany'])"/>
+    </x:scenario>
+
+    <x:scenario label="connectorTouchesAssociationClass - true when an end is an association class">
+        <x:call function="f:connectorTouchesAssociationClass">
+            <x:param name="connector" select="/xmi:XMI/xmi:Extension/connectors/connector[@name = 'rel']">
+                <xmi:XMI>
+                    <xmi:Extension>
+                        <elements>
+                            <element xmi:idref="AC1" xmi:type="uml:Class" name="AC1"/>
+                        </elements>
+                        <connectors>
+                            <connector name="rel">
+                                <source xmi:idref="REG"/>
+                                <target xmi:idref="AC1"/>
+                                <properties ea_type="Association"/>
+                            </connector>
+                            <connector name="acDef">
+                                <source xmi:idref="PX1"/>
+                                <target xmi:idref="PX2"/>
+                                <properties ea_type="Association" subtype="Class"/>
+                                <extendedProperties associationclass="AC1"/>
+                            </connector>
+                        </connectors>
+                    </xmi:Extension>
+                </xmi:XMI>
+            </x:param>
+        </x:call>
+        <x:expect label="an association from a regular class to an association class is flagged" test="$x:result = true()"/>
+    </x:scenario>
+
+    <x:scenario label="connectorTouchesAssociationClass - false for a plain association between regular classes">
+        <x:call function="f:connectorTouchesAssociationClass">
+            <x:param name="connector" select="/xmi:XMI/xmi:Extension/connectors/connector[@name = 'plain']">
+                <xmi:XMI>
+                    <xmi:Extension>
+                        <connectors>
+                            <connector name="plain">
+                                <source xmi:idref="REG1"/>
+                                <target xmi:idref="REG2"/>
+                                <properties ea_type="Association"/>
+                            </connector>
+                            <connector name="acDef">
+                                <source xmi:idref="PX1"/>
+                                <target xmi:idref="PX2"/>
+                                <extendedProperties associationclass="AC1"/>
+                            </connector>
+                        </connectors>
+                    </xmi:Extension>
+                </xmi:XMI>
+            </x:param>
+        </x:call>
+        <x:expect label="a plain association between regular classes is not flagged" test="$x:result = false()"/>
+    </x:scenario>
+
 </x:description>
