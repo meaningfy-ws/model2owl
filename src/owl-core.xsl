@@ -69,57 +69,12 @@
                 <owl:imports rdf:resource="{.}"/>
             </xsl:for-each>
              
-            <xsl:if test="exists(f:getMetadataValue('ontologyTitleCore'))">
-                <dct:title xml:lang="en">
-                    <xsl:value-of select="f:getMetadataValue('ontologyTitleCore')"/>
-                </dct:title>
-            </xsl:if>
-            <xsl:if test="exists(f:getMetadataValue('ontologyLabelCore'))">
-                <rdfs:label xml:lang="en">
-                    <xsl:value-of select="f:getMetadataValue('ontologyLabelCore')"/>
-                </rdfs:label>
-            </xsl:if>
-            <xsl:if test="exists(f:getMetadataValue('ontologyDescriptionCore'))">
-                <dct:description xml:lang="en">
-                    <xsl:value-of select="f:getMetadataValue('ontologyDescriptionCore')"/>
-                </dct:description>
-            </xsl:if>
-            <xsl:if test="exists(f:getMetadataValue('publisher'))">
-                <dct:publisher>
-                    <xsl:value-of select="f:getMetadataValue('publisher')"/>
-                </dct:publisher>
-            </xsl:if>
-          <rdfs:comment>This version is automatically generated from <xsl:value-of select="tokenize(base-uri(.), '/')[last()]"/> on <xsl:value-of select="format-date(current-date(),'[Y0001]-[M01]-[D01]')"/>
-              </rdfs:comment>
-            <xsl:variable name="seeAlsoArray" select="f:getMetadataArray('seeAlsoResources')"/>
-            <xsl:for-each select="1 to array:size($seeAlsoArray)">
-                <rdfs:seeAlso rdf:resource="{$seeAlsoArray(.)}"/>
-            </xsl:for-each>
-            <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date"><xsl:value-of select="$issuedDate"/></dct:issued>
-            <xsl:if test="exists(f:getMetadataValue('createdDate'))">
-                <dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date"><xsl:value-of select="f:getMetadataValue('createdDate')"/></dct:created>
-            </xsl:if>
-            <xsl:if test="exists(f:getMetadataValue('versionInfo'))">
-                <owl:versionInfo><xsl:value-of select="f:getMetadataValue('versionInfo')"/></owl:versionInfo>
-            </xsl:if>
-            <xsl:if test="exists(f:getMetadataValue('incompatibleWith'))">
-                <owl:incompatibleWith><xsl:value-of select="f:getMetadataValue('incompatibleWith')"/></owl:incompatibleWith>
-            </xsl:if>
-            <xsl:if test="exists(f:getMetadataValue('versionInfo'))">
-                <owl:versionIRI rdf:resource="{fn:concat($coreArtefactURI,'-',f:getMetadataValue('versionInfo'))}"/>
-            </xsl:if>
-            <xsl:if test="exists(f:getMetadataValue('priorVersion'))">
-                <owl:priorVersion><xsl:value-of select="fn:concat($coreArtefactURI,'-',f:getMetadataValue('priorVersion'))"/></owl:priorVersion>
-            </xsl:if>
-            <xsl:if test="exists(f:getMetadataValue('preferredNamespaceUri'))">
-                <vann:preferredNamespaceUri><xsl:value-of select="f:getMetadataValue('preferredNamespaceUri')"/></vann:preferredNamespaceUri>
-            </xsl:if>
-            <xsl:if test="exists(f:getMetadataValue('preferredNamespacePrefix'))">
-                <vann:preferredNamespacePrefix><xsl:value-of select="f:getMetadataValue('preferredNamespacePrefix')"/></vann:preferredNamespacePrefix>
-            </xsl:if>
-            <xsl:if test="exists(f:getMetadataValue('license'))">
-                <dct:license><xsl:value-of select="f:getMetadataValue('license')"/></dct:license>
-            </xsl:if>
+            <xsl:call-template name="ontologyMetadataHeader">
+                <xsl:with-param name="titleKey" select="'ontologyTitleCore'"/>
+                <xsl:with-param name="labelKey" select="'ontologyLabelCore'"/>
+                <xsl:with-param name="descriptionKey" select="'ontologyDescriptionCore'"/>
+                <xsl:with-param name="artefactURI" select="$coreArtefactURI"/>
+            </xsl:call-template>
 
         </owl:Ontology>
         

@@ -4,10 +4,13 @@
     xmlns:math="http://www.w3.org/2005/xpath-functions/math"
     xmlns:array="http://www.w3.org/2005/xpath-functions/array"
     xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl" xmlns:fn="http://www.w3.org/2005/xpath-functions"
-    exclude-result-prefixes="xs math xd xsl uml xmi umldi fn array"
+    exclude-result-prefixes="xs math xd xsl uml xmi umldi fn array functx f"
     xmlns:uml="http://www.omg.org/spec/UML/20131001"
     xmlns:xmi="http://www.omg.org/spec/XMI/20131001"
     xmlns:umldi="http://www.omg.org/spec/UML/20131001/UMLDI" xmlns:functx="http://www.functx.com"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:dct="http://purl.org/dc/terms/" xmlns:vann="http://purl.org/vocab/vann/"
     xmlns:f="http://https://github.com/costezki/model2owl#" version="3.0">
 
     <xd:doc scope="stylesheet">
@@ -1023,5 +1026,74 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
+
+    <xd:doc>
+        <xd:desc>Emit the shared metadata properties of an artefact's owl:Ontology header. The
+            ontology element, its rdf:about and the owl:imports differ per artefact and stay in the
+            entrypoint stylesheets (owl-core, owl-restrictions, shacl-shapes); only the metadata
+            block — identical across all three apart from the artefact-specific title/label/
+            description keys and the artefact URI — is centralised here. Every field stays guarded
+            by exists(f:getMetadataValue(...)) so absent/blank metadata emits no triple.</xd:desc>
+        <xd:param name="titleKey">Metadata key for the artefact-specific dct:title.</xd:param>
+        <xd:param name="labelKey">Metadata key for the artefact-specific rdfs:label.</xd:param>
+        <xd:param name="descriptionKey">Metadata key for the artefact-specific dct:description.</xd:param>
+        <xd:param name="artefactURI">The artefact ontology URI, used for owl:versionIRI / owl:priorVersion.</xd:param>
+    </xd:doc>
+    <xsl:template name="ontologyMetadataHeader">
+        <xsl:param name="titleKey" as="xs:string"/>
+        <xsl:param name="labelKey" as="xs:string"/>
+        <xsl:param name="descriptionKey" as="xs:string"/>
+        <xsl:param name="artefactURI" as="xs:string"/>
+        <xsl:if test="exists(f:getMetadataValue($titleKey))">
+            <dct:title xml:lang="en">
+                <xsl:value-of select="f:getMetadataValue($titleKey)"/>
+            </dct:title>
+        </xsl:if>
+        <xsl:if test="exists(f:getMetadataValue($labelKey))">
+            <rdfs:label xml:lang="en">
+                <xsl:value-of select="f:getMetadataValue($labelKey)"/>
+            </rdfs:label>
+        </xsl:if>
+        <xsl:if test="exists(f:getMetadataValue('publisher'))">
+            <dct:publisher>
+                <xsl:value-of select="f:getMetadataValue('publisher')"/>
+            </dct:publisher>
+        </xsl:if>
+        <xsl:if test="exists(f:getMetadataValue($descriptionKey))">
+            <dct:description xml:lang="en">
+                <xsl:value-of select="f:getMetadataValue($descriptionKey)"/>
+            </dct:description>
+        </xsl:if>
+        <rdfs:comment>This version is automatically generated from <xsl:value-of select="tokenize(base-uri(.), '/')[last()]"/> on <xsl:value-of select="format-date(current-date(),'[Y0001]-[M01]-[D01]')"/></rdfs:comment>
+        <xsl:variable name="seeAlsoArray" select="f:getMetadataArray('seeAlsoResources')"/>
+        <xsl:for-each select="1 to array:size($seeAlsoArray)">
+            <rdfs:seeAlso rdf:resource="{$seeAlsoArray(.)}"/>
+        </xsl:for-each>
+        <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date"><xsl:value-of select="$issuedDate"/></dct:issued>
+        <xsl:if test="exists(f:getMetadataValue('createdDate'))">
+            <dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date"><xsl:value-of select="f:getMetadataValue('createdDate')"/></dct:created>
+        </xsl:if>
+        <xsl:if test="exists(f:getMetadataValue('versionInfo'))">
+            <owl:versionInfo><xsl:value-of select="f:getMetadataValue('versionInfo')"/></owl:versionInfo>
+        </xsl:if>
+        <xsl:if test="exists(f:getMetadataValue('incompatibleWith'))">
+            <owl:incompatibleWith><xsl:value-of select="f:getMetadataValue('incompatibleWith')"/></owl:incompatibleWith>
+        </xsl:if>
+        <xsl:if test="exists(f:getMetadataValue('versionInfo'))">
+            <owl:versionIRI rdf:resource="{fn:concat($artefactURI,'-',f:getMetadataValue('versionInfo'))}"/>
+        </xsl:if>
+        <xsl:if test="exists(f:getMetadataValue('priorVersion'))">
+            <owl:priorVersion><xsl:value-of select="fn:concat($artefactURI,'-',f:getMetadataValue('priorVersion'))"/></owl:priorVersion>
+        </xsl:if>
+        <xsl:if test="exists(f:getMetadataValue('preferredNamespaceUri'))">
+            <vann:preferredNamespaceUri><xsl:value-of select="f:getMetadataValue('preferredNamespaceUri')"/></vann:preferredNamespaceUri>
+        </xsl:if>
+        <xsl:if test="exists(f:getMetadataValue('preferredNamespacePrefix'))">
+            <vann:preferredNamespacePrefix><xsl:value-of select="f:getMetadataValue('preferredNamespacePrefix')"/></vann:preferredNamespacePrefix>
+        </xsl:if>
+        <xsl:if test="exists(f:getMetadataValue('license'))">
+            <dct:license><xsl:value-of select="f:getMetadataValue('license')"/></dct:license>
+        </xsl:if>
+    </xsl:template>
 
 </xsl:stylesheet>
