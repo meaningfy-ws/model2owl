@@ -139,6 +139,24 @@
     </xsl:function>
 
     <xd:doc>
+        <xd:desc>Determines whether either end of a connector resolves to a ProxyConnector. EA uses
+            ProxyConnector ends for the spine of n-ary associations and for the association-class
+            link; those ends carry no usable class / role name and are not transformed, so such
+            connectors are excluded from the artefact-generating templates. The not(@type = ...)
+            form is deliberate: it keeps a connector whose @type is absent (an empty sequence),
+            whereas @type != 'ProxyConnector' would silently drop it.</xd:desc>
+        <xd:param name="connector">The UML connector element to test.</xd:param>
+    </xd:doc>
+    <xsl:function name="f:connectorHasProxyConnectorEnd" as="xs:boolean">
+        <xsl:param name="connector" as="element()"/>
+        <xsl:sequence
+            select="
+                $connector/source/model/@type = 'ProxyConnector'
+                or $connector/target/model/@type = 'ProxyConnector'"
+        />
+    </xsl:function>
+
+    <xd:doc>
         <xd:desc>fetch the xmi:conenctor with a given name (connectors attached to an association
             class are excluded, since association classes are not transformed)</xd:desc>
         <xd:param name="name"/>
@@ -557,8 +575,7 @@
              ProxyConnectors with no class name / role name, so they do not encode a binary relation.
              Returning an empty sequence here protects EVERY caller (ReSpec, glossary, convention
              report, reasoning layer) from the fatal f:isRelationValid error these connectors raise. -->
-        <xsl:if test="not($source/model/@type = 'ProxyConnector'
-                          or $target/model/@type = 'ProxyConnector')">
+        <xsl:if test="not(f:connectorHasProxyConnectorEnd($connector))">
         <xsl:variable name="connectorIdRef" select="$connector/@xmi:idref"/>
         <xsl:variable name="connectorType" select="$connector/properties/@ea_type"/>
         <xsl:variable name="connectorDocs" select="$connector/documentation/@value"/>

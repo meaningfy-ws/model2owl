@@ -33,8 +33,7 @@
              associations. -->
         <xsl:if test="not(f:isExcludedByStatus(.))
                       and not(f:isNaryAssociation(.))
-                      and ./source/model/@type != 'ProxyConnector'
-                      and ./target/model/@type != 'ProxyConnector'">
+                      and not(f:connectorHasProxyConnectorEnd(.))">
             <xsl:variable name="relations" select="f:getRelationsFromConnector(.)"/>
             <xsl:for-each select="$relations">
                     <xsl:variable name="sourceClassCurie" select="./source/@name"/>

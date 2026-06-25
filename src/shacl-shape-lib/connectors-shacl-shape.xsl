@@ -36,7 +36,7 @@
         <xsl:if test="not(f:isExcludedByStatus(.))">
         <xsl:if
             test="
-                not(./source/model/@type = 'ProxyConnector' or ./target/model/@type = 'ProxyConnector') and (
+                not(f:connectorHasProxyConnectorEnd(.)) and (
                 $generateReusedConceptsSHACL = fn:true()
                 or
                 fn:substring-before($connectorRoleName, ':') = $includedPrefixesList)">
@@ -65,7 +65,7 @@
         <xsl:if test="not(f:isExcludedByStatus(.))">
         <xsl:if
             test="
-                not(./source/model/@type = 'ProxyConnector' or ./target/model/@type = ('ProxyConnector', 'Object')) and (
+                not(f:connectorHasProxyConnectorEnd(.) or ./target/model/@type = 'Object') and (
                 $generateReusedConceptsSHACL = fn:true()
                 or
                 fn:substring-before($connectorRoleName, ':') = $includedPrefixesList)">

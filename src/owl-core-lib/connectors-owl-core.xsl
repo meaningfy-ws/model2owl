@@ -208,7 +208,7 @@
             <xsl:if test="not(f:isExcludedByStatus($connectorElement))">
             <xsl:if
                 test="
-                $connectorElement/source/model/@type != 'ProxyConnector' and $connectorElement/target/model/@type != 'ProxyConnector'
+                not(f:connectorHasProxyConnectorEnd($connectorElement))
                 and $connectorElement/properties/@ea_type = ('Association', 'Dependency')">
                 <xsl:variable name="connectorRoleName" select="f:getRoleNameFromConnector($connectorElement)"/>
                 <xsl:if
