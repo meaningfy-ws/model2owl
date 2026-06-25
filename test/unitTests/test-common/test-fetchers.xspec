@@ -520,4 +520,33 @@
         <x:expect label="an ordinary binary-association role 'ownedby' is kept" test="'ownedby' = $x:result"/>
     </x:scenario>
 
+    <!-- D-07 preservation: dropping the class facet of an association class and the qualifier of a
+         qualified association must NOT drop the ordinary binary associations between real classes.
+         These positive scenarios complement the exclusion tests above. Connectors are selected by
+         the names of the classes they relate. -->
+    <x:scenario label="getRelationsFromConnector - the base SomeOtherClass-Insurance binary association is preserved">
+        <x:call function="f:getRelationsFromConnector">
+            <x:param name="connector"
+                href="../../testData/prettyModel-cleaned.xmi"
+                select="//connector[source/model/@name = 'SomeOtherClass' and target/model/@name = 'Insurance']"/>
+        </x:call>
+        <x:expect label="a binary relation is produced" test="exists($x:result)"/>
+        <x:expect label="it is the 'hasIns' object property relating SomeOtherClass to Insurance"
+            test="$x:result/@name = 'hasIns'
+                  and $x:result/source/@name = 'SomeOtherClass'
+                  and $x:result/target/@name = 'Insurance'"/>
+    </x:scenario>
+
+    <x:scenario label="getRelationsFromConnector - a qualified association still yields its underlying binary relation (qualifier dropped, association kept)">
+        <x:call function="f:getRelationsFromConnector">
+            <x:param name="connector"
+                href="../../testData/prettyModel-cleaned.xmi"
+                select="//connector[source/model/@name = 'ClassForQualAssoc' and target/model/@name = 'SomeOtherClass']"/>
+        </x:call>
+        <x:expect label="a binary relation is produced" test="exists($x:result)"/>
+        <x:expect label="it relates ClassForQualAssoc to SomeOtherClass"
+            test="$x:result/source/@name = 'ClassForQualAssoc'
+                  and $x:result/target/@name = 'SomeOtherClass'"/>
+    </x:scenario>
+
 </x:description>
