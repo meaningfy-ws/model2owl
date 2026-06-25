@@ -155,7 +155,7 @@ install:  get-saxon get-rdflib get-robot get-widoco get-jena-cli-tools get-jinja
 # Run all tests
 test: unit-tests functional-tests
 	@mvn surefire-report:report-only
-	-@make test-summary
+	@make test-summary
 
 # Summarise XSpec results from target/surefire-reports (skips reports older than
 # TEST_SUMMARY_MAX_AGE_MIN minutes; set to 0 to consider all). Exits non-zero on
