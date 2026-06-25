@@ -16,6 +16,14 @@
     <xsl:import href="../common/checkers.xsl"/>
     <xsl:import href="utils-html-conventions.xsl"/>
 
+    <!-- Reference to the documentation page on UML constructs model2owl does not transform.
+         Shared by the unsupported connector / element / modifier / construct warnings below and
+         kept module-scoped so the host/path is changed in one place. -->
+    <xsl:variable name="unsupportedConstructsRefLabel" as="xs:string"
+        select="'unsupported UML constructs'"/>
+    <xsl:variable name="unsupportedConstructsRefLink" as="xs:string"
+        select="'&lt;a href=&quot;https://meaningfy-ws.github.io/model2owl-docs-gh-pages/public-review/uml/unsupported-uml-constructs.html#sec:unsupported-uml-constructs&quot; target=&quot;_blank&quot;&gt;Unsupported UML constructs&lt;/a&gt;'"/>
+
     <xd:doc>
         <xd:desc>Applying general conventions templates </xd:desc>
     </xd:doc>
@@ -70,8 +78,8 @@
                     f:generateFormattedWarningMessage('Model2owl supports association, dependency, generalisation and realisation connectors. The following connector types were found in the model and are not transformed. For guidance, see the documentation on unsupported UML constructs', $unsupportedConnectorTypes,
                     '//connectors/connector/properties/@ea_type',
                     'general-connector-type-1',
-                    'unsupported UML constructs',
-                    '&lt;a href=&quot;https://meaningfy-ws.github.io/model2owl-docs-gh-pages/public-review/uml/unsupported-uml-constructs.html#sec:unsupported-uml-constructs&quot; target=&quot;_blank&quot;&gt;Unsupported UML constructs&lt;/a&gt;'
+                    $unsupportedConstructsRefLabel,
+                    $unsupportedConstructsRefLink
                     )
                 else
                     ()
@@ -113,8 +121,8 @@
                     f:generateFormattedWarningMessage('Model2owl supports Class, Package, Datatype, Enumeration, and Object elements. The following element types were found in the model and are not transformed. For guidance, see the documentation on unsupported UML constructs', $unsupportedElementTypesDisplay,
                     '//elements/element/@xmi:type',
                     'general-element-type-2',
-                    'unsupported UML constructs',
-                    '&lt;a href=&quot;https://meaningfy-ws.github.io/model2owl-docs-gh-pages/public-review/uml/unsupported-uml-constructs.html#sec:unsupported-uml-constructs&quot; target=&quot;_blank&quot;&gt;Unsupported UML constructs&lt;/a&gt;'
+                    $unsupportedConstructsRefLabel,
+                    $unsupportedConstructsRefLink
                     )
                 else
                     ()
@@ -152,8 +160,8 @@
                     f:generateFormattedWarningMessage('Model2owl does not transform UML attribute or generalisation-set modifiers. The following were found in the model and carry no meaning in the generated artefacts. For guidance, see the documentation on unsupported UML constructs', $foundModifiers,
                     '//attributes/attribute/xrefs/@value | //connectors/connector/xrefs/@value',
                     'general-modifier-type-4',
-                    'unsupported UML constructs',
-                    '&lt;a href=&quot;https://meaningfy-ws.github.io/model2owl-docs-gh-pages/public-review/uml/unsupported-uml-constructs.html#sec:unsupported-uml-constructs&quot; target=&quot;_blank&quot;&gt;Unsupported UML constructs&lt;/a&gt;'
+                    $unsupportedConstructsRefLabel,
+                    $unsupportedConstructsRefLink
                     )
                 else
                     ()"
@@ -182,8 +190,8 @@
                     f:generateFormattedWarningMessage('Model2owl does not transform the following UML constructs found in the model. For guidance, see the documentation on unsupported UML constructs', $foundConstructs,
                     '//connectors/connector',
                     'general-construct-type-5',
-                    'unsupported UML constructs',
-                    '&lt;a href=&quot;https://meaningfy-ws.github.io/model2owl-docs-gh-pages/public-review/uml/unsupported-uml-constructs.html#sec:unsupported-uml-constructs&quot; target=&quot;_blank&quot;&gt;Unsupported UML constructs&lt;/a&gt;'
+                    $unsupportedConstructsRefLabel,
+                    $unsupportedConstructsRefLink
                     )
                 else
                     ()"
