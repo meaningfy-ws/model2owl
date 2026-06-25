@@ -385,7 +385,7 @@
                     else
                         f:generateErrorMessage(fn:concat('The tag ', $tag/@name, ' of element ', $element/@name, ' must have a value'),
                         path($element),
-                        'common-tag-14]',
+                        'common-tag-14',
                         'CMC-R6',
                         '&lt;a href=&quot;https://semiceu.github.io/style-guide/1.0.0/gc-conceptual-model-conventions.html#sec:cmc-r6&quot; target=&quot;_blank&quot;&gt;CMC-R6&lt;/a&gt;'
                         )"/>

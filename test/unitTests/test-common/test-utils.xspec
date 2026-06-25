@@ -394,6 +394,38 @@
             <x:expect label="err:description" test="boolean($x:result?err?description)"/>
         </x:scenario>
 
+        <x:scenario label="valid date (xsd:date value 2020-01-01 must not be rejected as xs:dateTime)">
+            <x:call function="f:validateTagValue">
+                <x:param name="tagValue" select="'2020-01-01'"/>
+                <x:param name="datatypeQName" select="'xsd:date'"/>
+            </x:call>
+            <x:expect label="result" select="fn:true()"/>
+        </x:scenario>
+
+        <x:scenario label="valid time">
+            <x:call function="f:validateTagValue">
+                <x:param name="tagValue" select="'10:30:00'"/>
+                <x:param name="datatypeQName" select="'xsd:time'"/>
+            </x:call>
+            <x:expect label="result" select="fn:true()"/>
+        </x:scenario>
+
+        <x:scenario label="valid dateTime">
+            <x:call function="f:validateTagValue">
+                <x:param name="tagValue" select="'2020-01-01T10:30:00'"/>
+                <x:param name="datatypeQName" select="'xsd:dateTime'"/>
+            </x:call>
+            <x:expect label="result" select="fn:true()"/>
+        </x:scenario>
+
+        <x:scenario label="invalid date" catch="yes">
+            <x:call function="f:validateTagValue">
+                <x:param name="tagValue" select="'not-a-date'"/>
+                <x:param name="datatypeQName" select="'xsd:date'"/>
+            </x:call>
+            <x:expect label="err:description" test="boolean($x:result?err?description)"/>
+        </x:scenario>
+
     </x:scenario>
 
 
@@ -504,13 +536,12 @@
                 <x:expect label="array is empty" test="array:size($x:result) = 0"/>
             </x:scenario>
             
-            <x:scenario catch="yes" label="Get non-existent array throws error">
+            <x:scenario label="Get non-existent array returns an empty array (optional metadata)">
                 <x:call function="f:getMetadataArray">
                     <x:param name="keyName" select="'nonExistentArray'"/>
                 </x:call>
-                <x:expect label="err:code" test="$x:result?err?code" select="xs:QName('keyNotFoundError')"/>
-                <x:expect label="err:description" test="$x:result?err?description" 
-                    select="'Error: Key ''nonExistentArray'' not found in metadata JSON.'"/>
+                <x:expect label="result is array" test="$x:result instance of array(*)"/>
+                <x:expect label="array is empty" test="array:size($x:result) = 0"/>
             </x:scenario>
             
             <x:scenario catch="yes" label="Get non-array value throws error">
@@ -582,6 +613,55 @@
             <x:expect label="returns false" select="fn:false()"/>
         </x:scenario>
 
+    </x:scenario>
+
+    <x:scenario label="getMetadataValue returns an empty sequence for a missing key">
+        <x:call function="f:getMetadataValue">
+            <x:param name="keyName" select="'aKeyThatDoesNotExistInMetadata'"/>
+        </x:call>
+        <x:expect label="empty sequence, no error" select="()"/>
+    </x:scenario>
+
+    <x:scenario label="getMetadataValue still returns a present value">
+        <x:call function="f:getMetadataValue">
+            <x:param name="keyName" select="'versionInfo'"/>
+        </x:call>
+        <x:expect label="present value returned" select="'3.1.0'"/>
+    </x:scenario>
+
+    <x:scenario label="nonBlankValue treats an empty string as absent">
+        <x:call function="f:nonBlankValue">
+            <x:param name="value" select="''"/>
+        </x:call>
+        <x:expect label="empty sequence" select="()"/>
+    </x:scenario>
+
+    <x:scenario label="nonBlankValue treats a whitespace-only string as absent">
+        <x:call function="f:nonBlankValue">
+            <x:param name="value" select="'   '"/>
+        </x:call>
+        <x:expect label="empty sequence" select="()"/>
+    </x:scenario>
+
+    <x:scenario label="nonBlankValue passes an empty sequence through">
+        <x:call function="f:nonBlankValue">
+            <x:param name="value" select="()"/>
+        </x:call>
+        <x:expect label="empty sequence" select="()"/>
+    </x:scenario>
+
+    <x:scenario label="nonBlankValue keeps a non-blank string">
+        <x:call function="f:nonBlankValue">
+            <x:param name="value" select="'ePO Core'"/>
+        </x:call>
+        <x:expect label="value returned unchanged" select="'ePO Core'"/>
+    </x:scenario>
+
+    <x:scenario label="nonBlankValue preserves a meaningful non-string value (0)">
+        <x:call function="f:nonBlankValue">
+            <x:param name="value" select="0"/>
+        </x:call>
+        <x:expect label="zero is kept" select="0"/>
     </x:scenario>
 
 

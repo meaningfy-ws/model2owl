@@ -562,8 +562,48 @@
             </x:call>
             <x:expect label="boolean-false" select="false()"/>
         </x:scenario>
+
+        <!-- Regression for the FORG0006 crash: a generalisation between two associations that
+             both connect the SAME pair of classes (epo:SubmissionStatisticalInformation -> epo:MonetaryValue).
+             Selected by class labels (not idref) via the connector resolvers. Expected: valid (false),
+             returned as a single boolean. -->
+        <x:scenario label="association generalisation with identical source and target classes - valid (single boolean, no FORG0006)">
+            <x:call function="f:generalisationMissingOrIncorrect">
+                <x:param name="generalisation" href="../../testData/ePO-core-4.2.0.xml"
+                    select="(/xmi:XMI/xmi:Extension/connectors/connector
+                                [properties/@ea_type = 'Generalization']
+                                [source/model/@type = 'ProxyConnector' and target/model/@type = 'ProxyConnector']
+                                [f:getSourceConnectorFromGeneralisation(.)/source/model/@name = 'epo:SubmissionStatisticalInformation'
+                                 and f:getSourceConnectorFromGeneralisation(.)/target/model/@name = 'epo:MonetaryValue'
+                                 and f:getTargetConnectorFromGeneralisation(.)/source/model/@name = 'epo:SubmissionStatisticalInformation'
+                                 and f:getTargetConnectorFromGeneralisation(.)/target/model/@name = 'epo:MonetaryValue'])[1]"/>
+            </x:call>
+            <x:expect label="boolean-false" select="false()"/>
+        </x:scenario>
+
+        <!-- Regression for XTTE0780: a generalisation between ProxyConnector spines whose resolved
+             connectors have EMPTY source/target class names (an n-ary association spine pointing at
+             another such spine). None of the three cases fire, so the old code returned an empty
+             sequence and raised XTTE0780 against as="xs:boolean". The function must instead return a
+             single boolean (false: an unresolvable/empty-name connector generalisation is treated as
+             not-missing/not-incorrect). Selected by label: the Generalization connector whose both
+             ends are ProxyConnectors AND whose resolved source/target connectors have empty class
+             names. -->
+        <x:scenario label="association generalisation between empty-name ProxyConnector spines - valid (single boolean, no XTTE0780)">
+            <x:call function="f:generalisationMissingOrIncorrect">
+                <x:param name="generalisation" href="../../testData/ePO_core.xml"
+                    select="(/xmi:XMI/xmi:Extension/connectors/connector
+                                [properties/@ea_type = 'Generalization']
+                                [source/model/@type = 'ProxyConnector' and target/model/@type = 'ProxyConnector']
+                                [string-length(string(f:getSourceConnectorFromGeneralisation(.)/source/model/@name)) = 0
+                                 and string-length(string(f:getSourceConnectorFromGeneralisation(.)/target/model/@name)) = 0
+                                 and string-length(string(f:getTargetConnectorFromGeneralisation(.)/source/model/@name)) = 0
+                                 and string-length(string(f:getTargetConnectorFromGeneralisation(.)/target/model/@name)) = 0])[1]"/>
+            </x:call>
+            <x:expect label="boolean-false" select="false()"/>
+        </x:scenario>
     </x:scenario>
-    
+
     <x:scenario label="Check isNaryAssociation - positive case">
         <x:call function="f:isNaryAssociation">
             <x:param name="connector"
@@ -583,6 +623,59 @@
         </x:call>
         <x:expect label="result" select="false()"/>
     </x:scenario>
-    
+
+    <!-- ISS-015 / M-8: UML primitive attribute types must be recognised as valid
+         ranges for owl:DatatypeProperty. Fixture attributes are selected BY NAME. -->
+    <x:scenario label="isAttributeTypeValidForDatatypeProperty - primitive int attribute (engravedID)">
+        <x:call function="f:isAttributeTypeValidForDatatypeProperty">
+            <x:param name="attributeElement"
+                href="../../testData/prettyModel-cleaned.xmi"
+                select="//attribute[@name = 'engravedID'][properties/@type = 'int']"
+            />
+        </x:call>
+        <x:expect label="result" select="true()"/>
+    </x:scenario>
+
+    <x:scenario label="isAttributeTypeValidForDatatypeProperty - primitive short attribute (colour)">
+        <x:call function="f:isAttributeTypeValidForDatatypeProperty">
+            <x:param name="attributeElement"
+                href="../../testData/prettyModel-cleaned.xmi"
+                select="//attribute[@name = 'colour'][properties/@type = 'short']"
+            />
+        </x:call>
+        <x:expect label="result" select="true()"/>
+    </x:scenario>
+
+    <x:scenario label="isAttributeTypeValidForDatatypeProperty - primitive long attribute (nickName)">
+        <x:call function="f:isAttributeTypeValidForDatatypeProperty">
+            <x:param name="attributeElement"
+                href="../../testData/prettyModel-cleaned.xmi"
+                select="//attribute[@name = 'nickName'][properties/@type = 'long']"
+            />
+        </x:call>
+        <x:expect label="result" select="true()"/>
+    </x:scenario>
+
+    <x:scenario label="isInvalidNamePrefix - an unprefixed name (empty prefix) is not an invalid prefix">
+        <x:call function="f:isInvalidNamePrefix">
+            <x:param name="name" select="'Boat'"/>
+        </x:call>
+        <x:expect label="empty prefix is not flagged as invalid (handled by 'prefix not defined')" test="$x:result = false()"/>
+    </x:scenario>
+
+    <x:scenario label="isInvalidNamePrefix - a well-formed prefix is valid">
+        <x:call function="f:isInvalidNamePrefix">
+            <x:param name="name" select="'epo:Buyer'"/>
+        </x:call>
+        <x:expect label="a normal prefix is valid" test="$x:result = false()"/>
+    </x:scenario>
+
+    <x:scenario label="isInvalidNamePrefix - a prefix with illegal characters is invalid">
+        <x:call function="f:isInvalidNamePrefix">
+            <x:param name="name" select="'bad prefix:Buyer'"/>
+        </x:call>
+        <x:expect label="a prefix containing a space is invalid" test="$x:result = true()"/>
+    </x:scenario>
+
 </x:description>
 

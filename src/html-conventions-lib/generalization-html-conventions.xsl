@@ -53,9 +53,9 @@
                 <xsl:call-template name="generalizationUnidirectionalConnectorsDirection">
                     <xsl:with-param name="generalizationConnector" select="."/>
                 </xsl:call-template>
-                <!-- <xsl:call-template name="generalizationMissingOrInvalidClassGeneralization">
+                <xsl:call-template name="generalizationMissingOrInvalidClassGeneralization">
                     <xsl:with-param name="generalizationConnector" select="."/>
-                </xsl:call-template> -->
+                </xsl:call-template>
             </xsl:if>
         </xsl:variable>
         <xsl:if test="boolean($generalizationChecks)">
@@ -88,9 +88,13 @@
         <xsl:variable name="idRefTarget" select="$generalizationConnector/target/@xmi:idref"/>
         <xsl:variable name="targetElement"
             select="f:getElementByIdRef($idRefTarget, root($generalizationConnector))"/>
+        <xsl:variable name="isConnectorGeneralization"
+            select="$generalizationConnector/source/model/@type = 'ProxyConnector' and $generalizationConnector/target/model/@type = 'ProxyConnector'"/>
         <xsl:sequence
             select="
-                if (count(f:getIncommingConnectors($targetElement)[properties/@ea_type = 'Generalization']) > 1) then
+                if ($isConnectorGeneralization) then
+                    ()
+                else if (count(f:getIncommingConnectors($targetElement)[properties/@ea_type = 'Generalization']) > 1) then
                     ()
                 else
                     f:generateInfoMessage(fn:concat('The class ', $generalizationConnector/target/model/@name, ' has only one sub-class ',
@@ -293,7 +297,7 @@
             if (not(f:generalisationConnectorsHasOppositeDirections($generalizationConnector))) then
             ()
             else
-            f:generateErrorMessage(fn:concat('The unidirectional connectors ',$targetConnectorString, ' and ', $sourceConnectorString,' associated with the generalisation connector have opposite directions'),
+            f:generateErrorMessage(fn:concat('The connectors ',$targetConnectorString, ' and ', $sourceConnectorString,' associated with the generalisation connector have opposite directions'),
             path($generalizationConnector),
             'generalisation-connector-unidirectional-connector-direction-8',
             '',
@@ -324,9 +328,9 @@
             if (not(f:generalisationMissingOrIncorrect($generalizationConnector))) then
             ()
             else
-            f:generateErrorMessage(fn:concat('The generalisation between ',$targetConnectorString, ' and ', $sourceConnectorString,' is missing or has invalid direction'),
+            f:generateErrorMessage(fn:concat('The generalisation between the connectors ',$targetConnectorString, ' and ', $sourceConnectorString,' is declared incorrectly: their same-side ends (source with source, target with target) must each be attached to the same class or to two classes linked by a class generalisation. This usually indicates an inconsistent end orientation of the two associations (which class sits at the source end and which at the target end, independent of navigability), which declares the generalisation on the inverse object property and, under reasoning, produces unintended subclass inferences.'),
             path($generalizationConnector),
-            'generalisation-connector-unidirectional-connector-direction-8',
+            'generalisation-connector-and-missing-class-generalisation-9',
             '',
             ''
             )"

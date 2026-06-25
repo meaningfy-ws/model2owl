@@ -40,10 +40,11 @@
                         <xsl:with-param name="attributeName" select="."/>
                         <xsl:with-param name="root" select="$root"/>
                     </xsl:call-template>
-                    <xsl:call-template name="checkDatatypeOfAttributesWithSameName">
-                        <xsl:with-param name="attributeName" select="."/>
-                        <xsl:with-param name="root" select="$root"/>
-                    </xsl:call-template>
+                    <!-- The "different datatypes in reuse contexts" checker
+                         (class-attributes-reuse-data-types-3) was removed: a reused
+                         attribute with differing primitive datatypes is now supported
+                         and rendered as an rdfs:Datatype union range (ISS-016), so the
+                         warning no longer reflects a convention violation (ISS-018). -->
                 </xsl:variable>
                 <xsl:if test="boolean($attributeChecks)">
                     <xsl:choose>
@@ -158,51 +159,12 @@
 
 
 
-    <xd:doc>
-        <xd:desc>[class-attributes-reuse-data-types-3] - The attribute $value$ has different datatypes in reuse contexts.
-            When a property is reused in multiple contexts, the data-type is expected to be the same.
-            In this case, multiple data-types are found: $Data-types</xd:desc>
-        <xd:param name="attributeName"/>
-        <xd:param name="root"/>
-    </xd:doc>
-    <xsl:template name="checkDatatypeOfAttributesWithSameName">
-        <xsl:param name="attributeName"/>
-        <xsl:param name="root"/>
-        <xsl:variable name="attributesWithSameName"
-            select="f:getClassAttributeByName($attributeName, $root)"/>
-        <xsl:variable name="datatypeValues" select="$attributesWithSameName/properties/@type"/>
-
-        <xsl:variable name="datatypeWithAnnotations" as="xs:string*"
-            select="
-                for $attribute in $attributesWithSameName
-                return
-                    if ($attribute/properties/@type) then
-                        fn:concat($attribute/properties/@type, ' (', $attribute/../../@name, ') ')
-                    else
-                        ()"/>
-
-        <xsl:variable name="allAttributesHaveDatatype"
-            select="fn:count($attributesWithSameName) = fn:count($datatypeValues)"/>
-
-        <xsl:sequence
-            select="
-                if (f:areStringsEqual($datatypeValues) and fn:boolean($datatypeValues) and $allAttributesHaveDatatype) then
-                    ()
-                else
-                    if (fn:boolean($datatypeValues)) then
-                        f:generateFormattedWarningMessage(fn:concat('The attribute ', $attributeName, ' has different datatypes in reuse contexts.',
-                        'When a property is reused in multiple contexts, the data-type is expected to be the same.',
-                        'In this case, multiple data-types are found: '), $datatypeWithAnnotations,
-                        '//elements/element/attributes',
-                        'class-attributes-reuse-data-types-3',
-                        'GC-R6',
-                        '&lt;a href=&quot;https://semiceu.github.io/style-guide/1.0.0/gc-general-conventions.html#sec:gc-r6&quot; target=&quot;_blank&quot;&gt;GC-R6&lt;/a&gt;
-                        &lt;a href=&quot;https://semiceu.github.io/style-guide/1.0.0/gc-general-conventions.html#sec:gc-r1&quot; target=&quot;_blank&quot;&gt;GC-R1&lt;/a&gt;'
-                        )
-                    else
-                        ()"
-        />
-    </xsl:template>
-
+    <!-- Removed template: checkDatatypeOfAttributesWithSameName
+         ([class-attributes-reuse-data-types-3]). It warned that a reused attribute
+         had "different datatypes in reuse contexts". Reusing an attribute with
+         differing primitive datatypes is now first-class supported and produces an
+         rdfs:Datatype union range in the reasoning layer (ISS-016), so flagging it
+         as a convention violation is no longer correct (ISS-018). The matching docs
+         row in ted-model2owl-docs (model2owl-checkers.adoc) must be removed too. -->
 
 </xsl:stylesheet>

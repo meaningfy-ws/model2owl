@@ -144,6 +144,24 @@
         <x:expect label="expect to do nothing" select="()"/>
     </x:scenario>
 
+    <x:scenario
+        label="Scenario for a connector (ProxyConnector) generalisation does not emit the class single-child message (bug M-4)">
+        <x:context href="../../testData/prettyModel-cleaned.xmi"
+            select="/xmi:XMI/xmi:Extension[1]/connectors[1]/connector[properties/@ea_type = 'Generalization'][source/model/@type = 'ProxyConnector'][target/model/@type = 'ProxyConnector']"/>
+        <x:expect label="no class single-child message is produced for an association (ProxyConnector) generalisation"
+            test="not(contains(string-join(//text(), ' '), 'has only one sub-class'))"/>
+    </x:scenario>
+
+    <x:scenario
+        label="Scenario for the class single-child check skips connector (ProxyConnector) generalisations (bug M-4)">
+        <x:call template="generalizationClassWithSingleChild">
+            <x:param name="generalizationConnector"
+                href="../../testData/prettyModel-cleaned.xmi"
+                select="/xmi:XMI/xmi:Extension[1]/connectors[1]/connector[properties/@ea_type = 'Generalization'][source/model/@type = 'ProxyConnector'][target/model/@type = 'ProxyConnector']"/>
+        </x:call>
+        <x:expect label="expect to do nothing for a ProxyConnector generalisation" select="()"/>
+    </x:scenario>
+
     <x:scenario label="Scenario for finding a Generalization between 2 classes">
         <x:call template="generalizationSourceTargetTypes">
             <x:param name="generalizationConnector"
@@ -164,7 +182,7 @@
             </x:call>
             <x:expect label="expect to find a Description Details element" test="boolean(/dd)"/>
             <x:expect label="expect correct error text"
-                test="dd[@class='filter errors']/text() = 'The unidirectional connectors epo:SubmissionStatisticalInformation -&gt; epo:MonetaryValue and epo:MonetaryValue -&gt; epo:SubmissionStatisticalInformation associated with the generalisation connector have opposite directions'"
+                test="dd[@class='filter errors']/text() = 'The connectors epo:SubmissionStatisticalInformation -&gt; epo:MonetaryValue and epo:MonetaryValue -&gt; epo:SubmissionStatisticalInformation associated with the generalisation connector have opposite directions'"
             />
         </x:scenario>
 
@@ -188,10 +206,25 @@
             </x:call>
             <x:expect label="expect to find a Description Details element" test="boolean(/dd)"/>
             <x:expect label="expect correct error text"
-                test="dd[@class='filter errors']/text() = 'The generalisation between epo:Notice -&gt; epo:Procedure and epo:SimplifiedNotice -&gt; epo:Procedure is missing or has invalid direction'"
+                test="dd[@class='filter errors']/text() = 'The generalisation between the connectors epo:Notice -&gt; epo:Procedure and epo:SimplifiedNotice -&gt; epo:Procedure is declared incorrectly: their same-side ends (source with source, target with target) must each be attached to the same class or to two classes linked by a class generalisation. This usually indicates an inconsistent end orientation of the two associations (which class sits at the source end and which at the target end, independent of navigability), which declares the generalisation on the inverse object property and, under reasoning, produces unintended subclass inferences.'"
             />
         </x:scenario>
-        
+
+        <x:scenario label="incorrect use of generalisations between associations - inconsistent end orientation (Boat/Insurance)">
+            <!-- prettyModel: assoc Boat->Insurance generalises Insurance->Vehicle. The two
+                 associations are anti-oriented (same-side ends attach to unrelated classes),
+                 which the reasoner turns into Boat subClassOf Insurance. Selected by the
+                 connector-generalization predicate, not a positional index. -->
+            <x:call template="generalizationMissingOrInvalidClassGeneralization">
+                <x:param name="generalizationConnector" href="../../testData/prettyModel-cleaned.xmi"
+                    select="/xmi:XMI/xmi:Extension[1]/connectors[1]/connector[properties/@ea_type = 'Generalization' and source/model/@type = 'ProxyConnector' and target/model/@type = 'ProxyConnector']"/>
+            </x:call>
+            <x:expect label="expect to find a Description Details element" test="boolean(/dd)"/>
+            <x:expect label="the checker flags it as an error" test="dd/@class = 'filter errors'"/>
+            <x:expect label="the message names the two related associations"
+                test="contains(dd/text(), 'Insurance -&gt; Vehicle and Boat -&gt; Insurance') and contains(dd/text(), 'inconsistent end orientation')"/>
+        </x:scenario>
+
         <x:scenario label="correct use of generalisations between associations - valid case">
             <x:call template="generalizationMissingOrInvalidClassGeneralization">
                 <x:param name="generalizationConnector" href="../../testData/ePO-core-4.2.0.xml"

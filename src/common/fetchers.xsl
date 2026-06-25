@@ -104,7 +104,61 @@
     </xsl:function>
     
     <xd:doc>
-        <xd:desc>fetch the xmi:conenctor with a given name</xd:desc>
+        <xd:desc>Returns true when one of the connector's ends is attached to an association class.
+            Such connectors (e.g. an ordinary association from a regular class to an association
+            class) are not transformed, since association classes are ignored.</xd:desc>
+        <xd:param name="connector"/>
+    </xd:doc>
+    <xsl:function name="f:connectorTouchesAssociationClass" as="xs:boolean">
+        <xsl:param name="connector" as="node()?"/>
+        <xsl:variable name="associationClassIds"
+            select="root($connector)//connectors/connector/extendedProperties/@associationclass[. != '']"/>
+        <xsl:sequence
+            select="
+                boolean($connector/source/@xmi:idref[. = $associationClassIds])
+                or boolean($connector/target/@xmi:idref[. = $associationClassIds])"
+        />
+    </xsl:function>
+
+    <xd:doc>
+        <xd:desc>Determines whether a given UML connector element represents an N-ary (e.g.
+            ternary) association. This requires the connector's properties/@ea_type to be
+            'Association' and its source/model/@type also to be 'Association' (the n-ary spine).
+            N-ary associations are not transformed, so n-ary connectors are excluded from the
+            connector fetchers below.</xd:desc>
+        <xd:param name="connector">The UML connector element to test.</xd:param>
+    </xd:doc>
+    <xsl:function name="f:isNaryAssociation" as="xs:boolean">
+        <xsl:param name="connector" as="element()"/>
+        <xsl:sequence
+            select="
+                if ($connector/properties/@ea_type = 'Association')
+                then $connector/source/model/@type = 'Association'
+                else false()"
+        />
+    </xsl:function>
+
+    <xd:doc>
+        <xd:desc>Determines whether either end of a connector resolves to a ProxyConnector. EA uses
+            ProxyConnector ends for the spine of n-ary associations and for the association-class
+            link; those ends carry no usable class / role name and are not transformed, so such
+            connectors are excluded from the artefact-generating templates. The not(@type = ...)
+            form is deliberate: it keeps a connector whose @type is absent (an empty sequence),
+            whereas @type != 'ProxyConnector' would silently drop it.</xd:desc>
+        <xd:param name="connector">The UML connector element to test.</xd:param>
+    </xd:doc>
+    <xsl:function name="f:connectorHasProxyConnectorEnd" as="xs:boolean">
+        <xsl:param name="connector" as="element()"/>
+        <xsl:sequence
+            select="
+                $connector/source/model/@type = 'ProxyConnector'
+                or $connector/target/model/@type = 'ProxyConnector'"
+        />
+    </xsl:function>
+
+    <xd:doc>
+        <xd:desc>fetch the xmi:conenctor with a given name (connectors attached to an association
+            class are excluded, since association classes are not transformed)</xd:desc>
         <xd:param name="name"/>
         <xd:param name="root"/>
     </xd:doc>
@@ -112,7 +166,7 @@
         <xsl:param name="name" as="xs:string"/>
         <xsl:param name="root" as="node()"/>
         <xsl:sequence
-            select="$root//connectors/connector[@name | target/role/@name | source/role/@name = $name]"
+            select="$root//connectors/connector[@name | target/role/@name | source/role/@name = $name][not(f:connectorTouchesAssociationClass(.))][not(f:isNaryAssociation(.))][not(properties/@ea_type = 'Aggregation')]"
         />
     </xsl:function>
     
@@ -176,24 +230,45 @@
     </xsl:function>
     
     <xd:doc>
-        <xd:desc>fetch the class attribute with a given name</xd:desc>
+        <xd:desc>Returns true when the element is an association class. An association class is a
+            uml:AssociationClass in the logical model but surfaces as a uml:Class in the EA
+            extension, so it would otherwise be transformed as an ordinary class. It is
+            identified by a connector that references it through
+            extendedProperties/@associationclass. Association classes are not supported and are
+            ignored across all artefacts (no class, no attributes/properties, no connectors to
+            them).</xd:desc>
+        <xd:param name="element"/>
+    </xd:doc>
+    <xsl:function name="f:isAssociationClass" as="xs:boolean">
+        <xsl:param name="element" as="node()?"/>
+        <xsl:sequence
+            select="
+                $element/@xmi:idref != ''
+                and boolean(root($element)//connectors/connector/extendedProperties[@associationclass = $element/@xmi:idref])"
+        />
+    </xsl:function>
+
+    <xd:doc>
+        <xd:desc>fetch the class attribute with a given name (association-class attributes are
+            excluded, since association classes are not transformed)</xd:desc>
         <xd:param name="name"/>
         <xd:param name="root"/>
     </xd:doc>
     <xsl:function name="f:getClassAttributeByName" as="node()*">
         <xsl:param name="name" as="xs:string"/>
         <xsl:param name="root" as="node()"/>
-        <xsl:sequence select="$root//element[@xmi:type = 'uml:Class']/attributes/attribute[@name=$name]"/>
+        <xsl:sequence select="$root//element[@xmi:type = 'uml:Class'][not(f:isAssociationClass(.))]/attributes/attribute[@name=$name]"/>
     </xsl:function>
-    
-    
+
+
     <xd:doc>
-        <xd:desc>fetch all distinct class attribute names</xd:desc>
+        <xd:desc>fetch all distinct class attribute names (association-class attributes are
+            excluded, since association classes are not transformed)</xd:desc>
         <xd:param name="root"/>
     </xd:doc>
     <xsl:function name="f:getDistinctClassAttributeNames" as="xs:string*">
         <xsl:param name="root" as="node()"/>
-        <xsl:sequence select="fn:distinct-values($root//element[@xmi:type = 'uml:Class']/attributes/attribute/@name)"/>
+        <xsl:sequence select="fn:distinct-values($root//element[@xmi:type = 'uml:Class'][not(f:isAssociationClass(.))]/attributes/attribute/@name)"/>
     </xsl:function>
     
     <xd:doc>
@@ -212,7 +287,7 @@
     </xd:doc>
     <xsl:function name="f:getDistinctConnectorsNames" as="xs:string*">
         <xsl:param name="root" as="node()"/>
-        <xsl:sequence select="fn:distinct-values($root//connectors/connector/(@name | target/role/@name | source/role/@name))"/>
+        <xsl:sequence select="fn:distinct-values($root//connectors/connector[not(f:connectorTouchesAssociationClass(.))][not(f:isNaryAssociation(.))][not(properties/@ea_type = 'Aggregation')]/(@name | target/role/@name | source/role/@name))"/>
     </xsl:function>
     
     <xd:doc>
@@ -221,7 +296,7 @@
     </xd:doc>
     <xsl:function name="f:getDistinctClassNames" as="xs:string*">
         <xsl:param name="root" as="node()"/>
-        <xsl:sequence select="fn:distinct-values($root//element[@xmi:type = 'uml:Class']/@name)"/>
+        <xsl:sequence select="fn:distinct-values($root//element[@xmi:type = 'uml:Class'][not(f:isAssociationClass(.))]/@name)"/>
     </xsl:function>
 
     <xd:doc>
@@ -403,14 +478,7 @@
     <xsl:function name="f:isConnectorBidirectional" as="xs:boolean">
         <xsl:param name="connector"/>
         <xsl:variable name="connectorDirection" select="$connector/properties/@direction"/>
-        <xsl:value-of select="
-            if($connectorDirection = 'Bi-Directional') then
-                true()
-            else if ($connectorDirection = 'Source -&gt; Destination') then
-                    false()
-                else
-                    fn:error(xs:QName('is-bidirectional'), concat($connector/@xmi:idref, ' - connector direction is invalid'))
-        "/>
+        <xsl:value-of select="$connectorDirection = 'Bi-Directional'"/>
     </xsl:function>
 
     <xd:doc>
@@ -450,7 +518,7 @@
         <xsl:param name="connectorTypes" as="xs:string*"/>
         <xsl:param name="root" as="node()"/>
         <relations>
-            <xsl:for-each select="$root//connector[properties/@ea_type = $connectorTypes]">
+            <xsl:for-each select="$root//connector[properties/@ea_type = $connectorTypes][not(f:isNaryAssociation(.))][not(f:connectorTouchesAssociationClass(.))]">
                 <xsl:sequence select="f:getRelationsFromConnector(.)"/>
             </xsl:for-each>
         </relations>
@@ -503,6 +571,11 @@
         <xsl:param name="connector"/>
         <xsl:variable name="source" select="$connector/source"/>
         <xsl:variable name="target" select="$connector/target"/>
+        <!-- Skip n-ary (e.g. ternary) association spine connectors: their source/target ends are
+             ProxyConnectors with no class name / role name, so they do not encode a binary relation.
+             Returning an empty sequence here protects EVERY caller (ReSpec, glossary, convention
+             report, reasoning layer) from the fatal f:isRelationValid error these connectors raise. -->
+        <xsl:if test="not(f:connectorHasProxyConnectorEnd($connector))">
         <xsl:variable name="connectorIdRef" select="$connector/@xmi:idref"/>
         <xsl:variable name="connectorType" select="$connector/properties/@ea_type"/>
         <xsl:variable name="connectorDocs" select="$connector/documentation/@value"/>
@@ -537,6 +610,7 @@
                 </xsl:if>
             </xsl:if>
         </xsl:sequence>
+        </xsl:if>
     </xsl:function>
 
     <xd:doc>

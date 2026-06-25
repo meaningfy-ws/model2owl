@@ -187,9 +187,19 @@
     </xd:doc>
     <xsl:function name="f:isAttributeTypeValidForDatatypeProperty">
         <xsl:param name="attributeElement"/>
+        <xsl:variable name="attributeType" select="$attributeElement/properties/@type"/>
+        <!-- Normalise the raw UML type through the UML->XSD mapping table first
+             (as the SHACL/JSON-LD range logic does), then test the mapped qname.
+             Falls back to the raw type when no mapping exists. -->
+        <xsl:variable name="resolvedType"
+            select="
+                if (boolean(f:getUmlDataTypeValues($attributeType, $umlDataTypesMapping))) then
+                    f:getUmlDataTypeValues($attributeType, $umlDataTypesMapping)
+                else
+                    $attributeType"/>
         <xsl:sequence
             select="
-                if (f:isValidDataType($attributeElement/properties/@type)) then
+                if (f:isValidDataType($resolvedType)) then
                     fn:true()
                 else
                     fn:false()"
@@ -354,7 +364,12 @@
         <xsl:variable name="prefix" select="fn:substring-before($name, ':')"/>
         <xsl:sequence
             select="
-                if (fn:matches($prefix, '^[a-zA-Z0-9-_]+$'))
+                if ($prefix = '')
+                then
+                    (: an empty/absent prefix is not an *invalid* prefix; the missing prefix is
+                       reported by the separate 'prefix not defined' checker :)
+                    fn:false()
+                else if (fn:matches($prefix, '^[a-zA-Z0-9_-]+$'))
                 then
                     fn:false()
                 else
@@ -628,7 +643,7 @@
         </xd:desc>
         <xd:param name="generalisation"/>
     </xd:doc>
-    <xsl:function name="f:generalisationMissingOrIncorrect">
+    <xsl:function name="f:generalisationMissingOrIncorrect" as="xs:boolean">
         <xsl:param name="generalisation"/>
         <xsl:variable name="targetConnector"
             select="f:getTargetConnectorFromGeneralisation($generalisation)"/>
@@ -642,64 +657,70 @@
         <!-- Extract source model names -->
         <xsl:variable name="sourceFromTargetConnector" select="$targetConnector/source/model/@name"/>
         <xsl:variable name="sourceFromSourceConnector" select="$sourceConnector/source/model/@name"/>
-        <!-- Case 1: Same Target, Different Sources -->
-        <xsl:if test="$targetFromTargetConnector = $targetFromSourceConnector">
-            <xsl:sequence
-                select="not(fn:exists(root($generalisation)//connector[./properties/@ea_type = 'Generalization' and ./source/model/@name = $sourceFromSourceConnector and ./target/model/@name = $sourceFromTargetConnector]))"
-            />
-        </xsl:if>
-        <!-- Case 2: Same Source, Different Targets -->
-        <xsl:if test="$sourceFromTargetConnector = $sourceFromSourceConnector">
-            <xsl:sequence
-                select="not(fn:exists(root($generalisation)//connector[./properties/@ea_type = 'Generalization' and ./source/model/@name = $targetFromSourceConnector and ./target/model/@name = $targetFromTargetConnector]))"
-            />
-        </xsl:if>
-
-        <!-- Case 3: Different Sources, Different Targets -->
-        <xsl:if
-            test="$sourceFromTargetConnector != $sourceFromSourceConnector and $targetFromTargetConnector != $targetFromSourceConnector">
-            <xsl:sequence
-                select="
-                    not(
-                    fn:exists(root($generalisation)//connector[
-                    ./properties/@ea_type = 'Generalization'
-                    and ./source/model/@name = $sourceFromSourceConnector
-                    and ./target/model/@name = $sourceFromTargetConnector
-                    ])
-                    and
-                    fn:exists(root($generalisation)//connector[
-                    ./properties/@ea_type = 'Generalization'
-                    and ./source/model/@name = $targetFromSourceConnector
-                    and ./target/model/@name = $targetFromTargetConnector
-                    ])
-                    )"
-            />
-        </xsl:if>
-
-
+        <!-- Guard: when both associations connect the SAME source class AND the SAME target class,
+             there is no distinct class pair for which a class generalisation could be expected
+             (analogous to the single-class-end situations), so the association generalisation is
+             valid. This guard also makes the three cases below mutually exclusive (exactly one
+             fires), so the function always returns a single boolean and never triggers FORG0006. -->
+        <xsl:choose>
+            <xsl:when test="$sourceFromTargetConnector = $sourceFromSourceConnector
+                            and $targetFromTargetConnector = $targetFromSourceConnector">
+                <xsl:sequence select="false()"/>
+            </xsl:when>
+            <!-- The three cases below are mutually exclusive but may ALL be false when the
+                 connector ends resolve to empty model/@name (e.g. the ProxyConnector spines of an
+                 n-ary association). Using an xsl:choose with a final xsl:otherwise guarantees the
+                 function always returns exactly one boolean and never yields an empty sequence
+                 (which would raise XTTE0780 against as="xs:boolean"). -->
+            <xsl:otherwise>
+                <xsl:choose>
+                    <!-- Case 1: Same Target, Different Sources -->
+                    <xsl:when test="$targetFromTargetConnector = $targetFromSourceConnector">
+                        <xsl:sequence
+                            select="not(fn:exists(root($generalisation)//connector[./properties/@ea_type = 'Generalization' and ./source/model/@name = $sourceFromSourceConnector and ./target/model/@name = $sourceFromTargetConnector]))"
+                        />
+                    </xsl:when>
+                    <!-- Case 2: Same Source, Different Targets -->
+                    <xsl:when test="$sourceFromTargetConnector = $sourceFromSourceConnector">
+                        <xsl:sequence
+                            select="not(fn:exists(root($generalisation)//connector[./properties/@ea_type = 'Generalization' and ./source/model/@name = $targetFromSourceConnector and ./target/model/@name = $targetFromTargetConnector]))"
+                        />
+                    </xsl:when>
+                    <!-- Case 3: Different Sources, Different Targets -->
+                    <xsl:when
+                        test="$sourceFromTargetConnector != $sourceFromSourceConnector and $targetFromTargetConnector != $targetFromSourceConnector">
+                        <xsl:sequence
+                            select="
+                                not(
+                                fn:exists(root($generalisation)//connector[
+                                ./properties/@ea_type = 'Generalization'
+                                and ./source/model/@name = $sourceFromSourceConnector
+                                and ./target/model/@name = $sourceFromTargetConnector
+                                ])
+                                and
+                                fn:exists(root($generalisation)//connector[
+                                ./properties/@ea_type = 'Generalization'
+                                and ./source/model/@name = $targetFromSourceConnector
+                                and ./target/model/@name = $targetFromTargetConnector
+                                ])
+                                )"
+                        />
+                    </xsl:when>
+                    <!-- Fallback: connector ends do not resolve to comparable class names
+                         (e.g. empty-name ProxyConnector spines of an n-ary association).
+                         Treat as not-missing/not-incorrect, i.e. not flagged. -->
+                    <xsl:otherwise>
+                        <xsl:sequence select="false()"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:function>
     
     
-    <xd:doc>
-        <xd:desc>
-            Determines whether a given UML connector element represents an N-ary (e.g. ternary) association.
-            This requires:
-            - the connector's properties/@ea_type to be 'Association', and
-            - the source/model/@type also to be 'Association'.
-        </xd:desc>
-        <xd:param name="connector">The UML connector element to test.</xd:param>
-        <xd:return>true if the connector is an N-ary association; false otherwise.</xd:return>
-    </xd:doc>
-    <xsl:function name="f:isNaryAssociation" as="xs:boolean">
-        <xsl:param name="connector" as="element()"/>
-        
-        <xsl:sequence select="
-            if ($connector/properties/@ea_type = 'Association') 
-            then $connector/source/model/@type = 'Association'
-            else false()
-            "/>
-    </xsl:function>
-    
+    <!-- f:isNaryAssociation moved to common/fetchers.xsl so the connector fetchers can use it
+         (fetchers is the base module; checkers imports it transitively). -->
+
     
     
 

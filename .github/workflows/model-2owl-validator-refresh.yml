@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: Checkout model2owl repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
 
 
       - name: Copy folder to destination repository
@@ -30,7 +30,7 @@ jobs:
           git config --global user.name "github-actions"
 
       - name: Checkout model2owl validator repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
         with:
           repository: meaningfy-ws/model2owl-validator
           token: ${{ secrets.GIT_USER }}

@@ -61,6 +61,8 @@ https://github.com/OP-TED/model2owl/tree/master/test/unitTests/test-html-convent
 * [test/unitTest/test-reasoning-layer-lib](https://github.com/OP-TED/model2owl/tree/master/test/unitTests/test-reasoning-layer-lib) is the location of the unit tests for the transformation script for the restrictions of OWL ontology (on classes and properties).
 * [test/unitTest/test-jsonld-context-lib](https://github.com/OP-TED/model2owl/tree/master/test/unitTests/test-jsonld-context-lib) is the location of the unit tests for the transformation script for the JSON-LD context.
 
+> **Reading test results:** `make unit-tests` prints `BUILD SUCCESS` and exits 0 even when XSpec assertions fail. The real outcome lives in the JUnit XML under `target/surefire-reports/*.xml`. The `reading-xspec-test-results` skill ([.claude/skills/reading-xspec-test-results/SKILL.md](.claude/skills/reading-xspec-test-results/SKILL.md)) provides a copy-paste command that lists every failing report and testcase.
+
 # How to use
 This project can be used in 2 different ways as follows.
 ## Locally
@@ -143,7 +145,7 @@ make owl-core XMI_INPUT_FILE_PATH=/home/mypc/work/model2owl/file1.xml OUTPUT_FOL
   * parameters:
     * RESPEC_OUTPUT_DIR - output directory for the documentation package
     * RESPEC_DATA_JSON_PATH - (optional) path to the ReSpec data JSON file. If not provided, the file will be generated automatically
-    * RESPEC_METADATA_JSON_PATH - path to the metadata JSON file; defaults to [metadata.json](./test/ePO-default-config/metadata.json)
+    * METADATA_JSON_PATH - path to the metadata JSON file shared by all artefacts; for ReSpec it defaults to [metadata.json](./test/ePO-default-config/metadata.json)
     * RESPEC_INPUT_ASSETS_DIR - directory containing static assets (examples, images, etc.); defaults to [assets directory](./respec-resources/assets)
     * XMI_INPUT_FILE_PATH - path to the UML XMI model file
     * MODEL_EAP_FILE_PATH - path to the UML EAP model file

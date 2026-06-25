@@ -27,16 +27,63 @@
         <x:call template="elementTypes">
             <x:param name="root" href="../../testData/ePO-CM_v.3.0.1.eap.xmi"
                 select="/"/>
-        </x:call>   
-        <x:expect label="expect to do nothing" test="boolean(/dd)"/> 
+        </x:call>
+        <x:expect label="a warning is produced" test="boolean(/dd)"/>
+        <x:expect label="message is softened guidance"
+            test="contains(/dd, 'Model2owl supports Class, Package, Datatype, Enumeration, and Object elements')"/>
+        <x:expect label="message points to the unsupported-constructs documentation"
+            test="contains(/dd, 'unsupported UML constructs')"/>
     </x:scenario>
-    
+
     <x:scenario label="Scenario for finding unsupported connector types">
         <x:call template="connectorTypes">
             <x:param name="root" href="../../testData/ePO-CM_v.3.0.1.eap.xmi"
                 select="/"/>
-        </x:call>   
-        <x:expect label="expect to do nothing" test="boolean(/dd)"/> 
+        </x:call>
+        <x:expect label="a warning is produced" test="boolean(/dd)"/>
+        <x:expect label="message is softened guidance"
+            test="contains(/dd, 'Model2owl supports association, dependency, generalisation and realisation connectors')"/>
+        <x:expect label="message points to the unsupported-constructs documentation"
+            test="contains(/dd, 'unsupported UML constructs')"/>
     </x:scenario>
-    
+
+    <x:scenario label="Scenario for labelling the n-ary association element and suppressing ProxyConnector">
+        <x:call template="elementTypes">
+            <x:param name="root" href="../../testData/prettyModel-cleaned.xmi" select="/"/>
+        </x:call>
+        <x:expect label="a warning is produced" test="boolean(/dd)"/>
+        <x:expect label="the uml:Association element is labelled as an n-ary association"
+            test="contains(/dd, 'uml:Association (n-ary association)')"/>
+        <x:expect label="EA-internal ProxyConnector elements are suppressed"
+            test="not(contains(/dd, 'uml:ProxyConnector'))"/>
+    </x:scenario>
+
+    <x:scenario label="Scenario for reporting unsupported UML modifiers (general-modifier-type-4)">
+        <x:call template="modifierTypes">
+            <x:param name="root" href="../../testData/prettyModel-cleaned.xmi" select="/"/>
+        </x:call>
+        <x:expect label="a warning is produced" test="boolean(/dd)"/>
+        <x:expect label="the modifier statement is shown"
+            test="contains(/dd, 'does not transform UML attribute or generalisation-set modifiers')"/>
+        <x:expect label="{id} is listed" test="contains(/dd, '{id}')"/>
+        <x:expect label="{complete} is listed" test="contains(/dd, '{complete}')"/>
+        <x:expect label="{disjoint} is listed" test="contains(/dd, '{disjoint}')"/>
+    </x:scenario>
+
+    <x:scenario label="Scenario for reporting unsupported UML constructs (general-construct-type-5)">
+        <x:call template="unsupportedConstructs">
+            <x:param name="root" href="../../testData/prettyModel-cleaned.xmi" select="/"/>
+        </x:call>
+        <x:expect label="a warning is produced" test="boolean(/dd)"/>
+        <x:expect label="association class is listed" test="contains(/dd, 'association class')"/>
+        <x:expect label="qualified association is listed" test="contains(/dd, 'qualified association')"/>
+    </x:scenario>
+
+    <x:scenario label="Scenario for a model with no modifiers or unsupported constructs">
+        <x:call template="modifierTypes">
+            <x:param name="root" href="../../testData/ePO-CM_v.3.0.1.eap.xmi" select="/"/>
+        </x:call>
+        <x:expect label="no modifier warning when none present" select="()"/>
+    </x:scenario>
+
 </x:description>

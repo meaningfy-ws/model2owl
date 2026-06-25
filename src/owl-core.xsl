@@ -69,39 +69,13 @@
                 <owl:imports rdf:resource="{.}"/>
             </xsl:for-each>
              
-            <dct:title xml:lang="en">
-                <xsl:value-of select="f:getMetadataValue('ontologyTitleCore')"/>
-            </dct:title>
-               
-            <rdfs:label xml:lang="en">
-                 <xsl:value-of select="f:getMetadataValue('ontologyLabelCore')"/>
-            </rdfs:label>
-            
-            <dct:description xml:lang="en">
-                <xsl:value-of select="f:getMetadataValue('ontologyDescriptionCore')"/>
-            </dct:description>
-            <dct:publisher>
-                <xsl:value-of select="f:getMetadataValue('publisher')"/>
-            </dct:publisher>
-          <rdfs:comment>This version is automatically generated from <xsl:value-of select="tokenize(base-uri(.), '/')[last()]"/> on <xsl:value-of select="format-date(current-date(),'[Y0001]-[M01]-[D01]')"/>
-              </rdfs:comment>
-            <xsl:variable name="seeAlsoArray" select="f:getMetadataArray('seeAlsoResources')"/>
-            <xsl:for-each select="1 to array:size($seeAlsoArray)">
-                <rdfs:seeAlso rdf:resource="{$seeAlsoArray(.)}"/>
-            </xsl:for-each>
-            <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date"><xsl:value-of select="$issuedDate"/></dct:issued>
-            <dct:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date"><xsl:value-of select="f:getMetadataValue('createdDate')"/></dct:created>
-            <owl:versionInfo><xsl:value-of select="f:getMetadataValue('versionInfo')"/></owl:versionInfo>   
-            <owl:incompatibleWith><xsl:value-of select="f:getMetadataValue('incompatibleWith')"/></owl:incompatibleWith>
-            <owl:versionIRI rdf:resource="{fn:concat($coreArtefactURI,'-',f:getMetadataValue('versionInfo'))}"/>
+            <xsl:call-template name="ontologyMetadataHeader">
+                <xsl:with-param name="titleKey" select="'ontologyTitleCore'"/>
+                <xsl:with-param name="labelKey" select="'ontologyLabelCore'"/>
+                <xsl:with-param name="descriptionKey" select="'ontologyDescriptionCore'"/>
+                <xsl:with-param name="artefactURI" select="$coreArtefactURI"/>
+            </xsl:call-template>
 
-            
-            <owl:priorVersion><xsl:value-of select="fn:concat($coreArtefactURI,'-',f:getMetadataValue('priorVersion'))"/></owl:priorVersion>
-            
-            <vann:preferredNamespaceUri><xsl:value-of select="f:getMetadataValue('preferredNamespaceUri')"/></vann:preferredNamespaceUri>
-            <vann:preferredNamespacePrefix><xsl:value-of select="f:getMetadataValue('preferredNamespacePrefix')"/></vann:preferredNamespacePrefix> 
-            <dct:license><xsl:value-of select="f:getMetadataValue('license')"/></dct:license>
-            
         </owl:Ontology>
         
     </xsl:template>

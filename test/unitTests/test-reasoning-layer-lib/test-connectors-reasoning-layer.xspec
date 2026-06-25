@@ -59,9 +59,16 @@
             test="rdf:Description/rdfs:subClassOf/owl:Restriction/owl:maxQualifiedCardinality = '1'"/>
         <x:expect label="there is a owl:onClass"
             test="rdf:Description/rdfs:subClassOf/owl:Restriction/owl:onClass/@rdf:resource = 'http://data.europa.eu/a4g/ontology#Tenderer'"/>
-        
+
     </x:scenario>
-    
+
+    <x:scenario
+        label="Scenario for testing the Association template on the ProxyConnector spine of the n-ary 'TernaryTest' association - it must be skipped, not error">
+        <x:context href="../../testData/prettyModel-cleaned.xmi"
+            select="/xmi:XMI/xmi:Extension/connectors/connector[source/model/@name = 'ProxyConnector' and target/model/@type = 'ProxyConnector']"/>
+        <x:expect label="produces no reasoning-layer output (skipped, no fatal error)"/>
+    </x:scenario>
+
     <x:scenario
         label="Scenario for testing template with match 'connector[./properties/@ea_type = 'Generalization']">
         <x:context href="../../testData/ePO-CM-v2.0.2-2020-05-17_test.eap.xmi"
@@ -265,10 +272,21 @@
         <x:expect label="there is a rdfs:domain" test="boolean(rdf:Description/rdfs:domain)"/>
         <x:expect label="correct class URI" test="rdf:Description/rdfs:domain/@rdf:resource = 'http://data.europa.eu/a4g/ontology#CentralPurchasingBody'"/>
 
-        
+
     </x:scenario>
-    
-    
+
+    <x:scenario label="Scenario for connector domain - several connectors sharing a single domain (regression: rdfs:domain, not rdf:domain)">
+        <x:call template="connectorDomain">
+            <x:param name="connectorName">for</x:param>
+            <x:param name="root" href="../../testData/prettyModel-cleaned.xmi" select="/"/>
+        </x:call>
+        <x:expect label="there is a rdf:Description" test="boolean(rdf:Description)"/>
+        <x:expect label="the domain uses rdfs:domain" test="boolean(rdf:Description/rdfs:domain)"/>
+        <x:expect label="no invalid rdf:domain element is emitted" test="not(boolean(rdf:Description/rdf:domain))"/>
+        <x:expect label="correct domain class" test="rdf:Description/rdfs:domain/@rdf:resource = 'http://data.europa.eu/a4g/ontology#Insurance'"/>
+    </x:scenario>
+
+
     <x:scenario label="Scenario for connector range - one connector">
         <x:call template="connectorRange">
             <x:param name="connectorName">epo:actsAs</x:param>
