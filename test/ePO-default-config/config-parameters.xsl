@@ -51,6 +51,10 @@
     <!--    Core Module URI-->
     <xsl:variable name="coreArtefactURI"
         select="fn:concat($base-ontology-uri, $defaultDelimiter, $moduleReference)"/>
+    <!--    OWL-full artefact URI: the IRI carried by the consolidated OWL-full artefact
+            (core + restrictions merged). Defaults to the canonical base-ontology-uri so
+            the full artefact is published as THE ontology in its consolidated form. -->
+    <xsl:variable name="fullArtefactURI" select="$base-ontology-uri"/>
 
     <!-- when a delimiter is missing in the base URI of a namespace, use this default value-->
     <xsl:variable name="defaultDelimiter" select="'#'"/>
@@ -96,7 +100,11 @@
     <xsl:variable name="generateReusedConceptsOWLrestrictions" select="fn:true()"/>
     <xsl:variable name="generateReusedConceptsGlossary" select="fn:true()"/>
     <xsl:variable name="generateReusedConceptsJSONLDcontext" select="fn:true()"/>
-    
+    <!-- Optional OWL-full artefact: when true, `make owl-full` consolidates the OWL core
+         and OWL restrictions artefacts into a single self-contained ontology and drops the
+         standalone core/restrictions outputs. Disabled by default. -->
+    <xsl:variable name="generateOWLFull" select="fn:false()"/>
+
 <!--    This set of variables controls generation of comments and how they will generate in the output -->
     <xsl:variable name="commentsGeneration" select="fn:true()"/>
     <xsl:variable name="commentProperty" select="'skos:editorialNote'"/>
