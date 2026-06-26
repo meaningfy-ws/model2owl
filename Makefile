@@ -7,7 +7,7 @@ ABSOLUTE_MODEL2OWL_FOLDER?=$(shell realpath "${MODEL2OWL_FOLDER}")
 RDF_LIB_VERSION?=6.2.0
 #Saxon path
 SAXON?=${MODEL2OWL_FOLDER}/saxon/saxon.jar
-JENA_RIOT_TOOL?=${MODEL2OWL_FOLDER}/jena/apache-jena-4.10.0/bin/riot
+JENA_RIOT_TOOL?=${MODEL2OWL_FOLDER}/jena/apache-jena/bin/riot
 JQ=${MODEL2OWL_FOLDER}/jq/jq
 TEMP_FILE=./temp_file.txt
 # Glossary output directory
