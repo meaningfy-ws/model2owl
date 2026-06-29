@@ -1,0 +1,132 @@
+{
+    "metadata": {
+        "title": "My Ontology",
+        "status": "Draft",
+        "versionInfo": "1.0.0",
+        "priorVersion": "",
+        "incompatibleWith": "",
+        "createdDate": "2024-01-01",
+        "ontologyTitleCore": "My Ontology core",
+        "ontologyTitleRestrictions": "My Ontology restrictions",
+        "ontologyTitleShapes": "My Ontology shapes",
+        "ontologyLabelCore": "My Ontology — core",
+        "ontologyLabelRestrictions": "My Ontology — restrictions",
+        "ontologyLabelShapes": "My Ontology — shapes",
+        "ontologyDescriptionCore": "Definitions of the core concepts of My Ontology (excludes the restrictions).",
+        "ontologyDescriptionRestrictions": "Restrictions and inference-related axioms of My Ontology (excludes the definitions).",
+        "ontologyDescriptionShapes": "Generic SHACL data-shape specifications for My Ontology.",
+        "preferredNamespaceUri": "http://example.org/ontology#",
+        "preferredNamespacePrefix": "myprefix",
+        "publisher": "https://example.org/publisher",
+        "license": "CC BY 4.0",
+
+        "contributors": [
+            {
+                "first_name": "Alice",
+                "last_name": "Example",
+                "email": "alice@example.org",
+                "role": "E",
+                "affiliation": {
+                    "name": "ACME Labs",
+                    "website": "https://acme.example"
+                }
+            },
+            {
+                "first_name": "John",
+                "last_name": "Smith",
+                "email": "john@example.org",
+                "role": "A",
+                "affiliation": {
+                    "name": "ACME Labs",
+                    "website": "https://acme.example"
+                }
+            }
+        ],
+        "owners": [
+            {
+                "name": "ACME",
+                "website": "https://acme.example"
+            },
+            {
+                "name": "Tom White"
+            }
+        ],
+
+        "seeAlsoResources": [
+            "https://example.org/related-resource"
+        ],
+        "changelogUrl": "https://github.com/my-org/my-ontology/releases",
+        "feedbackUrl": "https://github.com/my-org/my-ontology/issues",
+        "repositoryUrl": "https://github.com/my-org/my-ontology",
+        "github": "my-org/my-ontology",
+        "dependencies": [],
+        "localBiblio": {
+            "W3ID": {
+                "href": "https://w3id.org/",
+                "title": "Permanent Identifiers for the Web",
+                "publisher": "W3C Permanent Identifier Community Group"
+            }
+        },
+        "projectLocalResources": [
+            {
+                "name": "OWL core file",
+                "path": "owl_ontology/my_ontology.rdf"
+            },
+            {
+                "name": "OWL restrictions file",
+                "path": "owl_ontology/my_ontology_restrictions.rdf"
+            },
+            {
+                "name": "SHACL shapes file (TTL)",
+                "path": "shacl_shapes/my_ontology_shapes.ttl"
+            },
+            {
+                "name": "JSON-LD context file",
+                "path": "jsonld_context/my_ontology_context.jsonld"
+            },
+            {
+                "name": "UML XMI model file",
+                "path": "xmi_conceptual_model/my_ontology.xml"
+            }
+        ],
+
+        "conventionReportAuthor": "My Organisation",
+        "conventionReportAuthorLocation": "City, Country",
+        "conventionReportAuthorWebsite": "https://example.org",
+        "conventionReportCopyrightText": "My Organisation, 2024",
+        "conventionReportUMLModelName": "My Model",
+
+        "documentConfig": {
+            "editorDocumentRoot": "."
+        },
+        "navigation": {
+            "next": "",
+            "prev": "",
+            "self": "https://example.org/my-ontology/releases/1.0.0/"
+        },
+        "openGithubIssue": {
+            "columnLabel": "Feedback",
+            "buttonLabel": "Report an issue or share feedback"
+        },
+        "logo": {
+            "path": "assets/img/logo.png",
+            "link": "https://example.org"
+        }
+    },
+    "customMetadata": {
+        "metadataSectionProperties": [
+            {
+                "key": "Related documentation",
+                "data": [
+                    {
+                        "value": "Doc1",
+                        "href": "https://example.com/doc1"
+                    },
+                    {
+                        "value": "Doc2"
+                    }
+                ]
+            }
+        ]
+    }
+}
