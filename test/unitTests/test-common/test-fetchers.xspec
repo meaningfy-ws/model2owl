@@ -549,4 +549,23 @@
                   and $x:result/target/@name = 'SomeOtherClass'"/>
     </x:scenario>
 
+    <x:scenario label="getGeneralizationSets returns every generalization set">
+        <x:call function="f:getGeneralizationSets">
+            <x:param name="root" href="../../testData/prettyModel-cleaned.xmi" select="/"/>
+        </x:call>
+        <x:expect label="three sets in the model" test="count(/packagedElement) = 3"/>
+        <x:expect label="two are disjoint" test="count(/packagedElement[@isDisjoint = 'true']) = 2"/>
+    </x:scenario>
+
+    <x:scenario label="getGeneralizationSetSubclasses resolves the bm set to Bicycle and Monocycle">
+        <x:call function="f:getGeneralizationSetSubclasses">
+            <x:param name="generalizationSet" href="../../testData/prettyModel-cleaned.xmi"
+                select="//packagedElement[@name = 'bm']"/>
+            <x:param name="root" href="../../testData/prettyModel-cleaned.xmi" select="/"/>
+        </x:call>
+        <x:expect label="two member subclasses" test="count(/element) = 2"/>
+        <x:expect label="Bicycle resolved" test="boolean(/element[@name = 'Bicycle'])"/>
+        <x:expect label="Monocycle resolved" test="boolean(/element[@name = 'Monocycle'])"/>
+    </x:scenario>
+
 </x:description>
