@@ -76,15 +76,37 @@ java -jar "$ROBOT" merge \
 echo "==> [owl-full] rewriting rdfs:isDefinedBy to fullArtefactURI (if present)"
 # The OWL core artefact annotates every term with rdfs:isDefinedBy pointing to
 # the core IRI. After the merge that IRI is wrong for the consolidated artefact.
-# Sed rewrite is in-place and preserves the OWL API RDF/XML format exactly;
-# the serialisation steps below then propagate the corrected value to .rdf/.ttl.
-# (robot query would try to fetch external owl:imports from the web and fail;
-# rdflib reserialises to plain RDF/XML, destroying the OWL API format.)
-if grep -qF '<rdfs:isDefinedBy' "$FULL_OWL"; then
-    sed -i "s|<rdfs:isDefinedBy rdf:resource=\"[^\"]*\"/>|<rdfs:isDefinedBy rdf:resource=\"${FULL_URI}\"/>|g" "$FULL_OWL"
-    echo "    rewritten rdfs:isDefinedBy triples to <${FULL_URI}>"
+# robot query --catalog resolves all imports via the catalog (including the adms
+# workaround in robot-catalog.xsl) so external imports don't cause fetch failures.
+# Guards with an ASK so the file is left unchanged when nothing needs rewriting.
+defined_by_ask=$(mktemp --suffix=.sparql)
+defined_by_ask_out=$(mktemp --suffix=.csv)
+printf 'ASK { ?x <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> ?y . FILTER(?y != <%s>) }' \
+    "$FULL_URI" > "$defined_by_ask"
+java -jar "$ROBOT" query \
+    --input "$FULL_OWL" \
+    --catalog "$CATALOG" \
+    --query "$defined_by_ask" "$defined_by_ask_out"
+ask_result=$(tail -1 "$defined_by_ask_out")
+rm -f "$defined_by_ask" "$defined_by_ask_out"
+if [ "$ask_result" = "true" ]; then
+    defined_by_update=$(mktemp --suffix=.ru)
+    cat > "$defined_by_update" << SPARQL
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+DELETE { ?x rdfs:isDefinedBy ?old }
+INSERT { ?x rdfs:isDefinedBy <${FULL_URI}> }
+WHERE  { ?x rdfs:isDefinedBy ?old . FILTER(?old != <${FULL_URI}>) }
+SPARQL
+    defined_by_tmp=$(mktemp --suffix=.owl)
+    java -jar "$ROBOT" query \
+        --input "$FULL_OWL" \
+        --catalog "$CATALOG" \
+        --update "$defined_by_update" \
+        --output "$defined_by_tmp"
+    mv "$defined_by_tmp" "$FULL_OWL"
+    rm -f "$defined_by_update"
 else
-    echo "    no rdfs:isDefinedBy triples found; file unchanged"
+    echo "    no rdfs:isDefinedBy values to rewrite; file unchanged"
 fi
 
 echo "==> [owl-full] writing RDF/XML and Turtle serializations"
