@@ -76,9 +76,16 @@ java -jar "$ROBOT" merge \
 echo "==> [owl-full] rewriting rdfs:isDefinedBy to fullArtefactURI (if present)"
 # The OWL core artefact annotates every term with rdfs:isDefinedBy pointing to
 # the core IRI. After the merge that IRI is wrong for the consolidated artefact.
-# Uses rdflib (not robot) so owl:imports are not resolved — robot would try to
-# fetch external imports from the web and fail on unreachable IRIs.
-"$MODEL2OWL_FOLDER/model2owl-venv/bin/python3" "$SCRIPT_DIR/fix-defined-by.py" "$FULL_OWL" "$FULL_URI"
+# Sed rewrite is in-place and preserves the OWL API RDF/XML format exactly;
+# the serialisation steps below then propagate the corrected value to .rdf/.ttl.
+# (robot query would try to fetch external owl:imports from the web and fail;
+# rdflib reserialises to plain RDF/XML, destroying the OWL API format.)
+if grep -qF '<rdfs:isDefinedBy' "$FULL_OWL"; then
+    sed -i "s|<rdfs:isDefinedBy rdf:resource=\"[^\"]*\"/>|<rdfs:isDefinedBy rdf:resource=\"${FULL_URI}\"/>|g" "$FULL_OWL"
+    echo "    rewritten rdfs:isDefinedBy triples to <${FULL_URI}>"
+else
+    echo "    no rdfs:isDefinedBy triples found; file unchanged"
+fi
 
 echo "==> [owl-full] writing RDF/XML and Turtle serializations"
 make -C "$MODEL2OWL_FOLDER" convert-between-serialization-formats \
