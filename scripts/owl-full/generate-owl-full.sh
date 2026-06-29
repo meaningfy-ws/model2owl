@@ -74,36 +74,11 @@ java -jar "$ROBOT" merge \
     --output "$FULL_OWL"
 
 echo "==> [owl-full] rewriting rdfs:isDefinedBy to fullArtefactURI (if present)"
-# The OWL core artefact (one of the merge inputs) annotates every term with
-# rdfs:isDefinedBy pointing to the core's own IRI. After the merge that IRI is
-# wrong for the consolidated full artefact. Rewrite all rdfs:isDefinedBy values
-# that don't already point to FULL_URI — but only when such triples exist, so
-# the file is left byte-for-byte unchanged when there is nothing to rewrite.
-defined_by_ask=$(mktemp --suffix=.sparql)
-defined_by_ask_out=$(mktemp --suffix=.csv)
-printf 'ASK { ?x <http://www.w3.org/2000/01/rdf-schema#isDefinedBy> ?y . FILTER(?y != <%s>) }' \
-    "$FULL_URI" > "$defined_by_ask"
-java -jar "$ROBOT" query --input "$FULL_OWL" --query "$defined_by_ask" "$defined_by_ask_out"
-ask_result=$(tail -1 "$defined_by_ask_out")
-rm -f "$defined_by_ask" "$defined_by_ask_out"
-if [ "$ask_result" = "true" ]; then
-    defined_by_update=$(mktemp --suffix=.ru)
-    cat > "$defined_by_update" << SPARQL
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-DELETE { ?x rdfs:isDefinedBy ?old }
-INSERT { ?x rdfs:isDefinedBy <${FULL_URI}> }
-WHERE  { ?x rdfs:isDefinedBy ?old . FILTER(?old != <${FULL_URI}>) }
-SPARQL
-    defined_by_tmp=$(mktemp --suffix=.owl)
-    java -jar "$ROBOT" query \
-        --input "$FULL_OWL" \
-        --update "$defined_by_update" \
-        --output "$defined_by_tmp"
-    mv "$defined_by_tmp" "$FULL_OWL"
-    rm -f "$defined_by_update"
-else
-    echo "    no rdfs:isDefinedBy values to rewrite; file unchanged"
-fi
+# The OWL core artefact annotates every term with rdfs:isDefinedBy pointing to
+# the core IRI. After the merge that IRI is wrong for the consolidated artefact.
+# Uses rdflib (not robot) so owl:imports are not resolved — robot would try to
+# fetch external imports from the web and fail on unreachable IRIs.
+python3 "$SCRIPT_DIR/fix-defined-by.py" "$FULL_OWL" "$FULL_URI"
 
 echo "==> [owl-full] writing RDF/XML and Turtle serializations"
 make -C "$MODEL2OWL_FOLDER" convert-between-serialization-formats \
