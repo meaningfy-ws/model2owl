@@ -25,8 +25,6 @@
 # All inputs are passed as environment variables (see the required list below).
 set -euo pipefail
 
-SCRIPT_DIR=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
-
 : "${MODEL2OWL_FOLDER:?}"   # repo root (to call back into make for conversions)
 : "${SAXON:?}"              # path to saxon.jar
 : "${ROBOT:?}"              # path to robot.jar
