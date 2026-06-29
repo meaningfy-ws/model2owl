@@ -78,7 +78,7 @@ echo "==> [owl-full] rewriting rdfs:isDefinedBy to fullArtefactURI (if present)"
 # the core IRI. After the merge that IRI is wrong for the consolidated artefact.
 # Uses rdflib (not robot) so owl:imports are not resolved — robot would try to
 # fetch external imports from the web and fail on unreachable IRIs.
-python3 "$SCRIPT_DIR/fix-defined-by.py" "$FULL_OWL" "$FULL_URI"
+"$MODEL2OWL_FOLDER/model2owl-venv/bin/python3" "$SCRIPT_DIR/fix-defined-by.py" "$FULL_OWL" "$FULL_URI"
 
 echo "==> [owl-full] writing RDF/XML and Turtle serializations"
 make -C "$MODEL2OWL_FOLDER" convert-between-serialization-formats \
