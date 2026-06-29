@@ -320,6 +320,16 @@
             test="count(/rdf:Description[rdf:type/@rdf:resource = 'http://www.w3.org/2002/07/owl#AllDisjointClasses']/owl:members/rdf:Description) = 3"/>
         <x:expect label="the covering set fb (Wheel hierarchy) produces no disjointness"
             test="not(//*[@rdf:about[contains(., 'Wheel')]]) and not(//*[@rdf:resource[contains(., 'Wheel')]])"/>
+        <x:expect label="owl:disjointWith subject URI contains Bicycle"
+            test="contains(/rdf:Description[owl:disjointWith]/@rdf:about, 'Bicycle')"/>
+        <x:expect label="owl:disjointWith object URI contains Monocycle"
+            test="contains(/rdf:Description[owl:disjointWith]/owl:disjointWith/@rdf:resource, 'Monocycle')"/>
+    </x:scenario>
+
+    <x:scenario label="disjointClassesFromGeneralizationSets emits nothing when no disjoint sets exist">
+        <x:context href="../../testData/ePO-CM-v2.0.1-2022-04-29_test.eap.xmi"/>
+        <x:call template="disjointClassesFromGeneralizationSets"/>
+        <x:expect label="no output when model has no disjoint sets" select="()"/>
     </x:scenario>
 
 </x:description>
