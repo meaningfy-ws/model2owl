@@ -504,6 +504,44 @@
     </xsl:template>
 
     <xd:doc>
+        <xd:desc>Rule R.18 (re-introduced, set-aware). Emits OWL class disjointness for the
+            member subclasses of every generalization set marked {disjoint}
+            (isDisjoint='true'). Exactly two surviving members produce owl:disjointWith;
+            three or more produce owl:AllDisjointClasses. Members are filtered per term
+            (status, namespace/reused-concepts, association class, Class only); if fewer than
+            two survive, nothing is emitted. The common superclass is irrelevant to the
+            disjointness axiom and is not consulted.</xd:desc>
+    </xd:doc>
+    <xsl:template name="disjointClassesFromGeneralizationSets">
+        <xsl:variable name="root" select="/"/>
+        <xsl:for-each select="f:getGeneralizationSets($root)[@isDisjoint = 'true']">
+            <xsl:variable name="members" select="f:getGeneralizationSetSubclasses(., $root)"/>
+            <xsl:variable name="includedMembers" select="
+                    $members[@xmi:type = 'uml:Class']
+                           [not(f:isExcludedByStatus(.))]
+                           [not(f:isAssociationClass(.))]
+                           [$generateReusedConceptsOWLrestrictions
+                              or fn:substring-before(@name, ':') = $includedPrefixesList]"/>
+            <xsl:if test="count($includedMembers) = 2">
+                <rdf:Description rdf:about="{f:buildURIFromElement($includedMembers[1])}">
+                    <owl:disjointWith rdf:resource="{f:buildURIFromElement($includedMembers[2])}"/>
+                </rdf:Description>
+            </xsl:if>
+            <xsl:if test="count($includedMembers) > 2">
+                <rdf:Description>
+                    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
+                    <owl:members rdf:parseType="Collection">
+                        <xsl:for-each select="$includedMembers">
+                            <rdf:Description rdf:about="{f:buildURIFromElement(.)}"/>
+                        </xsl:for-each>
+                    </owl:members>
+                </rdf:Description>
+            </xsl:if>
+        </xsl:for-each>
+    </xsl:template>
+
+
+    <xd:doc>
         <xd:desc>
             Rule R.06. Association and dependency multiplicity — in reasoning layer
 

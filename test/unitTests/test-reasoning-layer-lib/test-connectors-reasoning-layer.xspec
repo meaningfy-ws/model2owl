@@ -303,10 +303,33 @@
     <x:scenario label="Scenario for dependency range to enumeration">
         <x:call template="connectorDependencyRange">
             <x:param name="connector" href="../../testData/ePO-CM-v2.0.1-2020-03-27_test.eap.xmi" select="/xmi:XMI/xmi:Extension[1]/connectors[1]/connector[247]"/>
-        </x:call>   
+        </x:call>
         <x:expect label="there is a rdf:Description" test="boolean(rdf:Description) "/>
         <x:expect label="there is a rdfs:range" test="boolean(rdf:Description/rdfs:range)"/>
         <x:expect label="range is skos:Concept" test="rdf:Description/rdfs:range/@rdf:resource = 'http://www.w3.org/2004/02/skos/core#Concept'"/>
     </x:scenario>
-    
+
+    <x:scenario label="disjointClassesFromGeneralizationSets emits disjointness only for {disjoint} sets">
+        <x:context href="../../testData/prettyModel-cleaned.xmi"/>
+        <x:call template="disjointClassesFromGeneralizationSets"/>
+        <x:expect label="exactly one owl:disjointWith axiom (bm, 2 members)"
+            test="count(/rdf:Description[owl:disjointWith]) = 1"/>
+        <x:expect label="exactly one AllDisjointClasses axiom (bcc, 3 members)"
+            test="count(/rdf:Description[rdf:type/@rdf:resource = 'http://www.w3.org/2002/07/owl#AllDisjointClasses']) = 1"/>
+        <x:expect label="the AllDisjointClasses set lists 3 members"
+            test="count(/rdf:Description[rdf:type/@rdf:resource = 'http://www.w3.org/2002/07/owl#AllDisjointClasses']/owl:members/rdf:Description) = 3"/>
+        <x:expect label="the covering set fb (Wheel hierarchy) produces no disjointness"
+            test="not(//*[@rdf:about[contains(., 'Wheel')]]) and not(//*[@rdf:resource[contains(., 'Wheel')]])"/>
+        <x:expect label="owl:disjointWith subject URI contains Bicycle"
+            test="contains(/rdf:Description[owl:disjointWith]/@rdf:about, 'Bicycle')"/>
+        <x:expect label="owl:disjointWith object URI contains Monocycle"
+            test="contains(/rdf:Description[owl:disjointWith]/owl:disjointWith/@rdf:resource, 'Monocycle')"/>
+    </x:scenario>
+
+    <x:scenario label="disjointClassesFromGeneralizationSets emits nothing when no disjoint sets exist">
+        <x:context href="../../testData/ePO-CM-v2.0.1-2022-04-29_test.eap.xmi"/>
+        <x:call template="disjointClassesFromGeneralizationSets"/>
+        <x:expect label="no output when model has no disjoint sets" select="()"/>
+    </x:scenario>
+
 </x:description>

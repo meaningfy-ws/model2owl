@@ -134,8 +134,9 @@
 
     <xd:doc>
         <xd:desc>[general-modifier-type-4] UML attribute / generalisation-set modifiers
-            ({id}, {complete}, {disjoint}) are not transformed. Reports which kinds occur at
-            least once in the model (presence only, not each occurrence). </xd:desc>
+            ({id}, {complete}) are not transformed. {disjoint} IS transformed (OWL
+            disjointness in owl-restrictions) and is no longer reported here. Reports which
+            kinds occur at least once in the model (presence only, not each occurrence). </xd:desc>
         <xd:param name="root"/>
     </xd:doc>
     <xsl:template name="modifierTypes">
@@ -148,10 +149,6 @@
             <xsl:if
                 test="$root//connectors/connector[properties/@ea_type = 'Generalization']/xrefs[contains(@value, 'IsCovering=1')]">
                 <xsl:sequence select="'{complete}'"/>
-            </xsl:if>
-            <xsl:if
-                test="$root//connectors/connector[properties/@ea_type = 'Generalization']/xrefs[contains(@value, 'IsDisjoint=1')]">
-                <xsl:sequence select="'{disjoint}'"/>
             </xsl:if>
         </xsl:variable>
         <xsl:sequence

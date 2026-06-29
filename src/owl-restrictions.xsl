@@ -41,11 +41,12 @@
     </xd:doc>
     <xsl:template match="/">
         <rdf:RDF>
-            <xsl:call-template name="namespacesDeclaration"/>            
+            <xsl:call-template name="namespacesDeclaration"/>
             <xsl:call-template name="ontology-header"/>
             <xsl:apply-templates/>
             <xsl:call-template name="distinctAttributeNamesInReasoningLayer"/>
             <xsl:call-template name="distinctConnectorsNamesInReasoningLayer"/>
+            <xsl:call-template name="disjointClassesFromGeneralizationSets"/>
         </rdf:RDF>
     </xsl:template>
 

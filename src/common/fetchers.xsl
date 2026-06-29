@@ -228,7 +228,39 @@
                   f:getElementByIdRef($id, $root)"
         />
     </xsl:function>
-    
+
+    <xd:doc>
+        <xd:desc>Returns all UML generalization sets in the logical model. They are
+            packagedElements whose xmi:type is 'uml:GeneralizationSet'. Selected unprefixed
+            with a STRING compare on @xmi:type because the model's uml namespace revision
+            (2016) differs from the stylesheet binding (2013); a uml:-prefixed path matches
+            nothing.</xd:desc>
+        <xd:param name="root"/>
+    </xd:doc>
+    <xsl:function name="f:getGeneralizationSets" as="node()*">
+        <xsl:param name="root" as="node()"/>
+        <xsl:sequence select="$root//packagedElement[@xmi:type = 'uml:GeneralizationSet']"/>
+    </xsl:function>
+
+    <xd:doc>
+        <xd:desc>Returns the member subclasses of a generalization set, as EA element nodes.
+            Each set member is a generalization referenced by idref; the owning subclass is
+            the packagedElement that declares that generalization (matched by xmi:id), and it
+            is resolved to the EA &lt;element&gt; node via its shared id so the URI builders and
+            the term filters apply to it.</xd:desc>
+        <xd:param name="generalizationSet"/>
+        <xd:param name="root"/>
+    </xd:doc>
+    <xsl:function name="f:getGeneralizationSetSubclasses" as="node()*">
+        <xsl:param name="generalizationSet" as="node()"/>
+        <xsl:param name="root" as="node()"/>
+        <xsl:sequence
+            select="
+                for $memberIdref in $generalizationSet/generalization/@xmi:idref
+                return
+                    f:getElementByIdRef($root//packagedElement[generalization/@xmi:id = $memberIdref]/@xmi:id, $root)"/>
+    </xsl:function>
+
     <xd:doc>
         <xd:desc>Returns true when the element is an association class. An association class is a
             uml:AssociationClass in the logical model but surfaces as a uml:Class in the EA
