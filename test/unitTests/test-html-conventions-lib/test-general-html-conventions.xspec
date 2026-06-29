@@ -67,7 +67,7 @@
             test="contains(/dd, 'does not transform UML attribute or generalisation-set modifiers')"/>
         <x:expect label="{id} is listed" test="contains(/dd, '{id}')"/>
         <x:expect label="{complete} is listed" test="contains(/dd, '{complete}')"/>
-        <x:expect label="{disjoint} is listed" test="contains(/dd, '{disjoint}')"/>
+        <x:expect label="{disjoint} is no longer listed (now supported)" test="not(contains(/dd, '{disjoint}'))"/>
     </x:scenario>
 
     <x:scenario label="Scenario for reporting unsupported UML constructs (general-construct-type-5)">
