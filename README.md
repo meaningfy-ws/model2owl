@@ -126,6 +126,13 @@ make owl-core XMI_INPUT_FILE_PATH=/home/mypc/work/model2owl/file1.xml OUTPUT_FOL
     * OUTPUT_FOLDER_PATH - path to the folder that stores the output
     * NAMESPACES_USER_XML_FILE_PATH: path to the *.xml file containing namespaces
     * IMPORTS_XML_FILE_PATH: path to the *.xml file containing ontology URIs to be imported
+* **owl-full** - optional consolidated form of the ontology: a smart (ontology-valid) merge of the OWL core and OWL restrictions artefacts into a single self-contained ontology (the two OWL artefacts consolidated for the user's convenience). This is an *alternative form* of the ontology, not a new artefact. It is disabled by default and gated by the `generateOWLFull` config flag; when enabled it generates core and restrictions (if absent), merges them - dropping the internal core/restrictions cross-import and keeping a single coherent ontology header - and removes only the core/restrictions artefacts it generated in this run (pre-existing caller-owned artefacts are left untouched). Produced in `.owl`, `.rdf` and `.ttl`.
+  * parameters:
+    * XMI_INPUT_FILE_PATH - path to the xmi file
+    * OUTPUT_FOLDER_PATH - path to the folder that stores the output
+    * NAMESPACES_USER_XML_FILE_PATH: path to the *.xml file containing namespaces
+    * IMPORTS_XML_FILE_PATH: path to the *.xml file containing ontology URIs to be imported
+  * config: `generateOWLFull` (boolean, default `false`); the consolidated ontology IRI is `fullArtefactURI` (defaults to the canonical `base-ontology-uri`). Optional metadata keys `ontologyTitleFull` / `ontologyDescriptionFull` / `ontologyLabelFull` describe the consolidated artefact; when omitted they fall back to the corresponding `…Core` values.
 * **shacl** - this generates data shapes suitable for validation from the UML export (xml/xmi)
   * parameters:
     * XMI_INPUT_FILE_PATH - path to the xmi file

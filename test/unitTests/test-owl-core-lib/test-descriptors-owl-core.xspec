@@ -44,7 +44,7 @@
     
     <x:scenario
         label="Scenario for testing generation of definedBy">
-        
+
         <x:call template="coreDefinedBy">
             <x:param name="elementUri" select="'http://data.europa.eu/a4g/ontology#Lot'"/>
         </x:call>
@@ -55,9 +55,12 @@
         <x:expect label="there is rdfs:isDefinedBy"
             test="boolean(/rdf:Description[@rdf:about='http://data.europa.eu/a4g/ontology#Lot']/rdfs:isDefinedBy)"
         />
+        <x:expect label="rdfs:isDefinedBy points to coreArtefactURI when generateOWLFull is false"
+            test="/rdf:Description[@rdf:about='http://data.europa.eu/a4g/ontology#Lot']/rdfs:isDefinedBy/@rdf:resource = 'http://data.europa.eu/a4g/ontology#core'"
+        />
 
-        
-        
+
+
     </x:scenario>
     
     
