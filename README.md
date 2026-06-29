@@ -214,7 +214,7 @@ The model2owl configuration is formed from 6 files that should be in one folder:
 * umlToXsdDataTypes.xml - mapping between uml to xsd data types
 * xsdAndRdfDataTypes.xml - configure datatypes used
 
-To start just copy the default configuration files from [ePO-default-config folder](test/ePO-default-config) in your new configuration folder.
+To start just copy the default configuration files from [ePO-default-config folder](test/ePO-default-config) in your new configuration folder. Alternatively, the [config-template folder](config-template) provides the same files pre-filled with placeholder values as a blank starting point; see its [README](config-template/README.md) for the placeholders to replace.
 #### Changing config parameters
 To change the configuration in the config-parameters.xsl just simply change the value of the variable.
 Notes: 

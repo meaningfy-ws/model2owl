@@ -10,69 +10,59 @@
 
     <xd:doc scope="stylesheet">
         <xd:desc>
-            <xd:p><xd:b>Created on:</xd:b> Mar 22, 2020</xd:p>
-            <xd:p><xd:b>Author:</xd:b> lps</xd:p>
-            <xd:p>This module defines project level variables and parameters.
-                Parameters are grouped by purpose into the numbered sections
-                below.</xd:p>
+            <xd:p>Project-level configuration for a model2owl transformation.</xd:p>
+            <xd:p>This is a TEMPLATE: copy this folder, edit the values, and point
+                <xd:i>config-proxy.xsl</xd:i> at it (or pass its files to the make
+                targets). Parameters are grouped by purpose (see the numbered
+                sections below and the accompanying README.md). Values written as
+                <xd:i>myprefix:*</xd:i> or <xd:i>http://example.org/*</xd:i> are
+                placeholders to replace with your own ontology's prefix and URIs.</xd:p>
         </xd:desc>
     </xd:doc>
 
     <!-- ===================================================================== -->
     <!-- 1. Config-file references (the sibling files in this config folder)    -->
     <!-- ===================================================================== -->
-    <!-- a set of prefix-baseURI definitions -->
     <xsl:variable name="namespacePrefixes" select="fn:doc('namespaces.xml')"/>
-    <!-- a mapping between UML atomic types to XSD datatypes  -->
     <xsl:variable name="umlDataTypesMapping" select="fn:doc('umlToXsdDataTypes.xml')"/>
-    <!-- XSD datatypes that conform to OWL2 requirements   -->
     <xsl:variable name="xsdAndRdfDataTypes" select="fn:doc('xsdAndRdfDataTypes.xml')"/>
     <!-- JSON metadata configuration. The path is overridable via the
-         `metadataJsonPath` stylesheet parameter; the default `metadata.json` is
-         resolved relative to this config file, preserving the original behaviour
-         (and following whichever config `config-proxy.xsl` imports). -->
+         `metadataJsonPath` stylesheet parameter (make targets: METADATA_JSON_PATH);
+         the default `metadata.json` is resolved relative to this config file. -->
     <xsl:param name="metadataJsonPath" select="'metadata.json'"/>
     <xsl:variable name="metadataJson" select="fn:json-doc($metadataJsonPath)"/>
 
     <!-- ===================================================================== -->
     <!-- 2. Namespaces & URI construction                                      -->
     <!-- ===================================================================== -->
-    <!--    set default namespace interpretation for lexical Qnames that are not prefix:localSegment or :localSegment. If this
-    is set to true localSegment will transform to :localSegment-->
+    <!-- If true, a bare localSegment (no prefix) is interpreted as :localSegment
+         (i.e. in the default/empty-prefix namespace). -->
     <xsl:variable name="defaultNamespaceInterpretation" select="fn:true()"/>
-
-    <!-- Ontology base URI, configure as necessary. Do not use a trailing local delimiter
-        like in the namespace definition-->
-    <!--<xsl:variable name="base-uri" select="'http://publications.europa.eu/ontology/ePO'"/>-->
-    <xsl:variable name="base-ontology-uri" select="'http://data.europa.eu/a4g/ontology'"/>
-    <xsl:variable name="base-shape-uri" select="'http://data.europa.eu/a4g/data-shape'"/>
+    <!-- Base URIs of YOUR ontology. No trailing delimiter (the delimiter below is added). -->
+    <xsl:variable name="base-ontology-uri" select="'http://example.org/ontology'"/>
+    <xsl:variable name="base-shape-uri" select="'http://example.org/data-shape'"/>
     <xsl:variable name="base-restriction-uri" select="$base-ontology-uri"/>
-
-    <!-- when a delimiter is missing in the base URI of a namespace, use this default value-->
+    <!-- Delimiter appended to a base URI when it has none (e.g. '#' or '/'). -->
     <xsl:variable name="defaultDelimiter" select="'#'"/>
-
-    <!-- suffix for URIs of sh:NodeShape instances in the SHACL artefact -->
+    <!-- Suffix for sh:NodeShape URIs in the SHACL artefact. -->
     <xsl:variable name="nodeShapeURIsuffix" select="'Shape'"/>
-
     <!-- Short id of this module; also used in the artefact URIs (…#<moduleReference>). -->
     <xsl:variable name="moduleReference" select="'core'"/>
-
-    <!--    Shapes Module URI-->
     <xsl:variable name="shapeArtefactURI"
         select="fn:concat($base-shape-uri,$defaultDelimiter, $moduleReference, '-shape')"/>
-    <!--    Restrictions Module URI-->
     <xsl:variable name="restrictionsArtefactURI"
         select="fn:concat($base-restriction-uri, $defaultDelimiter, $moduleReference, '-restriction')"/>
-    <!--    Core Module URI-->
     <xsl:variable name="coreArtefactURI"
         select="fn:concat($base-ontology-uri, $defaultDelimiter, $moduleReference)"/>
 
     <!-- ===================================================================== -->
     <!-- 3. Scope / reused-concepts filtering                                  -->
     <!-- ===================================================================== -->
-    <!--    Generate reused classes, attributes and connectors. Concepts with these prefixes will be included in the generated artefacts. -->
-    <xsl:variable name="includedPrefixesList" select="('epo', 'epo-acc', 'epo-cat', 'epo-con', 'epo-ful', 'epo-inv', 'epo-not', 'epo-ord', 'epo-sub', 'epo-eva', 'epo-awa', 'epo-req', 'epo-qua', 'epo-pay')"/>
-    <!-- This set of variables controls the generation of reused concepts within artifacts. -->
+    <!-- The namespace prefix(es) of YOUR ontology's own concepts. Concepts with
+         these prefixes are treated as "main" and generated; others are reused
+         concepts. Use '' (empty string) if your model's class names carry no prefix. -->
+    <xsl:variable name="includedPrefixesList" select="('myprefix')"/>
+    <!-- Whether reused (out-of-scope-prefix) concepts are still emitted, per artefact. -->
     <xsl:variable name="generateReusedConceptsSHACL" select="fn:true()"/>
     <xsl:variable name="generateReusedConceptsOWLcore" select="fn:true()"/>
     <xsl:variable name="generateReusedConceptsOWLrestrictions" select="fn:true()"/>
@@ -82,11 +72,12 @@
     <!-- ===================================================================== -->
     <!-- 4. Attribute -> property typing                                       -->
     <!-- ===================================================================== -->
-    <!-- types of elements and names for attribute types that are acceptable to produce object properties -->
+    <!-- Attribute types that still yield an object property. Add your project's
+         identifier datatype(s), e.g. ('myprefix:Identifier', 'rdfs:Literal'). -->
     <xsl:variable name="acceptableTypesForObjectProperties"
-        select="('epo:Identifier', 'rdfs:Literal')"/>
-    <!--    the type of attributes which takes values from a controlled list-->
-    <xsl:variable name="controlledListType" select="'epo:Code'"/>
+        select="('rdfs:Literal')"/>
+    <!-- The attribute type whose values come from a controlled list / code list. -->
+    <xsl:variable name="controlledListType" select="'myprefix:Code'"/>
 
     <!-- ===================================================================== -->
     <!-- 5. Accepted UML stereotypes (per element kind)                        -->
@@ -106,88 +97,64 @@
     <!-- ===================================================================== -->
     <!-- 6. Enumerations -> SKOS                                                -->
     <!-- ===================================================================== -->
-    <!--    This variable controls whether the enumeration items are transformed into skos concepts or ignored-->
+    <!-- Transform enumeration items into skos:Concept / skos:ConceptScheme? -->
     <xsl:variable name="enableGenerationOfSkosConcept" select="fn:false()"/>
-    <!--    This variable controls whether the enumerations are transformed into skos schemes or ignored-->
     <xsl:variable name="enableGenerationOfConceptSchemes" select="fn:false()"/>
-    <!--    Property used for constraint level for enumerations-->
-    <xsl:variable name="cvConstraintLevelProperty" select="'epo:constraintLevel'"/>
+    <!-- Tag carrying the constraint level for enumerations. -->
+    <xsl:variable name="cvConstraintLevelProperty" select="'myprefix:constraintLevel'"/>
 
     <!-- ===================================================================== -->
     <!-- 7. Tags, comments, references, status & rdfs:isDefinedBy              -->
     <!-- ===================================================================== -->
     <!-- 7a. Comments / notes -->
-    <!--    This set of variables controls generation of comments and how they will generate in the output -->
     <xsl:variable name="commentsGeneration" select="fn:true()"/>
     <xsl:variable name="commentProperty" select="'skos:editorialNote'"/>
-    <!-- Tag name/key that is used to describe a usage note of a class or property-->
     <xsl:variable name="usageNoteTagName" select="'skos:note'"/>
-    <!-- Tag name/key that is used as custom label for terms in the ReSpec documentation-->
     <xsl:variable name="customTermLabelTagName" select="'skos:prefLabel'"/>
 
     <!-- 7b. Tag keys & reference labels -->
-    <!-- Tag name/key that is used to indicate if a property is mandatory or
-         optional. If the tag is missing then cardinality will be used to
-         determine if a property is mandatory or optional-->
+    <!-- Tag indicating whether a property is mandatory/optional (else cardinality is used). -->
     <xsl:variable name="mandatoryStatusTagName" select="'cfg:usage'"/>
-    <!-- Tag name/key that is used to provide reference links/reuse information for a class or property-->
+    <!-- Tag providing reference/reuse links for a class or property. -->
     <xsl:variable name="referenceTagName" select="'dcterms:references'"/>
-    <!-- Label that will be used in the ReSpec docs to describe values of `referenceTagName` for properties -->
+    <!-- ReSpec labels for the reference/reuse information. -->
     <xsl:variable name="propertyReferenceRespecLabel" select="'Reuse'"/>
-    <!-- Label that will be used in the ReSpec docs to describe values of `referenceTagName` for classes -->
     <xsl:variable name="classReferenceRespecLabel" select="'Reference'"/>
-    <!-- A flag to control whether references/reuse information is shown in the ReSpec docs -->
     <xsl:variable name="showReferencesInRespec" select="fn:true()"/>
-    <!--    Tag names/keys that are excluded from output -->
+    <!-- Tag names excluded from the output. -->
     <xsl:variable name="excludedTagNamesList" select="($statusProperty, $cvConstraintLevelProperty)"/>
 
     <!-- 7c. Status filtering -->
-    <!-- Variables for status filtering:
-     - The property used to indicate the status
-     - A list of valid statuses
-     - A list of statuses to be excluded from the output
-     - The default status value interpretation for elements without a status set -->
-    <xsl:variable name="statusProperty" select="'epo:status'"/>
+    <xsl:variable name="statusProperty" select="'myprefix:status'"/>
     <xsl:variable name="validStatusesList" select="('proposed', 'approved', 'implemented')"/>
     <xsl:variable name="excludedElementStatusesList" select="('proposed', 'approved')"/>
     <xsl:variable name="unspecifiedStatusInterpretation" select="'implemented'"/>
 
     <!-- 7d. rdfs:isDefinedBy annotation -->
-    <!--    If true, this will annotate all OWL concepts defined in the current ontology
-    with the name of the core ontology using rdfs:isDefinedBy.-->
+    <!-- Annotate every concept defined in this ontology with rdfs:isDefinedBy
+         pointing at the ontology IRI. One flag for the OWL artefacts, one for SHACL.
+         Set to fn:false() to suppress (see transformation rules T.08 / T.09). -->
     <xsl:variable name="annotateDefinedConceptsWithOntology" select="fn:true()"/>
-    <!-- If true, this option will annotate all SHACL concepts in the shapes
-    artefact with the ontology IRI defined therein, using rdfs:isDefinedBy. -->
     <xsl:variable name="annotateShaclConceptsWithOntology" select="fn:true()"/>
 
     <!-- ===================================================================== -->
     <!-- 8. Output toggles & misc                                              -->
     <!-- ===================================================================== -->
-    <!-- This variable control if Object and Realisation are generated -->
+    <!-- Generate UML Objects and Realisation connectors. -->
     <xsl:variable name="generateObjectsAndRealisations" select="fn:false()"/>
-
-    <!-- If enabled then any occurence of rdf:PlainLiteral datatype will be
-    replaced in a SHACL shape. A list of the two string datatypes will be used
-    instead: (xsd:string, rdf:langString).
-    -->
+    <!-- Replace rdf:PlainLiteral in SHACL shapes with (xsd:string, rdf:langString). -->
     <xsl:variable name="translatePlainLiteralToStringTypesInSHACL" select="fn:true()"/>
-
-    <!--Allowed characters for a normalized string-->
+    <!-- Allowed characters for a normalized string. -->
     <xsl:variable name="allowedStrings" select="'^[\w\d-_:]+$'"/>
-
-    <!-- URIs list of UML versions supported by model2owl -->
+    <!-- UML versions (XMI namespace URIs) accepted by model2owl. -->
     <xsl:variable name="supportedUmlVersions"
         select="('http://www.omg.org/spec/UML/20131001',
             'https://www.omg.org/spec/UML/20131001',
             'http://www.omg.org/spec/UML/20161101',
             'https://www.omg.org/spec/UML/20161101'
         )"/>
-
-    <!-- Date used for dct:issued property in the RDF artefacts and ReSpec
-    documentation. Defaults to the currrent date.
-    A fixed date can be set as follows:
-    select="xs:date('2024-01-01')"
-    -->
+    <!-- Date for dct:issued. Defaults to the current date; for a fixed date use
+         select="xs:date('2024-01-01')". -->
     <xsl:variable name="issuedDate" select="format-date(current-date(),'[Y0001]-[M01]-[D01]')"/>
 
 </xsl:stylesheet>

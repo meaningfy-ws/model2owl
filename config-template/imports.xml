@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<imports xmlns="http://publications.europa.eu/ns/">
+    <!-- owl:imports added to the generated artefacts. List the external ontologies
+         your model reuses. Leave a section empty to import nothing there.
+         Example (uncomment and adapt):
+           <import uri="http://purl.org/dc/terms/"/>
+           <import uri="http://www.w3.org/2004/02/skos/core#"/>
+    -->
+    <!-- affects all three artefacts -->
+    <all></all>
+    <!-- affects core artefact -->
+    <core></core>
+    <!-- affects restrictions artefact -->
+    <restrictions></restrictions>
+    <!-- affects SHACL artefact -->
+    <shacl></shacl>
+</imports>
