@@ -407,6 +407,21 @@
     </xsl:function>
 
     <xd:doc>
+        <xd:desc>Returns true when either end of the connector is a ProxyConnector
+            (i.e. an n-ary association spine). Such connectors do not encode a binary
+            relation and must be skipped before calling f:isRelationValid.</xd:desc>
+        <xd:param name="connector">The UML connector element to test.</xd:param>
+    </xd:doc>
+    <xsl:function name="f:connectorHasProxyConnectorEnd" as="xs:boolean">
+        <xsl:param name="connector" as="element()"/>
+        <xsl:sequence
+            select="
+                $connector/source/model/@type = 'ProxyConnector'
+                or $connector/target/model/@type = 'ProxyConnector'"
+        />
+    </xsl:function>
+
+    <xd:doc>
         <xd:desc>
             Checks if a relation encoded in a connector source and target nodes
             is valid. It expects source name and target role name to be defined.
@@ -496,6 +511,11 @@
         <xsl:param name="connector"/>
         <xsl:variable name="source" select="$connector/source"/>
         <xsl:variable name="target" select="$connector/target"/>
+        <!-- Skip n-ary association spine connectors: their ends are ProxyConnectors
+             with no class name / role name, so they do not encode a binary relation.
+             Returning an empty sequence here protects every caller from the fatal
+             f:isRelationValid error these connectors raise. -->
+        <xsl:if test="not(f:connectorHasProxyConnectorEnd($connector))">
         <xsl:variable name="connectorIdRef" select="$connector/@xmi:idref"/>
         <xsl:variable name="connectorType" select="$connector/properties/@ea_type"/>
         <xsl:variable name="connectorDocs" select="$connector/documentation/@value"/>
@@ -530,6 +550,7 @@
                 </xsl:if>
             </xsl:if>
         </xsl:sequence>
+        </xsl:if>
     </xsl:function>
 
     <xd:doc>
