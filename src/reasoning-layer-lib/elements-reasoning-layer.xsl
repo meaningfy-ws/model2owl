@@ -269,26 +269,24 @@
                         </rdfs:subClassOf>
                     </xsl:when>
                     <xsl:otherwise>
-                        <owl:Class>
-                            <rdfs:subClassOf>
-                                <owl:Restriction>
-                                    <owl:onProperty rdf:resource="{$attributeURI}"/>
-                                    <owl:onDataRange rdf:resource="{$attrTypeURI}"/>
-                                    <owl:minQualifiedCardinality rdf:datatype="{$cardValueDatatypeURI}">
-                                        <xsl:value-of select="$attributeMultiplicityMin"/>
-                                    </owl:minQualifiedCardinality>
-                                </owl:Restriction>
-                            </rdfs:subClassOf>
-                            <rdfs:subClassOf>
-                                <owl:Restriction>
-                                    <owl:onProperty rdf:resource="{$attributeURI}"/>
-                                    <owl:onDataRange rdf:resource="{$attrTypeURI}"/>
-                                    <owl:maxQualifiedCardinality rdf:datatype="{$cardValueDatatypeURI}">
-                                        <xsl:value-of select="$attributeMultiplicityMax"/>
-                                    </owl:maxQualifiedCardinality>
-                                </owl:Restriction>
-                            </rdfs:subClassOf>
-                        </owl:Class>
+                        <rdfs:subClassOf>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="{$attributeURI}"/>
+                                <owl:onDataRange rdf:resource="{$attrTypeURI}"/>
+                                <owl:minQualifiedCardinality rdf:datatype="{$cardValueDatatypeURI}">
+                                    <xsl:value-of select="$attributeMultiplicityMin"/>
+                                </owl:minQualifiedCardinality>
+                            </owl:Restriction>
+                        </rdfs:subClassOf>
+                        <rdfs:subClassOf>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="{$attributeURI}"/>
+                                <owl:onDataRange rdf:resource="{$attrTypeURI}"/>
+                                <owl:maxQualifiedCardinality rdf:datatype="{$cardValueDatatypeURI}">
+                                    <xsl:value-of select="$attributeMultiplicityMax"/>
+                                </owl:maxQualifiedCardinality>
+                            </owl:Restriction>
+                        </rdfs:subClassOf>
                     </xsl:otherwise>
                 </xsl:choose>
             </rdf:Description>
