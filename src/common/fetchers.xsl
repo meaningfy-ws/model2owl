@@ -403,14 +403,7 @@
     <xsl:function name="f:isConnectorBidirectional" as="xs:boolean">
         <xsl:param name="connector"/>
         <xsl:variable name="connectorDirection" select="$connector/properties/@direction"/>
-        <xsl:value-of select="
-            if($connectorDirection = 'Bi-Directional') then
-                true()
-            else if ($connectorDirection = 'Source -&gt; Destination') then
-                    false()
-                else
-                    fn:error(xs:QName('is-bidirectional'), concat($connector/@xmi:idref, ' - connector direction is invalid'))
-        "/>
+        <xsl:value-of select="$connectorDirection = 'Bi-Directional'"/>
     </xsl:function>
 
     <xd:doc>
