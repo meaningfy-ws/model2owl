@@ -9,6 +9,93 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 
 
+## [3.3.0-beta] - 2026-06-30
+### Added
+- OWL-API flavour RDF/XML serialization: the OWL core, OWL restrictions and SHACL
+  transformations additionally produce a ROBOT-normalized `.owl` file (OWL-API
+  exchange syntax) suitable for loading in tools such as Protégé. A ROBOT catalog
+  is generated automatically to resolve `owl:imports` declarations.
+- New optional consolidated OWL-full artefact (`make owl-full`), producing a
+  single normalized RDF/XML file that merges the OWL core and OWL restrictions
+  outputs. Controlled by the new `generateOWLFull` and `fullArtefactURI`
+  configuration parameters.
+- Generation of `owl:disjointWith` axioms from UML generalization sets annotated
+  with the `{disjoint}` modifier in the OWL-restrictions artefact.
+- Convention-report checkers that identify unsupported UML constructs: n-ary
+  associations, class modifiers other than `{abstract}`, association classes,
+  and qualified associations.
+- `Character` UML primitive type mapped to `xsd:string` in the datatype catalog.
+- Datatype union range (`owl:unionOf`) generated for data properties whose reused
+  range contains mixed datatypes.
+- Warning emitted when no class qualifies as a main entity during ReSpec
+  generation.
+- Unified `METADATA_JSON_PATH` Make parameter to override the metadata file for
+  all transformations with a single variable.
+- Config-parameters template with named sections to guide project configuration.
+- Configurable output-file suffix parameters in `config-parameters.xsl`, allowing
+  artefact filenames to be decoupled from the ePO-specific core/restrictions
+  naming convention; Make recipes updated to support relative paths and output
+  subdirectories.
+- New artefact naming: the primary transformation targets (`owl-core`,
+  `owl-restrictions`, `shacl`) now write output with a `.owl` extension. A new
+  `convert-ontology-rdfxml-to-turtle` recipe converts those `.owl` outputs to
+  Turtle on demand, writing the result as `<name>-ttl.owl`.
+
+### Changed
+- **[BREAKING]** `RESPEC_METADATA_JSON_PATH` is replaced by `METADATA_JSON_PATH`.
+  Projects and CI workflows passing `RESPEC_METADATA_JSON_PATH=...` must rename
+  the variable to `METADATA_JSON_PATH=...`.
+- Association classes and qualified associations are now consistently ignored
+  across all generated artefacts (OWL, SHACL, glossary, ReSpec).
+- N-ary association connectors are now consistently ignored across all generated
+  artefacts, including the convention report, glossary, and ReSpec.
+- Aggregation connectors are excluded from the glossary and convention-report
+  nomenclature.
+- `{disjoint}` generalization-set modifiers are no longer flagged as unsupported
+  constructs; they now produce `owl:disjointWith` axioms.
+- Unsupported UML element and connector warnings are now less emphatic in tone
+  and link to the new unsupported-constructs documentation page.
+- All metadata fields in `metadata.json` are treated as optional except
+  `versionInfo`. Blank values are treated as absent and omitted from output.
+- Single-domain connector restrictions now use `rdfs:domain` instead of a
+  qualified restriction axiom.
+- The `config-parameters.xsl` file is reorganised into named sections for
+  easier navigation and maintenance.
+- `http` scheme used for the m8g import URI in the default configuration
+  (alignment with upstream).
+
+### Removed
+- Convention checker for cardinality restrictions on reused properties (the
+  corresponding transformation rule was abandoned).
+- Convention checker for differing datatypes on a reused attribute
+  (`class-attributes-reuse-data-types-3`) — differing datatypes on reuse are now
+  supported via datatype-union ranges.
+- Redundant import URIs for `cccev` and `cv` namespaces in the default
+  configuration (alignment with upstream).
+
+### Fixed
+- Association-generalisation checker returning a multi-value sequence instead of
+  a single boolean, causing an FORG0006 error; the checker is re-enabled.
+- Bounded attribute cardinality restrictions generating malformed RDF/XML.
+- Class single-child convention incorrectly applied to connector-based
+  generalisations.
+- Three convention-report false positives.
+- Missing class-generalisation finding incorrectly tagged under checker `-8`
+  instead of `-9`.
+- Date and time tag values not validated against their respective XSD datatypes.
+- UML primitive attribute types not recognised as datatype-property ranges.
+- Non-bidirectional connector directions raising a transformation error instead
+  of being treated as non-bidirectional.
+- N-ary ProxyConnector spine connectors included in relation extraction,
+  producing spurious relations.
+- `f:generalisationMissingOrIncorrect` returning a non-deterministic sequence
+  instead of a single boolean.
+- Broken link to the conventions documentation in the convention-report
+  introduction.
+- CI gate updated to fail on XSpec assertion failures (Maven previously returned
+  exit code 0 even when XSpec assertions failed).
+
+
 ## [3.2.0-rc.2] - 2026-02-03
 ### Added
 - Test suite demonstrating RDF diff cases (TEDM2O-12).
